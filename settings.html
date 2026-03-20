@@ -85,7 +85,7 @@ body::after{
 [data-mode="light"] .topbar{background:rgba(250,247,242,.9)}
 
 .topbar-inner{
-  max-width:900px;margin:0 auto;padding:0 24px;
+  max-width:1100px;margin:0 auto;padding:0 32px;
   width:100%;display:flex;align-items:center;gap:14px;
 }
 
@@ -138,58 +138,7 @@ body::after{
 [data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
 [data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
 
-/* ═══════════════════════════════════════
-   HERO STRIP
-═══════════════════════════════════════ */
-.settings-hero{
-  max-width:900px;margin:0 auto;
-  padding:80px 24px 0;
-  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
-}
 
-.hero-text{}
-.hero-eyebrow{
-  font-family:var(--mono);font-size:11px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--amber);
-  margin-bottom:10px;
-  display:flex;align-items:center;gap:8px;
-}
-.hero-eyebrow::before{content:'';display:block;width:22px;height:1px;background:var(--amber);opacity:.6}
-.hero-heading{
-  font-family:var(--serif);font-size:clamp(36px,5vw,56px);
-  line-height:1.05;letter-spacing:-.02em;color:var(--tx);
-  animation:hero-in .6s var(--spring) both;
-}
-.hero-heading em{font-style:italic;color:var(--amber)}
-@keyframes hero-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.hero-sub{
-  font-size:14px;color:var(--tx3);margin-top:10px;
-  max-width:360px;line-height:1.7;
-  animation:hero-in .6s var(--spring) .1s both;
-}
-
-.hero-avatar-wrap{
-  flex-shrink:0;
-  position:relative;
-  animation:hero-in .6s var(--spring) .15s both;
-}
-.hero-avatar{
-  width:80px;height:80px;border-radius:50%;object-fit:cover;
-  border:3px solid var(--bdr2);
-  box-shadow:var(--sh2);
-  transition:all .2s;
-}
-.hero-avatar:hover{transform:scale(1.04)}
-.hero-avatar-edit{
-  position:absolute;bottom:0;right:0;
-  width:24px;height:24px;border-radius:50%;
-  background:linear-gradient(135deg,#92400e,#d97706);
-  display:flex;align-items:center;justify-content:center;
-  border:2px solid var(--bg);cursor:pointer;
-  transition:transform .2s var(--spring);
-}
-.hero-avatar-edit:hover{transform:scale(1.15)}
-.hero-avatar-edit svg{width:11px;height:11px;color:#fff}
 
 /* ═══════════════════════════════════════
    HERO STRIP — redesigned
@@ -903,7 +852,6 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 @keyframes spin{to{transform:rotate(360deg)}}
   .row-2{grid-template-columns:1fr}
   .theme-grid{flex-direction:column}
-  .settings-hero{flex-direction:column;gap:12px}
   .topbar-inner,.settings-hero,.tab-nav-wrap,.settings-body{padding-left:16px;padding-right:16px}
   .tab-btn{padding:7px 13px;font-size:12px}
 }
