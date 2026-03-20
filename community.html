@@ -300,26 +300,128 @@ header{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display:flex;
 /* ── PROFILE HOVER CARD ── */
 .profile-hcard{
   position:fixed;z-index:600;
-  width:260px;
-  background:var(--sur);border:1px solid var(--bdr2);
-  border-radius:var(--r3);box-shadow:var(--sh2);
+  width:280px;
+  background:var(--sur);
+  border:1px solid var(--bdr2);
+  border-radius:24px;
+  box-shadow:var(--sh2), 0 0 0 1px rgba(139,92,246,.08), 0 0 60px rgba(124,58,237,.18);
   overflow:hidden;pointer-events:none;
-  opacity:0;transform:scale(.94) translateY(6px);
-  transition:all .22s var(--spring);
+  opacity:0;transform:scale(.9) translateY(10px);
+  transition:opacity .25s var(--spring), transform .3s var(--spring);
 }
-.profile-hcard.show{opacity:1;transform:none;pointer-events:auto}
-.phc-banner{height:60px;background:var(--grad);position:relative}
-.phc-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent 60%)}
-.phc-av{width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid var(--sur);position:absolute;bottom:-26px;left:16px}
-.phc-body{padding:32px 16px 16px}
-.phc-name{font-size:15px;font-weight:800;color:var(--tx);margin-bottom:2px}
-.phc-sub{font-size:12px;color:var(--tx4);font-family:var(--mono)}
-.phc-stats{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)}
-.phc-stat{text-align:center}
-.phc-stat-n{font-size:16px;font-weight:800;color:var(--tx);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.phc-stat-l{font-size:10px;color:var(--tx4);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
-.phc-online{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--emerald);margin-top:8px;font-family:var(--mono)}
-.phc-online span{width:6px;height:6px;border-radius:50%;background:var(--emerald)}
+.profile-hcard.show{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
+
+/* Animated gradient banner */
+.phc-banner{
+  height:80px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#7c3aed 0%,#a855f7 40%,#ec4899 70%,#f59e0b 100%);
+  background-size:300% 300%;
+  animation:phc-grad 6s ease infinite;
+}
+@keyframes phc-grad{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+/* Sheen sweep */
+.phc-banner::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);
+  animation:phc-sheen 3s ease-in-out infinite;
+}
+@keyframes phc-sheen{
+  0%{transform:translateX(-100%)}
+  60%,100%{transform:translateX(160%)}
+}
+/* Grid pattern overlay */
+.phc-banner::after{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
+  background-size:18px 18px;
+}
+
+/* Avatar ring */
+.phc-av-wrap{
+  position:absolute;bottom:-24px;left:18px;
+  width:52px;height:52px;
+  border-radius:50%;
+  padding:3px;
+  background:var(--grad);
+  box-shadow:0 0 0 3px var(--sur), 0 4px 16px rgba(0,0,0,.4);
+  animation:phc-av-in .35s var(--spring) both;
+}
+@keyframes phc-av-in{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.phc-av{
+  width:100%;height:100%;border-radius:50%;
+  object-fit:cover;display:block;
+}
+
+/* Online badge on avatar */
+.phc-av-status{
+  position:absolute;bottom:2px;right:2px;
+  width:11px;height:11px;border-radius:50%;
+  background:var(--emerald);
+  border:2px solid var(--sur);
+  display:none;
+}
+.phc-av-status.visible{display:block;animation:badge-pop .3s var(--spring)}
+
+.phc-body{padding:32px 18px 18px}
+
+/* Name + role row */
+.phc-name-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.phc-name{font-size:16px;font-weight:800;color:var(--tx);letter-spacing:-.03em;line-height:1}
+.phc-role-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;
+  background:rgba(124,58,237,.15);color:var(--p3);
+  border:1px solid rgba(124,58,237,.25);
+}
+.phc-role-badge.admin{background:rgba(245,158,11,.12);color:var(--amber);border-color:rgba(245,158,11,.25)}
+
+.phc-sub{font-size:11px;color:var(--tx4);font-family:var(--mono);margin-bottom:10px}
+
+/* Online pill */
+.phc-online{
+  display:none;align-items:center;gap:5px;
+  font-size:11px;color:var(--emerald);
+  font-family:var(--mono);font-weight:500;
+  background:rgba(16,185,129,.08);
+  border:1px solid rgba(16,185,129,.2);
+  border-radius:99px;padding:3px 10px;
+  width:fit-content;margin-bottom:14px;
+}
+.phc-online.visible{display:flex}
+.phc-online-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:cdot 2s infinite}
+
+/* Divider */
+.phc-divider{height:1px;background:var(--bdr);margin-bottom:14px}
+
+/* Stats row */
+.phc-stats{display:flex;gap:0}
+.phc-stat{
+  flex:1;text-align:center;
+  padding:10px 8px;
+  border-radius:12px;
+  transition:background .18s;
+  cursor:default;
+}
+.phc-stat:hover{background:var(--sur2)}
+.phc-stat-n{
+  font-size:18px;font-weight:800;line-height:1;
+  background:var(--grad);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:3px;
+}
+.phc-stat-l{font-size:9px;color:var(--tx4);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em}
+.phc-stat-sep{width:1px;background:var(--bdr);align-self:stretch;margin:8px 0}
+
+/* XP progress bar */
+.phc-xp-bar-wrap{margin-top:14px}
+.phc-xp-label{display:flex;justify-content:space-between;font-size:10px;color:var(--tx4);font-family:var(--mono);margin-bottom:5px}
+.phc-xp-track{height:4px;background:var(--sur3);border-radius:99px;overflow:hidden}
+.phc-xp-fill{height:100%;border-radius:99px;background:var(--grad);width:0%;transition:width .6s var(--spring)}
 
 /* ── POSTS ── */
 .posts-grid{display:grid;grid-template-columns:1fr 290px;gap:18px}
@@ -454,14 +556,44 @@ footer .fg{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill
 <!-- Profile hover card (global) -->
 <div class="profile-hcard" id="profileHCard">
   <div class="phc-banner"></div>
-  <img class="phc-av" id="phcAv" src="" alt=""/>
+  <div class="phc-av-wrap">
+    <img class="phc-av" id="phcAv" src="" alt=""/>
+    <div class="phc-av-status" id="phcAvStatus"></div>
+  </div>
   <div class="phc-body">
-    <div class="phc-name" id="phcName">—</div>
+    <div class="phc-name-row">
+      <div class="phc-name" id="phcName">—</div>
+      <span class="phc-role-badge" id="phcRoleBadge">Member</span>
+    </div>
     <div class="phc-sub" id="phcSub">Community Member</div>
-    <div class="phc-online" id="phcOnline"><span></span>Online now</div>
+    <div class="phc-online" id="phcOnline">
+      <span class="phc-online-dot"></span>Online now
+    </div>
+    <div class="phc-divider"></div>
     <div class="phc-stats">
-      <div class="phc-stat"><div class="phc-stat-n" id="phcXP">—</div><div class="phc-stat-l">XP</div></div>
-      <div class="phc-stat"><div class="phc-stat-n" id="phcPosts">—</div><div class="phc-stat-l">Posts</div></div>
+      <div class="phc-stat">
+        <div class="phc-stat-n" id="phcXP">—</div>
+        <div class="phc-stat-l">XP</div>
+      </div>
+      <div class="phc-stat-sep"></div>
+      <div class="phc-stat">
+        <div class="phc-stat-n" id="phcPosts">—</div>
+        <div class="phc-stat-l">Posts</div>
+      </div>
+      <div class="phc-stat-sep"></div>
+      <div class="phc-stat">
+        <div class="phc-stat-n" id="phcReactions">—</div>
+        <div class="phc-stat-l">Reactions</div>
+      </div>
+    </div>
+    <div class="phc-xp-bar-wrap">
+      <div class="phc-xp-label">
+        <span>Level Progress</span>
+        <span id="phcXPLabel">0 / 500 XP</span>
+      </div>
+      <div class="phc-xp-track">
+        <div class="phc-xp-fill" id="phcXPFill"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -873,23 +1005,48 @@ renderNotifs();
 
 // ── PROFILE HOVER CARD ──
 let phcHideTimeout=null;
+const phcAvStatus=$('phcAvStatus'),phcRoleBadge=$('phcRoleBadge'),phcReactions=$('phcReactions'),phcXPFill=$('phcXPFill'),phcXPLabel=$('phcXPLabel');
+
 function showProfileCard(uid,name,photo,anchorEl){
   clearTimeout(phcHideTimeout);
-  phcAv.src=photo||DA;phcName.textContent=name||'User';
+  phcAv.src=photo||DA;
+  phcName.textContent=name||'User';
+  phcSub.textContent='Community Member';
+  phcRoleBadge.textContent='Member';
+  phcRoleBadge.className='phc-role-badge';
   const isOn=onlineUsers.some(u=>u.uid===uid);
-  phcOnline.style.display=isOn?'inline-flex':'none';
-  phcXP.textContent='—';phcPosts.textContent='—';
-  // fetch xp
-  if(uid){getDoc(doc(db,'users',uid)).then(s=>{if(s.exists()){const d=s.data();phcXP.textContent=d.xp||0;phcSub.textContent=d.role==='admin'?'Admin':'Member'}}).catch(()=>{})}
-  // position
+  if(isOn){phcOnline.classList.add('visible');phcAvStatus.classList.add('visible')}
+  else{phcOnline.classList.remove('visible');phcAvStatus.classList.remove('visible')}
+  phcXP.textContent='—';phcPosts.textContent='—';phcReactions.textContent='—';
+  phcXPFill.style.width='0%';phcXPLabel.textContent='0 / 500 XP';
+  if(uid){
+    getDoc(doc(db,'users',uid)).then(s=>{
+      if(s.exists()){
+        const d=s.data();
+        const xp=d.xp||0;
+        phcXP.textContent=xp;
+        phcSub.textContent=d.role==='admin'?'Admin · Books Coffee and Dreams':'Community Member';
+        if(d.role==='admin'){phcRoleBadge.textContent='Admin';phcRoleBadge.className='phc-role-badge admin'}
+        const lvlXP=xp%500,nextLvl=500,pct=Math.min(100,Math.round(lvlXP/nextLvl*100));
+        phcXPFill.style.width=pct+'%';
+        phcXPLabel.textContent=`${lvlXP} / ${nextLvl} XP`;
+      }
+    }).catch(()=>{});
+    // count posts
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({query:q2,collection:col2,where:w,getCountFromServer})=>{
+      getCountFromServer(q2(col2(db,'communityPosts'),w('uid','==',uid))).then(r=>phcPosts.textContent=r.data().count).catch(()=>{phcPosts.textContent='—'});
+    }).catch(()=>{});
+  }
+  // Position
   const rect=anchorEl.getBoundingClientRect();
-  let top=rect.bottom+8,left=rect.left;
-  if(left+260>window.innerWidth)left=window.innerWidth-270;
-  if(top+220>window.innerHeight)top=rect.top-228;
+  let top=rect.bottom+10,left=rect.left;
+  if(left+285>window.innerWidth)left=window.innerWidth-290;
+  if(top+320>window.innerHeight)top=rect.top-330;
+  if(top<10)top=10;
   profileHCard.style.top=top+'px';profileHCard.style.left=left+'px';
   profileHCard.classList.add('show');
 }
-function hideProfileCard(){phcHideTimeout=setTimeout(()=>profileHCard.classList.remove('show'),200)}
+function hideProfileCard(){phcHideTimeout=setTimeout(()=>profileHCard.classList.remove('show'),220)}
 profileHCard.addEventListener('mouseenter',()=>clearTimeout(phcHideTimeout));
 profileHCard.addEventListener('mouseleave',hideProfileCard);
 
