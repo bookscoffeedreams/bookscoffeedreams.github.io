@@ -636,16 +636,16 @@ header{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display:flex;
    LIVE REACTION POP ANIMATION
 ══════════════════════════════════ */
 @keyframes rxn-pop{
-  0%{transform:translateY(0) scale(.6);opacity:1}
-  40%{transform:translateY(-20px) scale(1.4);opacity:1}
-  100%{transform:translateY(-48px) scale(1);opacity:0}
+  0%{transform:translateY(0) scale(.5);opacity:1}
+  45%{transform:translateY(-22px) scale(1.5);opacity:1}
+  100%{transform:translateY(-50px) scale(.9);opacity:0}
 }
 .rxn-float{
-  position:absolute;
   pointer-events:none;
-  font-size:18px;
-  z-index:50;
-  animation:rxn-pop .7s var(--spring) forwards;
+  font-size:22px;
+  z-index:99999;
+  animation:rxn-pop .75s var(--spring) forwards;
+  line-height:1;
 }
 /* Reaction button pop on click */
 @keyframes rxn-btn-pop{
@@ -1165,7 +1165,16 @@ function spawnReactionFloat(emoji,anchorEl){
   const el=document.createElement('div');
   el.className='rxn-float';
   el.textContent=emoji;
-  el.style.cssText=`position:fixed;left:${rect.left+rect.width/2-12}px;top:${rect.top-10}px;z-index:9999;pointer-events:none;font-size:20px;`;
+  const x=rect.left+rect.width/2-11;
+  const y=rect.top-14;
+  el.style.position='fixed';
+  el.style.left=x+'px';
+  el.style.top=y+'px';
+  el.style.zIndex='99999';
+  el.style.pointerEvents='none';
+  el.style.fontSize='22px';
+  el.style.lineHeight='1';
+  el.style.animation='rxn-pop .75s cubic-bezier(.34,1.56,.64,1) forwards';
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),800);
 }
