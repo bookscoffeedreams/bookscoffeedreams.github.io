@@ -271,13 +271,16 @@ body::after{
    TAB NAVIGATION
 ═══════════════════════════════════════ */
 .tab-nav-wrap{
-  max-width:1100px;margin:0 auto;
-  padding:12px 36px 0;
+  max-width:100%;
   position:sticky;top:64px;z-index:50;
   background:var(--bg);
-  padding-bottom:4px;
+  border-bottom:1px solid var(--bdr);
+  padding:10px 0;
+  margin-bottom:4px;
 }
 .tab-nav-outer{
+  max-width:1100px;margin:0 auto;
+  padding:0 36px;
   position:relative;
 }
 .tab-nav{
@@ -340,12 +343,15 @@ body::after{
 ═══════════════════════════════════════ */
 .settings-body{
   max-width:1100px;margin:0 auto;
-  padding:20px 36px 100px;
+  padding:16px 36px 100px;
 }
 
 .panel{display:none;animation:panel-in .3s var(--spring) both}
 .panel.active{display:flex;flex-direction:column;gap:20px}
 @keyframes panel-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* Each panel scrolls into view below the sticky tab nav */
+.panel > .block{scroll-margin-top:120px}
 
 /* ═══════════════════════════════════════
    SECTION BLOCK
