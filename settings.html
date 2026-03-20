@@ -150,6 +150,11 @@ body::after{
   padding:82px 36px 0;
 }
 
+/* Remove extra space after hero */
+.settings-hero + .tab-nav-wrap{
+  margin-top:0;
+}
+
 .hero-card{
   background:var(--sur);border:1px solid var(--bdr);
   border-radius:20px;overflow:hidden;
@@ -267,7 +272,7 @@ body::after{
 ═══════════════════════════════════════ */
 .tab-nav-wrap{
   max-width:1100px;margin:0 auto;
-  padding:20px 36px 0;
+  padding:12px 36px 0;
   position:sticky;top:64px;z-index:50;
   background:var(--bg);
   padding-bottom:4px;
