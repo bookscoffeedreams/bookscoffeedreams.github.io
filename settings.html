@@ -855,7 +855,15 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
   .topbar-inner,.settings-hero,.tab-nav-wrap,.settings-body{padding-left:16px;padding-right:16px}
   .tab-btn{padding:7px 13px;font-size:12px}
 }
-@media(max-width:768px){
+/* ── SKELETON LOADING ── */
+.skeleton{
+  background:linear-gradient(90deg,var(--sur3) 25%,var(--sur4) 50%,var(--sur3) 75%);
+  background-size:200% 100%;
+  animation:skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius:6px;
+}
+@keyframes skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.hero-avatar[src=""]{background:linear-gradient(135deg,#92400e55,#d9770644);}
   .hero-card-inner{grid-template-columns:1fr}
   .hero-left{border-right:none;border-bottom:1px solid var(--bdr);padding:24px 20px}
   .hero-right{width:100%;padding:24px 20px}
@@ -918,7 +926,8 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
       <!-- Right: avatar + user info -->
       <div class="hero-right">
         <div class="hero-avatar-wrap">
-          <img id="heroAvatar" class="hero-avatar" src="" alt="avatar"/>
+          <img id="heroAvatar" class="hero-avatar" src="" alt="avatar"
+            style="background:linear-gradient(135deg,#92400e,#d97706);"/>
           <label class="hero-avatar-edit" for="avatarFile">
             <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </label>
@@ -1617,21 +1626,42 @@ let CUR=null,pendingFile=null;
 auth.onAuthStateChanged(async u=>{
   if(!u)return location.href='login.html';
   CUR=u;
+
+  // Set a generated avatar as immediate fallback (never broken)
+  const initials=encodeURIComponent((u.displayName||u.email||'U').slice(0,2).toUpperCase());
+  const generatedAv=`https://ui-avatars.com/api/?name=${initials}&background=92400e&color=fbbf24&size=200&bold=true&font-size=0.45`;
+  const photo=u.photoURL||generatedAv;
+
+  // Hero avatar
+  const heroAv=document.getElementById('heroAvatar');
+  heroAv.src=photo;
+  heroAv.onerror=()=>heroAv.src=generatedAv;
+
+  // Preview avatar
+  const prevAv=document.getElementById('previewAvatar');
+  prevAv.src=photo;
+  prevAv.onerror=()=>prevAv.src=generatedAv;
+
   document.getElementById('displayName').value=u.displayName||'';
   document.getElementById('emailField').value=u.email||'';
-  document.getElementById('heroAvatar').src=u.photoURL||DP;
   document.getElementById('heroName').textContent=u.displayName||u.email||'User';
   document.getElementById('heroEmail').textContent=u.email||'';
-  // sync preview avatar immediately
-  document.getElementById('previewAvatar').src=u.photoURL||DP;
   document.getElementById('previewName').textContent=u.displayName||u.email||'User';
   document.getElementById('previewEmail').textContent=u.email||'';
+
   // load banner
   await loadBanner(u.uid);
   try{
     const s=await db.collection('users').doc(u.uid).get();
     if(s.exists){
       const d=s.data();
+
+      // Use Firestore photoURL as better fallback
+      if(d.photoURL&&!u.photoURL){
+        heroAv.src=d.photoURL;
+        prevAv.src=d.photoURL;
+      }
+
       document.getElementById('bioField').value=d.bio||'';
       document.getElementById('locationField').value=d.location||'';
       document.getElementById('websiteField').value=d.website||'';
@@ -1650,7 +1680,6 @@ auth.onAuthStateChanged(async u=>{
       const a=d.appearance||{};
       if(a.fontSize)document.getElementById('fontSizeSelect').value=a.fontSize;
       if(a.language)document.getElementById('languageSelect').value=a.language;
-      // sync preview with loaded data
       syncPreview();
     }
   }catch(e){console.warn(e)}
