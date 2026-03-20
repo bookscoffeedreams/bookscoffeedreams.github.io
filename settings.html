@@ -68,7 +68,7 @@ body::after{
 }
 @keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(8vw,6vh)}}
 
-.page{position:relative;z-index:1}
+.page{display:block}
 
 /* ═══════════════════════════════════════
    TOPBAR
@@ -151,15 +151,11 @@ body::after{
 }
 
 /* Remove extra space after hero */
-.settings-hero + .tab-nav-wrap{
-  margin-top:0;
-}
 
 .hero-card{
   background:var(--sur);border:1px solid var(--bdr);
   border-radius:20px;overflow:hidden;
   box-shadow:var(--sh);
-  position:relative;
 }
 
 /* Amber top accent line */
@@ -271,16 +267,13 @@ body::after{
    TAB NAVIGATION
 ═══════════════════════════════════════ */
 .tab-nav-wrap{
-  max-width:100%;
   position:sticky;top:64px;z-index:50;
   background:var(--bg);
   border-bottom:1px solid var(--bdr);
-  padding:10px 0;
-  margin-bottom:4px;
 }
 .tab-nav-outer{
   max-width:1100px;margin:0 auto;
-  padding:0 36px;
+  padding:10px 36px;
   position:relative;
 }
 .tab-nav{
@@ -298,25 +291,24 @@ body::after{
 /* Scroll arrow buttons */
 .tab-scroll-btn{
   position:absolute;top:50%;transform:translateY(-50%);
-  width:28px;height:28px;border-radius:8px;
-  background:var(--sur);border:1px solid var(--bdr2);
+  width:26px;height:26px;border-radius:7px;
+  background:var(--sur2);border:1px solid var(--bdr2);
   color:var(--tx3);display:none;align-items:center;justify-content:center;
   cursor:pointer;z-index:2;transition:all .18s;
-  box-shadow:var(--sh);
 }
 .tab-scroll-btn:hover{color:var(--amber);border-color:var(--amber)}
-.tab-scroll-btn svg{width:13px;height:13px}
+.tab-scroll-btn svg{width:12px;height:12px}
 .tab-scroll-btn.visible{display:flex}
-.tab-scroll-left{left:-14px}
-.tab-scroll-right{right:-14px}
+.tab-scroll-left{left:36px}
+.tab-scroll-right{right:36px}
 
 /* Fade edges */
 .tab-nav-outer::before,.tab-nav-outer::after{
-  content:'';position:absolute;top:0;bottom:0;width:32px;
-  pointer-events:none;z-index:1;opacity:0;transition:opacity .2s;
+  content:'';position:absolute;top:10px;bottom:10px;width:40px;
+  pointer-events:none;z-index:1;opacity:0;transition:opacity .2s;border-radius:12px;
 }
-.tab-nav-outer::before{left:0;background:linear-gradient(90deg,var(--bg),transparent);border-radius:12px 0 0 12px}
-.tab-nav-outer::after{right:0;background:linear-gradient(270deg,var(--bg),transparent);border-radius:0 12px 12px 0}
+.tab-nav-outer::before{left:36px;background:linear-gradient(90deg,var(--sur),transparent)}
+.tab-nav-outer::after{right:36px;background:linear-gradient(270deg,var(--sur),transparent)}
 .tab-nav-outer.fade-left::before{opacity:1}
 .tab-nav-outer.fade-right::after{opacity:1}
 
@@ -343,15 +335,12 @@ body::after{
 ═══════════════════════════════════════ */
 .settings-body{
   max-width:1100px;margin:0 auto;
-  padding:16px 36px 100px;
+  padding:20px 36px 100px;
 }
 
 .panel{display:none;animation:panel-in .3s var(--spring) both}
 .panel.active{display:flex;flex-direction:column;gap:20px}
 @keyframes panel-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-/* Each panel scrolls into view below the sticky tab nav */
-.panel > .block{scroll-margin-top:120px}
 
 /* ═══════════════════════════════════════
    SECTION BLOCK
@@ -841,7 +830,6 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 .autosave-ts.fresh{color:var(--green)}
 
 /* ── TAB SCROLL FADE INDICATOR ── */
-.tab-nav-wrap{position:relative}
 .tab-fade{
   position:absolute;right:32px;top:20px;bottom:0;
   width:60px;
@@ -1057,7 +1045,7 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
   </div>
 </div>
 
-<!-- ══ TAB NAV ══ -->
+<!-- ══ TAB NAV — sticky ══ -->
 <div class="tab-nav-wrap">
   <div class="tab-nav-outer" id="tabNavOuter">
     <button class="tab-scroll-btn tab-scroll-left" id="tabScrollLeft">
@@ -1655,7 +1643,6 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
   </div>
 
 </div><!-- .settings-body -->
-</div><!-- .page -->
 
 <!-- ════ SCRIPTS ════ -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
