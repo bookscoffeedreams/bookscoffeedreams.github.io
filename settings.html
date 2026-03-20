@@ -498,8 +498,153 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 .toast.err svg{color:var(--red)}
 
 /* ═══════════════════════════════════════
-   RESPONSIVE
+   DISCORD-STYLE PROFILE BANNER
 ═══════════════════════════════════════ */
+
+/* Live preview card — Discord style */
+.profile-preview-card{
+  background:var(--sur2);
+  border:1px solid var(--bdr);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:var(--sh);
+}
+
+/* Banner strip */
+.preview-banner{
+  height:110px;
+  position:relative;
+  background:linear-gradient(135deg,#92400e,#d97706,#fbbf24);
+  overflow:hidden;
+  cursor:pointer;
+  transition:filter .2s;
+}
+.preview-banner:hover{filter:brightness(1.06)}
+.preview-banner:hover .banner-hover-hint{opacity:1}
+.preview-banner img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+.banner-hover-hint{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;color:#fff;font-size:13px;font-weight:600;
+  opacity:0;transition:opacity .2s;
+  pointer-events:none;
+}
+.banner-hover-hint svg{width:16px;height:16px}
+
+/* Avatar overlapping banner */
+.preview-avatar-wrap{
+  position:relative;
+  display:inline-block;
+  margin:0 16px;
+  margin-top:-36px;
+  z-index:2;
+}
+.preview-avatar{
+  width:72px;height:72px;border-radius:50%;
+  object-fit:cover;
+  border:4px solid var(--sur2);
+  box-shadow:0 2px 12px rgba(0,0,0,.4);
+  display:block;
+}
+.preview-avatar-status{
+  position:absolute;bottom:4px;right:2px;
+  width:16px;height:16px;border-radius:50%;
+  background:#16a34a;
+  border:3px solid var(--sur2);
+}
+
+/* Preview info */
+.preview-info{
+  padding:8px 16px 16px;
+}
+.preview-name{
+  font-family:var(--serif);font-size:18px;
+  color:var(--tx);letter-spacing:-.01em;margin-bottom:2px;
+}
+.preview-tag{
+  font-family:var(--mono);font-size:11px;color:var(--tx4);
+}
+.preview-bio{
+  margin-top:8px;font-size:13px;color:var(--tx3);
+  line-height:1.5;
+}
+.preview-reading{
+  margin-top:8px;display:flex;align-items:center;gap:7px;
+  font-size:12px;color:var(--tx4);font-family:var(--mono);
+  background:var(--sur3);border:1px solid var(--bdr);
+  border-radius:8px;padding:7px 10px;
+}
+.preview-reading svg{width:13px;height:13px;color:var(--amber);flex-shrink:0}
+
+/* Banner editor controls */
+.banner-editor{
+  background:var(--sur2);border:1px solid var(--bdr);
+  border-radius:12px;padding:18px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.banner-editor-title{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx4);
+  margin-bottom:2px;
+}
+
+.banner-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* Gradient presets */
+.gradient-presets{
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.grad-preset{
+  width:36px;height:36px;border-radius:8px;
+  cursor:pointer;border:2px solid transparent;
+  transition:all .18s;flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.grad-preset::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 55%);
+}
+.grad-preset:hover{transform:scale(1.1);border-color:rgba(255,255,255,.35)}
+.grad-preset.active{
+  border-color:#fff;
+  box-shadow:0 0 0 3px rgba(217,119,6,.4);
+  transform:scale(1.1);
+}
+
+/* Banner remove */
+.banner-remove{
+  font-size:12px;color:var(--red);
+  background:rgba(220,38,38,.07);
+  border:1px solid rgba(220,38,38,.18);
+  border-radius:8px;padding:7px 14px;
+  cursor:pointer;font-family:var(--mono);
+  transition:all .18s;display:flex;align-items:center;gap:6px;
+}
+.banner-remove:hover{background:rgba(220,38,38,.14);border-color:rgba(220,38,38,.35)}
+.banner-remove svg{width:13px;height:13px}
+
+/* Upload drop zone for banner */
+.banner-drop-zone{
+  border:2px dashed var(--bdr2);border-radius:10px;
+  padding:16px;text-align:center;cursor:pointer;
+  transition:all .22s;
+  background:var(--sur);
+}
+.banner-drop-zone:hover,.banner-drop-zone.drag-over{
+  border-color:var(--amber2);
+  background:rgba(217,119,6,.05);
+}
+.banner-drop-zone svg{width:22px;height:22px;color:var(--tx4);margin:0 auto 6px;display:block}
+.banner-drop-zone-text{font-size:12px;color:var(--tx4)}
+.banner-drop-zone-text strong{color:var(--amber);cursor:pointer}
+
+@keyframes banner-save-flash{
+  0%{opacity:1}50%{opacity:.3}100%{opacity:1}
+}
 @media(max-width:640px){
   .row-2{grid-template-columns:1fr}
   .theme-grid{flex-direction:column}
@@ -610,6 +755,98 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 
   <!-- ── PROFILE ── -->
   <div class="panel active" id="panel-profile">
+
+    <!-- ── LIVE PREVIEW CARD ── -->
+    <div class="block">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div><div class="block-title">Profile Preview</div><div class="block-desc">This is exactly how others see your profile card</div></div>
+      </div>
+      <div class="block-body" style="padding:20px 24px 24px">
+        <div class="profile-preview-card">
+          <!-- Banner -->
+          <div class="preview-banner" id="previewBanner" onclick="document.getElementById('bannerFile').click()" title="Click to change banner">
+            <img id="previewBannerImg" src="" alt="" style="display:none"/>
+            <div class="banner-hover-hint">
+              <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Change Banner
+            </div>
+          </div>
+          <!-- Avatar -->
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;padding-right:16px">
+            <div class="preview-avatar-wrap">
+              <img id="previewAvatar" class="preview-avatar" src="" alt="avatar"/>
+              <div class="preview-avatar-status"></div>
+            </div>
+          </div>
+          <!-- Info -->
+          <div class="preview-info">
+            <div class="preview-name" id="previewName">Your Name</div>
+            <div class="preview-tag" id="previewEmail">you@email.com</div>
+            <div class="preview-bio" id="previewBio" style="display:none"></div>
+            <div class="preview-reading" id="previewReading" style="display:none">
+              <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span id="previewReadingText"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BANNER EDITOR ── -->
+    <div class="block">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="block-title">Profile Banner</div><div class="block-desc">Upload an image or pick a gradient — like Discord</div></div>
+      </div>
+      <div class="block-body">
+        <input type="file" id="bannerFile" accept="image/*" class="hidden"/>
+
+        <!-- Drop zone -->
+        <div class="banner-drop-zone" id="bannerDropZone">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="banner-drop-zone-text">Drop an image here, or <strong onclick="document.getElementById('bannerFile').click()">browse to upload</strong></div>
+          <div style="font-size:11px;color:var(--tx4);font-family:var(--mono);margin-top:4px">PNG, JPG, GIF · Max 5 MB</div>
+        </div>
+
+        <!-- Gradient presets -->
+        <div>
+          <div class="banner-editor-title">Or choose a gradient</div>
+          <div class="gradient-presets" id="gradientPresets">
+            <div class="grad-preset active" data-grad="linear-gradient(135deg,#92400e,#d97706,#fbbf24)" style="background:linear-gradient(135deg,#92400e,#d97706,#fbbf24)" title="Amber"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#1e1b4b,#4f46e5,#818cf8)" style="background:linear-gradient(135deg,#1e1b4b,#4f46e5,#818cf8)" title="Indigo"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#701a75,#a21caf,#e879f9)" style="background:linear-gradient(135deg,#701a75,#a21caf,#e879f9)" title="Fuchsia"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#14532d,#16a34a,#4ade80)" style="background:linear-gradient(135deg,#14532d,#16a34a,#4ade80)" title="Emerald"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#0c4a6e,#0284c7,#38bdf8)" style="background:linear-gradient(135deg,#0c4a6e,#0284c7,#38bdf8)" title="Sky"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#7f1d1d,#dc2626,#fca5a5)" style="background:linear-gradient(135deg,#7f1d1d,#dc2626,#fca5a5)" title="Red"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#0f172a,#1e293b,#475569)" style="background:linear-gradient(135deg,#0f172a,#1e293b,#475569)" title="Slate"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#1a0a2e,#6d28d9,#a78bfa)" style="background:linear-gradient(135deg,#1a0a2e,#6d28d9,#a78bfa)" title="Violet"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#042f2e,#0f766e,#5eead4)" style="background:linear-gradient(135deg,#042f2e,#0f766e,#5eead4)" title="Teal"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#431407,#ea580c,#fdba74)" style="background:linear-gradient(135deg,#431407,#ea580c,#fdba74)" title="Orange"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#4a044e,#86198f,#f0abfc)" style="background:linear-gradient(135deg,#4a044e,#86198f,#f0abfc)" title="Pink"></div>
+            <div class="grad-preset" data-grad="linear-gradient(135deg,#1c1917,#44403c,#a8a29e)" style="background:linear-gradient(135deg,#1c1917,#44403c,#a8a29e)" title="Stone"></div>
+          </div>
+        </div>
+
+        <!-- Banner actions -->
+        <div class="banner-actions">
+          <button class="banner-remove hidden" id="removeBannerBtn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            Remove custom banner
+          </button>
+        </div>
+
+        <div class="save-row">
+          <span class="save-status" id="bannerStatus"></span>
+          <button class="btn-primary" id="saveBannerBtn">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Banner
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE INFO ── -->
     <div class="block">
       <div class="block-header">
         <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
@@ -931,6 +1168,12 @@ auth.onAuthStateChanged(async u=>{
   document.getElementById('heroAvatar').src=u.photoURL||DP;
   document.getElementById('heroName').textContent=u.displayName||u.email||'User';
   document.getElementById('heroEmail').textContent=u.email||'';
+  // sync preview avatar immediately
+  document.getElementById('previewAvatar').src=u.photoURL||DP;
+  document.getElementById('previewName').textContent=u.displayName||u.email||'User';
+  document.getElementById('previewEmail').textContent=u.email||'';
+  // load banner
+  await loadBanner(u.uid);
   try{
     const s=await db.collection('users').doc(u.uid).get();
     if(s.exists){
@@ -953,6 +1196,8 @@ auth.onAuthStateChanged(async u=>{
       const a=d.appearance||{};
       if(a.fontSize)document.getElementById('fontSizeSelect').value=a.fontSize;
       if(a.language)document.getElementById('languageSelect').value=a.language;
+      // sync preview with loaded data
+      syncPreview();
     }
   }catch(e){console.warn(e)}
 });
@@ -960,7 +1205,12 @@ auth.onAuthStateChanged(async u=>{
 // Avatar preview
 document.getElementById('avatarFile').addEventListener('change',function(){
   const f=this.files[0];if(!f)return;pendingFile=f;
-  const r=new FileReader();r.onload=e=>document.getElementById('heroAvatar').src=e.target.result;r.readAsDataURL(f);
+  const r=new FileReader();
+  r.onload=e=>{
+    document.getElementById('heroAvatar').src=e.target.result;
+    document.getElementById('previewAvatar').src=e.target.result;
+  };
+  r.readAsDataURL(f);
   toast('Photo ready — save profile to apply','ok');
 });
 document.getElementById('uploadAvatarBtn').addEventListener('click',()=>document.getElementById('avatarFile').click());
@@ -970,8 +1220,135 @@ document.getElementById('removeAvatarBtn').addEventListener('click',async()=>{
   catch(e){toast(e.message,'err')}
 });
 
-// Upload imgbb
-async function uploadImgbb(file){
+// ════ BANNER SYSTEM ════
+let pendingBannerFile=null;
+let currentBannerGrad='linear-gradient(135deg,#92400e,#d97706,#fbbf24)';
+let currentBannerImageURL=null;
+
+const previewBanner=document.getElementById('previewBanner');
+const previewBannerImg=document.getElementById('previewBannerImg');
+const bannerFile=document.getElementById('bannerFile');
+const bannerDropZone=document.getElementById('bannerDropZone');
+const removeBannerBtn=document.getElementById('removeBannerBtn');
+
+// Set banner visually
+function applyBannerGrad(grad){
+  previewBanner.style.background=grad;
+  previewBannerImg.style.display='none';
+  currentBannerImageURL=null;
+  pendingBannerFile=null;
+  currentBannerGrad=grad;
+}
+function applyBannerImage(src){
+  previewBannerImg.src=src;
+  previewBannerImg.style.display='block';
+  previewBanner.style.background='none';
+  removeBannerBtn.classList.remove('hidden');
+}
+
+// Gradient presets
+document.querySelectorAll('.grad-preset').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('.grad-preset').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+    applyBannerGrad(p.dataset.grad);
+    removeBannerBtn.classList.add('hidden');
+  });
+});
+
+// File input
+bannerFile.addEventListener('change',function(){
+  const f=this.files[0];if(!f)return;
+  if(f.size>5*1024*1024){toast('Image must be under 5MB','err');return}
+  pendingBannerFile=f;
+  const r=new FileReader();
+  r.onload=e=>{
+    applyBannerImage(e.target.result);
+    document.querySelectorAll('.grad-preset').forEach(x=>x.classList.remove('active'));
+  };
+  r.readAsDataURL(f);
+  toast('Banner ready — click Save Banner to apply','ok');
+});
+
+// Drag & drop on drop zone
+bannerDropZone.addEventListener('dragover',e=>{e.preventDefault();bannerDropZone.classList.add('drag-over')});
+bannerDropZone.addEventListener('dragleave',()=>bannerDropZone.classList.remove('drag-over'));
+bannerDropZone.addEventListener('drop',e=>{
+  e.preventDefault();bannerDropZone.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];if(!f||!f.type.startsWith('image/'))return;
+  bannerFile.files;// just simulate
+  pendingBannerFile=f;
+  if(f.size>5*1024*1024){toast('Image must be under 5MB','err');return}
+  const r=new FileReader();
+  r.onload=ev=>{applyBannerImage(ev.target.result);document.querySelectorAll('.grad-preset').forEach(x=>x.classList.remove('active'))};
+  r.readAsDataURL(f);
+  toast('Banner ready — click Save Banner','ok');
+});
+
+// Also clicking the preview banner opens file picker
+document.getElementById('previewBanner').addEventListener('click',()=>bannerFile.click());
+
+// Remove banner image → back to default gradient
+removeBannerBtn.addEventListener('click',()=>{
+  pendingBannerFile=null;currentBannerImageURL=null;
+  applyBannerGrad(currentBannerGrad||'linear-gradient(135deg,#92400e,#d97706,#fbbf24)');
+  removeBannerBtn.classList.add('hidden');
+  document.querySelector('.grad-preset').classList.add('active');
+});
+
+// Save banner
+document.getElementById('saveBannerBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('saveBannerBtn');btn.disabled=true;
+  try{
+    let bannerData={type:'gradient',value:currentBannerGrad};
+    if(pendingBannerFile){
+      const url=await uploadImgbb(pendingBannerFile);
+      if(!url)throw new Error('Upload failed');
+      bannerData={type:'image',value:url};
+      currentBannerImageURL=url;pendingBannerFile=null;
+    }
+    await db.collection('users').doc(CUR.uid).set({banner:bannerData},{merge:true});
+    toast('Banner saved!','ok');setSave('bannerStatus','success','Saved');
+  }catch(e){toast(e.message,'err');setSave('bannerStatus','error',e.message)}
+  finally{btn.disabled=false}
+});
+
+// Live preview sync — watch profile fields
+function syncPreview(){
+  const name=document.getElementById('displayName').value||'Your Name';
+  const bio=document.getElementById('bioField').value;
+  const reading=document.getElementById('readingField').value;
+  document.getElementById('previewName').textContent=name;
+  const bioEl=document.getElementById('previewBio');
+  if(bio){bioEl.textContent=bio;bioEl.style.display='block'}else bioEl.style.display='none';
+  const readEl=document.getElementById('previewReading');
+  if(reading){document.getElementById('previewReadingText').textContent=reading;readEl.style.display='flex'}else readEl.style.display='none';
+}
+['displayName','bioField','readingField'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',syncPreview);
+});
+
+// Load banner from Firestore
+async function loadBanner(uid){
+  try{
+    const s=await db.collection('users').doc(uid).get();
+    if(s.exists){
+      const d=s.data();
+      if(d.banner){
+        if(d.banner.type==='image'&&d.banner.value){
+          applyBannerImage(d.banner.value);
+          currentBannerImageURL=d.banner.value;
+        }else if(d.banner.type==='gradient'&&d.banner.value){
+          applyBannerGrad(d.banner.value);
+          // highlight matching preset
+          document.querySelectorAll('.grad-preset').forEach(p=>{
+            p.classList.toggle('active',p.dataset.grad===d.banner.value);
+          });
+        }
+      }
+    }
+  }catch(e){console.warn('banner load',e)}
+}
   const fd=new FormData();fd.append('key',IMGBB);fd.append('image',file);
   const r=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});
   const d=await r.json();return d.success?d.data.url:null;
