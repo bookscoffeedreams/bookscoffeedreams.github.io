@@ -191,30 +191,131 @@ body::after{
 .hero-avatar-edit:hover{transform:scale(1.15)}
 .hero-avatar-edit svg{width:11px;height:11px;color:#fff}
 
-/* User info strip */
-.hero-user-info{
-  display:flex;align-items:center;gap:10px;
-  margin-top:16px;padding:10px 16px;
-  background:var(--sur2);border:1px solid var(--bdr);
-  border-radius:10px;
-  animation:hero-in .6s var(--spring) .2s both;
+/* ═══════════════════════════════════════
+   HERO STRIP — redesigned
+═══════════════════════════════════════ */
+.settings-hero{
+  max-width:1100px;margin:0 auto;
+  padding:80px 32px 0;
 }
-.hero-user-name{font-weight:600;font-size:14px;color:var(--tx)}
+
+.hero-card{
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:20px;overflow:hidden;
+  box-shadow:var(--sh);
+  position:relative;
+}
+
+/* Amber top accent line */
+.hero-card::before{
+  content:'';display:block;height:3px;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);
+  background-size:200% 100%;
+  animation:hero-line 4s linear infinite;
+}
+@keyframes hero-line{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+
+.hero-card-inner{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:0;
+  align-items:stretch;
+}
+
+/* Left: text */
+.hero-left{
+  padding:32px 36px;
+  border-right:1px solid var(--bdr);
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--amber);
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.hero-eyebrow::before{content:'';display:block;width:22px;height:1px;background:var(--amber);opacity:.6}
+.hero-heading{
+  font-family:var(--serif);font-size:clamp(32px,4vw,48px);
+  line-height:1.08;letter-spacing:-.02em;color:var(--tx);
+  animation:hero-in .6s var(--spring) both;
+}
+.hero-heading em{font-style:italic;color:var(--amber)}
+@keyframes hero-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hero-sub{
+  font-size:14px;color:var(--tx3);margin-top:10px;
+  max-width:400px;line-height:1.7;
+  animation:hero-in .6s var(--spring) .1s both;
+}
+
+/* Right: avatar + info */
+.hero-right{
+  width:320px;
+  padding:32px 28px;
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:16px;
+  background:var(--sur2);
+  animation:hero-in .6s var(--spring) .15s both;
+}
+
+.hero-avatar-wrap{position:relative;flex-shrink:0}
+.hero-avatar{
+  width:96px;height:96px;border-radius:50%;object-fit:cover;
+  border:4px solid var(--sur);
+  box-shadow:0 0 0 3px var(--amber2), var(--sh2);
+  transition:all .2s;display:block;
+}
+.hero-avatar:hover{transform:scale(1.04)}
+.hero-avatar-edit{
+  position:absolute;bottom:2px;right:2px;
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#92400e,#d97706);
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--sur2);cursor:pointer;
+  transition:transform .2s var(--spring);
+}
+.hero-avatar-edit:hover{transform:scale(1.15)}
+.hero-avatar-edit svg{width:12px;height:12px;color:#fff}
+
+.hero-user-info{
+  width:100%;text-align:center;
+}
+.hero-user-name{font-weight:700;font-size:17px;color:var(--tx);margin-bottom:4px}
 .hero-user-email{font-family:var(--mono);font-size:11px;color:var(--tx4)}
 .hero-xp-chip{
-  margin-left:auto;display:flex;align-items:center;gap:5px;
-  background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);
-  border-radius:99px;padding:3px 10px;
-  font-family:var(--mono);font-size:11px;color:var(--amber);
+  display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+  background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.25);
+  border-radius:99px;padding:5px 14px;
+  font-family:var(--mono);font-size:12px;color:var(--amber);font-weight:600;
 }
-.hero-xp-chip svg{width:12px;height:12px}
+.hero-xp-chip svg{width:13px;height:13px}
+
+/* XP bar inside hero */
+.xp-wrap{
+  width:100%;
+  padding:12px 14px;background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;
+}
+.xp-labels{display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--tx4);margin-bottom:7px}
+.xp-track{height:7px;background:var(--sur4);border-radius:99px;overflow:hidden}
+.xp-fill{
+  height:100%;border-radius:99px;width:0%;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);
+  transition:width .8s var(--spring);
+  position:relative;overflow:hidden;
+}
+.xp-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  animation:xp-s 2s ease-in-out infinite;
+}
+@keyframes xp-s{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 
 /* ═══════════════════════════════════════
    TAB NAVIGATION
 ═══════════════════════════════════════ */
 .tab-nav-wrap{
-  max-width:900px;margin:0 auto;
-  padding:24px 24px 0;
+  max-width:1100px;margin:0 auto;
+  padding:20px 32px 0;
   position:sticky;top:58px;z-index:50;
 }
 .tab-nav{
@@ -230,7 +331,7 @@ body::after{
 
 .tab-btn{
   display:flex;align-items:center;gap:7px;
-  padding:8px 18px;border-radius:8px;
+  padding:9px 20px;border-radius:8px;
   font-size:13px;font-weight:500;color:var(--tx3);
   transition:all .2s;white-space:nowrap;flex-shrink:0;
 }
@@ -250,8 +351,8 @@ body::after{
    SETTINGS PANELS
 ═══════════════════════════════════════ */
 .settings-body{
-  max-width:900px;margin:0 auto;
-  padding:24px 24px 80px;
+  max-width:1100px;margin:0 auto;
+  padding:24px 32px 80px;
 }
 
 .panel{display:none;animation:panel-in .3s var(--spring) both}
@@ -806,8 +907,20 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
   .topbar-inner,.settings-hero,.tab-nav-wrap,.settings-body{padding-left:16px;padding-right:16px}
   .tab-btn{padding:7px 13px;font-size:12px}
 }
+@media(max-width:768px){
+  .hero-card-inner{grid-template-columns:1fr}
+  .hero-left{border-right:none;border-bottom:1px solid var(--bdr);padding:24px 20px}
+  .hero-right{width:100%;padding:24px 20px}
+  .row-2{grid-template-columns:1fr}
+  .theme-grid{flex-direction:column}
+  .data-stat-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+  .topbar-inner,.settings-hero,.tab-nav-wrap,.settings-body{padding-left:16px;padding-right:16px}
+  .tab-btn{padding:7px 12px;font-size:12px}
+  .data-stat-grid{grid-template-columns:1fr 1fr}
+}
 </style>
-</head>
 <body>
 
 <!-- Toast -->
@@ -844,32 +957,39 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 
 <!-- ══ HERO STRIP ══ -->
 <div class="settings-hero">
-  <div class="hero-text">
-    <div class="hero-eyebrow">Account Settings</div>
-    <h1 class="hero-heading">Your<br><em>profile &amp; prefs.</em></h1>
-    <p class="hero-sub">Manage your account, personalise your experience, and keep your data secure.</p>
-  </div>
-  <div>
-    <div class="hero-avatar-wrap">
-      <img id="heroAvatar" class="hero-avatar" src="" alt="avatar"/>
-      <label class="hero-avatar-edit" for="avatarFile">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </label>
-      <input type="file" id="avatarFile" accept="image/*" class="hidden"/>
-    </div>
-    <div class="hero-user-info">
-      <div>
-        <div class="hero-user-name" id="heroName">Loading…</div>
-        <div class="hero-user-email" id="heroEmail"></div>
+  <div class="hero-card">
+    <div class="hero-card-inner">
+
+      <!-- Left: branding text -->
+      <div class="hero-left">
+        <div class="hero-eyebrow">Account Settings</div>
+        <h1 class="hero-heading">Your<br><em>profile &amp; prefs.</em></h1>
+        <p class="hero-sub">Manage your account, personalise your experience, and keep your data secure.</p>
       </div>
-      <div class="hero-xp-chip">
-        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span id="heroXP">0</span> XP
+
+      <!-- Right: avatar + user info -->
+      <div class="hero-right">
+        <div class="hero-avatar-wrap">
+          <img id="heroAvatar" class="hero-avatar" src="" alt="avatar"/>
+          <label class="hero-avatar-edit" for="avatarFile">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </label>
+          <input type="file" id="avatarFile" accept="image/*" class="hidden"/>
+        </div>
+        <div class="hero-user-info">
+          <div class="hero-user-name" id="heroName">Loading…</div>
+          <div class="hero-user-email" id="heroEmail"></div>
+          <div class="hero-xp-chip">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span id="heroXP">0</span> XP
+          </div>
+        </div>
+        <div class="xp-wrap">
+          <div class="xp-labels"><span>Level Progress</span><span id="xpLabel">0 / 500 XP</span></div>
+          <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+        </div>
       </div>
-    </div>
-    <div class="xp-wrap" style="margin-top:10px;min-width:260px">
-      <div class="xp-labels"><span>Level Progress</span><span id="xpLabel">0 / 500 XP</span></div>
-      <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+
     </div>
   </div>
 </div>
@@ -952,7 +1072,7 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
           <!-- Info -->
           <div class="preview-info">
             <div class="preview-name" id="previewName">Your Name</div>
-            <div class="preview-tag" id="previewEmail">you@email.com</div>
+            <div class="preview-tag" id="previewEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b9c0d6ccf9dcd4d8d0d597dad6d4">[email&#160;protected]</a></div>
             <div class="preview-bio" id="previewBio" style="display:none"></div>
             <div class="preview-reading" id="previewReading" style="display:none">
               <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1465,7 +1585,7 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 </div><!-- .page -->
 
 <!-- ════ SCRIPTS ════ -->
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── MODE TOGGLE ── */
 const H=document.documentElement;
 const savedMode=localStorage.getItem('bcd-settings-mode')||'dark';
@@ -2094,10 +2214,3 @@ function loadAllNewFeatures(){
   loadStatus();
   loadSocial();
   buildActivityLog(CUR);
-  loadDataStats();
-}
-// Call once CUR is set — patch into existing auth callback via polling
-const _loadInterval=setInterval(()=>{if(CUR){loadAllNewFeatures();clearInterval(_loadInterval)}},300);
-</script>
-</body>
-</html>
