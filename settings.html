@@ -75,23 +75,23 @@ body::after{
 ═══════════════════════════════════════ */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:100;
-  height:58px;
+  height:64px;
   display:flex;align-items:center;
-  background:rgba(16,15,14,.85);
-  backdrop-filter:blur(20px);
+  background:rgba(16,15,14,.88);
+  backdrop-filter:blur(24px);
   border-bottom:1px solid var(--bdr);
   transition:background .35s,border-color .35s;
 }
-[data-mode="light"] .topbar{background:rgba(250,247,242,.9)}
+[data-mode="light"] .topbar{background:rgba(250,247,242,.92)}
 
 .topbar-inner{
-  max-width:1100px;margin:0 auto;padding:0 32px;
-  width:100%;display:flex;align-items:center;gap:14px;
+  max-width:1100px;margin:0 auto;padding:0 36px;
+  width:100%;display:flex;align-items:center;gap:18px;
 }
 
 .tb-back{
   display:flex;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:8px;
+  width:36px;height:36px;border-radius:9px;
   color:var(--tx3);border:1px solid var(--bdr);
   background:var(--sur2);
   transition:all .2s;text-decoration:none;flex-shrink:0;
@@ -100,37 +100,39 @@ body::after{
 .tb-back svg{width:16px;height:16px}
 
 .tb-brand{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:10px;
   text-decoration:none;
 }
 .tb-logo{
-  width:28px;height:28px;border-radius:7px;
+  width:34px;height:34px;border-radius:9px;
   background:linear-gradient(135deg,#92400e,#d97706);
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 0 0 0 rgba(217,119,6,.4);
   animation:logo-pulse 3s ease-in-out infinite;
+  flex-shrink:0;
 }
-@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 7px rgba(217,119,6,0)}}
-.tb-logo svg{width:14px;height:14px}
-.tb-site-name{font-family:var(--serif);font-size:15px;color:var(--tx);letter-spacing:-.01em}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+.tb-logo svg{width:16px;height:16px}
+.tb-site-name{font-family:var(--serif);font-size:17px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .tb-site-name em{color:var(--amber);font-style:italic}
 
-.tb-divider{width:1px;height:18px;background:var(--bdr);margin:0 2px}
+.tb-divider{width:1px;height:20px;background:var(--bdr);margin:0 4px;flex-shrink:0}
 
 .tb-page-title{
   font-family:var(--mono);font-size:11px;font-weight:400;
-  color:var(--tx4);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tx4);letter-spacing:.14em;text-transform:uppercase;
+  white-space:nowrap;
 }
 
-.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 
 /* Mode toggle */
 .mode-toggle{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:99px;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 16px;border-radius:99px;
   background:var(--sur3);border:1px solid var(--bdr);
-  color:var(--tx3);font-size:11px;font-family:var(--mono);
-  transition:all .2s;
+  color:var(--tx3);font-size:12px;font-family:var(--mono);
+  transition:all .2s;white-space:nowrap;
 }
 .mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
 .mode-toggle svg{width:14px;height:14px}
@@ -145,7 +147,7 @@ body::after{
 ═══════════════════════════════════════ */
 .settings-hero{
   max-width:1100px;margin:0 auto;
-  padding:80px 32px 0;
+  padding:86px 36px 0;
 }
 
 .hero-card{
@@ -265,31 +267,60 @@ body::after{
 ═══════════════════════════════════════ */
 .tab-nav-wrap{
   max-width:1100px;margin:0 auto;
-  padding:20px 32px 0;
-  position:sticky;top:58px;z-index:50;
+  padding:18px 36px 0;
+  position:sticky;top:64px;z-index:50;
+}
+.tab-nav-outer{
+  position:relative;
 }
 .tab-nav{
-  display:flex;align-items:center;gap:2px;
+  display:flex;align-items:center;gap:1px;
   background:var(--sur);
   border:1px solid var(--bdr);
   border-radius:12px;
-  padding:5px;
+  padding:4px;
   box-shadow:var(--sh);
   overflow-x:auto;
+  scroll-behavior:smooth;
 }
 .tab-nav::-webkit-scrollbar{height:0}
 
+/* Scroll arrow buttons */
+.tab-scroll-btn{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border-radius:8px;
+  background:var(--sur);border:1px solid var(--bdr2);
+  color:var(--tx3);display:none;align-items:center;justify-content:center;
+  cursor:pointer;z-index:2;transition:all .18s;
+  box-shadow:var(--sh);
+}
+.tab-scroll-btn:hover{color:var(--amber);border-color:var(--amber)}
+.tab-scroll-btn svg{width:13px;height:13px}
+.tab-scroll-btn.visible{display:flex}
+.tab-scroll-left{left:-14px}
+.tab-scroll-right{right:-14px}
+
+/* Fade edges */
+.tab-nav-outer::before,.tab-nav-outer::after{
+  content:'';position:absolute;top:0;bottom:0;width:32px;
+  pointer-events:none;z-index:1;opacity:0;transition:opacity .2s;
+}
+.tab-nav-outer::before{left:0;background:linear-gradient(90deg,var(--bg),transparent);border-radius:12px 0 0 12px}
+.tab-nav-outer::after{right:0;background:linear-gradient(270deg,var(--bg),transparent);border-radius:0 12px 12px 0}
+.tab-nav-outer.fade-left::before{opacity:1}
+.tab-nav-outer.fade-right::after{opacity:1}
+
 .tab-btn{
-  display:flex;align-items:center;gap:7px;
-  padding:9px 20px;border-radius:8px;
-  font-size:13px;font-weight:500;color:var(--tx3);
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:8px;
+  font-size:12px;font-weight:500;color:var(--tx3);
   transition:all .2s;white-space:nowrap;flex-shrink:0;
 }
-.tab-btn svg{width:14px;height:14px;transition:transform .2s var(--spring)}
+.tab-btn svg{width:13px;height:13px;transition:transform .2s var(--spring)}
 .tab-btn:hover{color:var(--tx);background:var(--sur2)}
 .tab-btn.active{
   background:var(--sur3);color:var(--amber);
-  box-shadow:0 1px 4px rgba(0,0,0,.12);
+  box-shadow:0 1px 4px rgba(0,0,0,.15);
   font-weight:600;
 }
 .tab-btn.active svg{transform:scale(1.1);color:var(--amber)}
@@ -302,7 +333,7 @@ body::after{
 ═══════════════════════════════════════ */
 .settings-body{
   max-width:1100px;margin:0 auto;
-  padding:24px 32px 80px;
+  padding:22px 36px 80px;
 }
 
 .panel{display:none;animation:panel-in .3s var(--spring) both}
@@ -1013,8 +1044,11 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 
 <!-- ══ TAB NAV ══ -->
 <div class="tab-nav-wrap">
-  <div class="tab-nav" id="tabNav">
-    <div class="tab-fade" id="tabFade"></div>
+  <div class="tab-nav-outer" id="tabNavOuter">
+    <button class="tab-scroll-btn tab-scroll-left" id="tabScrollLeft">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="tab-nav" id="tabNav">
     <button class="tab-btn active" data-panel="profile">
       <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Profile
@@ -1055,10 +1089,12 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
       <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
       My Data
     </button>
-  </div>
-</div>
-
-<!-- ══ PANELS ══ -->
+    </div><!-- end tab-nav -->
+    <button class="tab-scroll-btn tab-scroll-right" id="tabScrollRight">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div><!-- end tab-nav-outer -->
+</div><!-- end tab-nav-wrap -->
 <div class="settings-body">
 
   <!-- ── PROFILE ── -->
@@ -1768,19 +1804,27 @@ window.addEventListener('beforeunload',e=>{
   if(hasUnsaved){e.preventDefault();e.returnValue=''}
 });
 
-/* ── TAB SCROLL FADE ── */
+/* ── TAB SCROLL ARROWS + FADES ── */
 const tabNav=document.getElementById('tabNav');
-const tabFade=document.getElementById('tabFade');
-if(tabNav&&tabFade){
-  function updateTabFade(){
-    const canScroll=tabNav.scrollWidth>tabNav.clientWidth;
-    const atEnd=tabNav.scrollLeft+tabNav.clientWidth>=tabNav.scrollWidth-4;
-    tabFade.classList.toggle('show',canScroll&&!atEnd);
-  }
-  tabNav.addEventListener('scroll',updateTabFade);
-  window.addEventListener('resize',updateTabFade);
-  setTimeout(updateTabFade,200);
+const tabNavOuter=document.getElementById('tabNavOuter');
+const tabScrollLeft=document.getElementById('tabScrollLeft');
+const tabScrollRight=document.getElementById('tabScrollRight');
+
+function updateTabScroll(){
+  if(!tabNav)return;
+  const canScroll=tabNav.scrollWidth>tabNav.clientWidth+4;
+  const atStart=tabNav.scrollLeft<=4;
+  const atEnd=tabNav.scrollLeft+tabNav.clientWidth>=tabNav.scrollWidth-4;
+  tabScrollLeft?.classList.toggle('visible',canScroll&&!atStart);
+  tabScrollRight?.classList.toggle('visible',canScroll&&!atEnd);
+  tabNavOuter?.classList.toggle('fade-left',canScroll&&!atStart);
+  tabNavOuter?.classList.toggle('fade-right',canScroll&&!atEnd);
 }
+tabScrollLeft?.addEventListener('click',()=>{tabNav.scrollBy({left:-200,behavior:'smooth'})});
+tabScrollRight?.addEventListener('click',()=>{tabNav.scrollBy({left:200,behavior:'smooth'})});
+tabNav?.addEventListener('scroll',updateTabScroll);
+window.addEventListener('resize',updateTabScroll);
+setTimeout(updateTabScroll,300);
 
 /* ── PASSWORD STRENGTH ── */
 document.getElementById('newPassword').addEventListener('input',function(){
