@@ -268,11 +268,14 @@ body::after{
 ═══════════════════════════════════════ */
 .tab-nav-wrap{
   position:sticky;top:64px;z-index:50;
-  background:var(--bg);
-  padding:10px 0 8px;
-  mask-image:linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
-  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+  background:rgba(16,15,14,.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--bdr);
+  border-bottom:1px solid var(--bdr);
+  padding:8px 0;
 }
+[data-mode="light"] .tab-nav-wrap{background:rgba(250,247,242,.95)}
 .tab-nav-outer{
   max-width:1100px;margin:0 auto;
   padding:10px 36px;
