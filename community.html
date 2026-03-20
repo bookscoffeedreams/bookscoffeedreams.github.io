@@ -1,918 +1,956 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Community | Books Coffee and Dreams</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Community | Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   CSS CUSTOM PROPERTIES — THEMES
+═══════════════════════════════════════════ */
+:root {
+  --p1:#7c3aed;--p2:#8b5cf6;--p3:#a78bfa;--p4:#c4b5fd;--p5:#ede9fe;
+  --acc:#f472b6;--acc2:#ec4899;--teal:#06b6d4;--emerald:#10b981;--amber:#f59e0b;
+  --grad:linear-gradient(135deg,#7c3aed 0%,#a855f7 45%,#ec4899 100%);
+  --grad2:linear-gradient(135deg,#6d28d9 0%,#7c3aed 50%,#a855f7 100%);
+  --grad-text:linear-gradient(135deg,#a78bfa,#f472b6);
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'Fira Code',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --r1:8px;--r2:14px;--r3:20px;--r4:28px;
+}
+[data-theme="dark"]{
+  --bg:#06060f;--bg2:#0d0d1a;--bg3:#131324;
+  --sur:#161628;--sur2:#1c1c34;--sur3:#22223e;
+  --bdr:rgba(139,92,246,.1);--bdr2:rgba(139,92,246,.22);--bdr3:rgba(139,92,246,.45);
+  --tx:#f0eeff;--tx2:#c4b5fd;--tx3:rgba(196,181,253,.55);--tx4:rgba(196,181,253,.28);
+  --sh:0 4px 28px rgba(0,0,0,.65);--sh2:0 14px 52px rgba(0,0,0,.75);
+  --glow:0 0 48px rgba(139,92,246,.18);
+  --scr:rgba(124,58,237,.3);
+}
+[data-theme="light"]{
+  --bg:#faf9ff;--bg2:#f3f0ff;--bg3:#ede9fe;
+  --sur:#ffffff;--sur2:#f7f5ff;--sur3:#efecff;
+  --bdr:rgba(109,40,217,.08);--bdr2:rgba(109,40,217,.18);--bdr3:rgba(109,40,217,.4);
+  --tx:#1e1340;--tx2:#4c1d95;--tx3:rgba(76,29,149,.6);--tx4:rgba(76,29,149,.35);
+  --sh:0 4px 28px rgba(109,40,217,.07);--sh2:0 14px 52px rgba(109,40,217,.12);
+  --glow:0 0 48px rgba(139,92,246,.08);
+  --scr:rgba(124,58,237,.18);
+}
 
-  <!-- Fonts + Tailwind -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .3s var(--ease),color .3s var(--ease)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+input,textarea,button{font-family:var(--font)}
+button{cursor:pointer}
+.hidden{display:none!important}
 
-  <!-- Particles (optional visual) -->
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+/* ═══════════════════════════════════════════
+   ANIMATED BACKGROUND LAYERS (pure CSS)
+═══════════════════════════════════════════ */
+.bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 
-  <!-- AOS -->
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+/* Grid lines */
+.bg-canvas::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(var(--bdr) 1px,transparent 1px),linear-gradient(90deg,var(--bdr) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);
+  opacity:.5;animation:grid-breathe 8s ease-in-out infinite alternate;
+}
+@keyframes grid-breathe{0%{opacity:.3}100%{opacity:.6}}
 
-  <style>
-    body { font-family: 'Outfit', sans-serif; background: linear-gradient(135deg,#f3e8ff,#ede9fe); min-height:100vh; color:#111827; }
-    .white-card { background:#fff; border-radius:14px; padding:16px; box-shadow:0 10px 30px rgba(2,6,23,0.06); border:1px solid rgba(0,0,0,0.04); }
-    .tab-btn{ padding:8px 14px; cursor:pointer; border-radius:999px; }
-    .tab-btn.active{ color:#fff; background:linear-gradient(90deg,#a855f7,#ec4899); box-shadow:0 8px 22px rgba(168,85,247,0.12); }
-    .tab-content.hidden{ display:none; }
-    .reaction-btn{ cursor:pointer; padding:6px 8px; border-radius:999px; display:inline-flex; gap:8px; align-items:center; border:1px solid transparent; font-weight:600; }
-    .reaction-btn.small { padding:4px 6px; font-size:13px; }
-    .reaction-btn.reacted { background:#eef2ff; border-color:#c7d2fe; }
-    .small-muted{ font-size:12px; color:#6b7280; }
-    .mention { background: linear-gradient(90deg,#e9d5ff,#fce7f3); padding:2px 6px; border-radius:6px; color:#5b21b6; font-weight:600; }
-    .admin-actions { display:flex; gap:8px; margin-left:auto; }
-    .file-preview { max-width:200px; max-height:140px; border-radius:8px; object-fit:cover; }
-    .avatar { width:36px; height:36px; border-radius:999px; object-fit:cover; }
-    .message .meta { font-size:12px; color:#6b7280; }
-    .composer { display:flex; gap:8px; align-items:center; }
-    textarea { resize:vertical; min-height:64px; }
-    .hidden-by-admin { opacity: 0.5; font-style: italic; } /* rarely used */
-  </style>
+/* Orb 1 — top left */
+.bg-canvas::after{
+  content:'';position:absolute;top:-30vh;left:-15vw;
+  width:75vw;height:75vh;
+  background:radial-gradient(ellipse,rgba(124,58,237,.22) 0%,transparent 65%);
+  animation:orb1 20s ease-in-out infinite alternate;
+}
+@keyframes orb1{0%{transform:translate(0,0) scale(1)}100%{transform:translate(10vw,8vh) scale(1.18)}}
+
+/* Orb 2 — bottom right */
+.orb2{position:fixed;bottom:-25vh;right:-12vw;width:60vw;height:60vh;
+  background:radial-gradient(ellipse,rgba(236,72,153,.12) 0%,transparent 65%);
+  z-index:0;pointer-events:none;animation:orb2 26s ease-in-out infinite alternate}
+@keyframes orb2{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-8vw,-10vh) scale(1.22)}}
+
+/* Orb 3 — center */
+.orb3{position:fixed;top:35%;left:35%;width:50vw;height:50vh;
+  background:radial-gradient(ellipse,rgba(6,182,212,.05) 0%,transparent 70%);
+  z-index:0;pointer-events:none;animation:orb3 32s ease-in-out infinite alternate}
+@keyframes orb3{0%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-40%,-60%) scale(1.35)}}
+
+/* Noise texture */
+.bg-noise{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Floating sparkle particles (pure CSS keyframe) */
+.spark{position:fixed;z-index:0;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,rgba(167,139,250,.6),transparent);
+  animation:spark-float linear infinite}
+.spark:nth-child(1){width:4px;height:4px;left:12%;top:20%;animation-duration:18s;animation-delay:0s}
+.spark:nth-child(2){width:3px;height:3px;left:78%;top:15%;animation-duration:22s;animation-delay:-5s}
+.spark:nth-child(3){width:5px;height:5px;left:55%;top:60%;animation-duration:15s;animation-delay:-8s;background:radial-gradient(circle,rgba(244,114,182,.5),transparent)}
+.spark:nth-child(4){width:3px;height:3px;left:30%;top:75%;animation-duration:25s;animation-delay:-12s}
+.spark:nth-child(5){width:4px;height:4px;left:88%;top:50%;animation-duration:19s;animation-delay:-3s;background:radial-gradient(circle,rgba(6,182,212,.4),transparent)}
+@keyframes spark-float{
+  0%{transform:translate(0,0) scale(1);opacity:0}
+  10%{opacity:1}
+  90%{opacity:.6}
+  100%{transform:translate(calc(-30px + 60px * var(--rx,0.5)),calc(-80px + -60px * var(--ry,0.5))) scale(.5);opacity:0}
+}
+
+.page-wrap{position:relative;z-index:2}
+
+/* ═══════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════ */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:64px;
+  display:flex;align-items:center;
+  background:rgba(6,6,15,.78);
+  backdrop-filter:blur(28px) saturate(1.8);
+  border-bottom:1px solid var(--bdr);
+  transition:background .3s,border-color .3s;
+}
+[data-theme="light"] header{background:rgba(250,249,255,.85)}
+
+.hd-inner{max-width:1440px;margin:0 auto;padding:0 28px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-box{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--grad);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  animation:logo-halo 3.5s ease-in-out infinite;
+}
+.logo-box::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,transparent 55%)}
+@keyframes logo-halo{
+  0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.5)}
+  50%{box-shadow:0 0 0 9px rgba(139,92,246,0)}
+}
+.logo-box svg{position:relative;z-index:1}
+.logo-name{font-size:16px;font-weight:800;letter-spacing:-.03em;color:var(--tx);line-height:1}
+.logo-name span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Header search */
+.hd-search{
+  display:flex;align-items:center;gap:9px;
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:99px;padding:8px 16px;
+  width:240px;transition:all .25s var(--ease);
+}
+.hd-search:focus-within{border-color:var(--bdr3);box-shadow:0 0 0 3px rgba(124,58,237,.12);width:300px}
+.hd-search input{background:none;border:none;outline:none;font-size:13px;color:var(--tx);width:100%}
+.hd-search input::placeholder{color:var(--tx4)}
+.hd-search svg{color:var(--tx4);flex-shrink:0}
+
+.hd-right{display:flex;align-items:center;gap:9px}
+
+/* Theme toggle */
+.theme-btn{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--sur);border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--tx3);transition:all .2s var(--spring);
+  position:relative;overflow:hidden;
+}
+.theme-btn:hover{border-color:var(--bdr3);background:var(--sur2);transform:scale(1.06) rotate(10deg);color:var(--p3)}
+.theme-btn .t-sun,.theme-btn .t-moon{position:absolute;transition:all .35s var(--spring)}
+[data-theme="dark"] .t-sun{transform:rotate(180deg) scale(0);opacity:0}
+[data-theme="dark"] .t-moon{transform:none;opacity:1}
+[data-theme="light"] .t-sun{transform:none;opacity:1}
+[data-theme="light"] .t-moon{transform:rotate(-180deg) scale(0);opacity:0}
+
+#headerPhoto{width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid var(--p2);transition:all .2s;outline:2px solid transparent}
+#headerPhoto:hover{transform:scale(1.08);outline-color:rgba(139,92,246,.5)}
+
+#loginBtn{
+  display:flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:700;color:#fff;
+  background:var(--grad);border:none;border-radius:99px;
+  padding:9px 20px;letter-spacing:.02em;
+  transition:all .22s var(--ease);position:relative;overflow:hidden;
+}
+#loginBtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 55%);opacity:0;transition:.2s}
+#loginBtn:hover::after{opacity:1}
+#loginBtn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(124,58,237,.5)}
+#loginBtn:active{transform:none}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero{padding:108px 28px 52px;max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:48px}
+.hero-l{flex:1}
+
+.hero-chip{
+  display:inline-flex;align-items:center;gap:9px;
+  background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.22);
+  border-radius:99px;padding:6px 14px 6px 10px;margin-bottom:24px;
+  font-size:11px;font-weight:700;color:var(--p3);letter-spacing:.07em;text-transform:uppercase;
+  animation:chip-drop .6s var(--spring) both;
+}
+@keyframes chip-drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+.chip-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);animation:cdot 2s infinite}
+@keyframes cdot{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.55)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}
+
+.hero-title{font-size:clamp(38px,5.5vw,72px);font-weight:800;line-height:1.05;letter-spacing:-.04em;animation:hero-rise .7s var(--spring) .1s both}
+.hero-title .ht-grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:grad-pan 5s ease infinite}
+@keyframes grad-pan{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes hero-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+.hero-sub{margin-top:16px;font-size:16px;line-height:1.7;color:var(--tx3);max-width:440px;animation:hero-rise .7s var(--spring) .2s both}
+
+.hero-stats{display:flex;gap:28px;margin-top:36px;animation:hero-rise .7s var(--spring) .3s both}
+.stat{text-align:center}
+.stat-n{font-size:30px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-l{font-size:10px;color:var(--tx4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.stat-sep{width:1px;background:var(--bdr);align-self:stretch}
+
+/* Hero visual card */
+.hero-r{width:268px;flex-shrink:0;animation:hero-rise .8s var(--spring) .25s both}
+.hcard{background:var(--sur);border:1px solid var(--bdr2);border-radius:var(--r4);padding:20px;box-shadow:var(--sh2),var(--glow);position:relative;overflow:hidden}
+.hcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.hcard-dots{display:flex;gap:6px;margin-bottom:16px}
+.hc-dot{width:10px;height:10px;border-radius:50%}
+.hc-dot.r{background:#ff5f57}.hc-dot.y{background:#ffbd2e}.hc-dot.g{background:#28c840}
+.hc-msg{display:flex;gap:9px;margin-bottom:10px;animation:msg-float 3s ease-in-out infinite}
+.hc-msg:nth-child(3){animation-delay:.4s}.hc-msg:nth-child(4){animation-delay:.9s}
+@keyframes msg-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.hc-av{width:26px;height:26px;border-radius:50%;flex-shrink:0}
+.hc-av.a{background:var(--grad)}.hc-av.b{background:linear-gradient(135deg,var(--teal),var(--p2))}.hc-av.c{background:linear-gradient(135deg,var(--acc),var(--amber))}
+.hc-bub{background:var(--sur2);border:1px solid var(--bdr);border-radius:0 10px 10px 10px;padding:8px 11px;font-size:11.5px;color:var(--tx2);flex:1;line-height:1.45}
+.hc-bub.own{background:rgba(124,58,237,.13);border-color:rgba(124,58,237,.25);color:var(--p3);border-radius:10px 0 10px 10px}
+
+/* ═══════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════ */
+.tabs-wrap{max-width:1440px;margin:0 auto;padding:0 28px 28px}
+.tabs-bar{
+  display:flex;align-items:center;gap:4px;
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:var(--r4);padding:6px;
+}
+.tab-btn{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;color:var(--tx3);
+  background:transparent;border:none;
+  padding:9px 20px;border-radius:var(--r3);
+  transition:all .22s var(--ease);position:relative;overflow:hidden;
+  white-space:nowrap;
+}
+.tab-btn svg{width:15px;height:15px;transition:transform .25s var(--spring)}
+.tab-btn:hover{color:var(--tx)}
+.tab-btn:hover svg{transform:scale(1.15)}
+.tab-btn.active{color:#fff;background:var(--grad);box-shadow:0 4px 20px rgba(124,58,237,.48)}
+.tab-btn.active::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 55%)}
+.tab-btn.active svg{filter:drop-shadow(0 0 4px rgba(255,255,255,.4))}
+
+.tabs-meta{margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 6px;font-size:12px;color:var(--tx4);font-family:var(--mono);white-space:nowrap}
+.tabs-meta .online-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);animation:cdot 2s infinite}
+.tabs-meta #signedName{color:var(--p3);font-weight:600;margin-left:4px}
+
+.tab-content{display:none}
+.tab-content.active{display:block;animation:tab-in .35s var(--spring) both}
+@keyframes tab-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════
+   MAIN WRAP
+═══════════════════════════════════════════ */
+.main-wrap{max-width:1440px;margin:0 auto;padding:0 28px 80px}
+
+/* ═══════════════════════════════════════════
+   CARDS & SURFACES
+═══════════════════════════════════════════ */
+.card{
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:var(--r4);box-shadow:var(--sh);
+  position:relative;overflow:hidden;
+  transition:border-color .22s,box-shadow .22s,transform .22s var(--ease);
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--grad);opacity:.5;pointer-events:none}
+.card:hover{border-color:var(--bdr2)}
+
+/* ═══════════════════════════════════════════
+   CHAT
+═══════════════════════════════════════════ */
+.chat-grid{display:grid;grid-template-columns:1fr 290px;gap:18px}
+
+/* Chat panel */
+.chat-panel{display:flex;flex-direction:column}
+
+.cp-head{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 22px;border-bottom:1px solid var(--bdr);
+  background:var(--sur2);
+}
+.live-ind{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald);font-family:var(--mono)}
+.live-ring{width:10px;height:10px;border-radius:50%;background:var(--emerald);position:relative}
+.live-ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--emerald);animation:lring 1.6s ease-out infinite;opacity:0}
+@keyframes lring{0%{transform:scale(.8);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+.cp-title{font-size:16px;font-weight:800;color:var(--tx);letter-spacing:-.02em}
+.cp-sub{margin-left:auto;font-size:11px;color:var(--tx4);font-family:var(--mono)}
+
+#chatMessages{flex:1;height:480px;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:2px}
+
+/* Message */
+.message{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:8px 10px;border-radius:var(--r2);
+  transition:background .18s;animation:msg-in .3s var(--spring) both;
+  position:relative;
+}
+.message:hover{background:var(--sur2)}
+.message:hover .msg-float-rxns{opacity:1;transform:translateY(0)}
+@keyframes msg-in{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+
+.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bdr2);transition:border-color .18s}
+.message:hover .avatar{border-color:var(--bdr3)}
+
+.msg-bd{flex:1;min-width:0}
+.msg-top{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.msg-name{font-size:13px;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.msg-time{font-size:10px;color:var(--tx4);font-family:var(--mono)}
+.msg-txt{font-size:14px;color:var(--tx2);line-height:1.65;word-break:break-word}
+
+/* Hover reaction bar */
+.msg-float-rxns{
+  position:absolute;right:10px;top:6px;
+  display:flex;gap:4px;
+  background:var(--sur3);border:1px solid var(--bdr2);
+  border-radius:99px;padding:3px 7px;
+  opacity:0;transform:translateY(5px);
+  transition:all .2s var(--ease);z-index:10;
+}
+/* Permanent reaction row below message */
+.rxn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+
+.rxn-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  cursor:pointer;padding:3px 9px;border-radius:99px;
+  background:transparent;border:1px solid transparent;
+  font-size:12px;color:var(--tx3);font-family:var(--mono);
+  transition:all .18s;font-weight:500;
+}
+.rxn-btn:hover{background:var(--sur2);border-color:var(--bdr2);color:var(--tx);transform:scale(1.08)}
+.rxn-btn.reacted{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.35);color:var(--p3)}
+.rxn-btn svg{width:12px;height:12px}
+
+.file-preview{max-width:220px;max-height:160px;border-radius:var(--r2);object-fit:cover;margin-top:8px;border:1px solid var(--bdr2)}
+.file-link{color:var(--p3);text-decoration:none;font-size:13px;font-family:var(--mono);transition:color .18s;display:inline-flex;align-items:center;gap:5px}
+.file-link:hover{color:var(--p4)}
+
+.adm-del{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;color:#ef4444;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
+  border-radius:6px;padding:3px 10px;cursor:pointer;font-family:var(--mono);
+  transition:all .18s;margin-left:auto;
+}
+.adm-del:hover{background:rgba(239,68,68,.18)}
+.adm-del svg{width:11px;height:11px}
+.adm-acts{display:flex;gap:6px;margin-left:auto;align-items:center}
+
+/* Typing */
+.typing-strip{
+  min-height:32px;padding:4px 22px 8px;
+  display:none;align-items:center;gap:9px;
+}
+.typing-strip.show{display:flex}
+.tdots{display:flex;gap:4px;align-items:center}
+.tdots span{width:6px;height:6px;border-radius:50%;background:var(--p3);animation:tbounce 1.2s ease-in-out infinite}
+.tdots span:nth-child(2){animation-delay:.15s}
+.tdots span:nth-child(3){animation-delay:.3s}
+@keyframes tbounce{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.typing-txt{font-size:12px;color:var(--tx4);font-family:var(--mono)}
+
+/* Composer */
+.composer{border-top:1px solid var(--bdr);padding:14px 18px;background:var(--sur2);display:flex;align-items:center;gap:10px}
+#chatInput{
+  flex:1;background:var(--sur3);border:1px solid var(--bdr);border-radius:var(--r3);
+  padding:12px 16px;color:var(--tx);font-size:14px;outline:none;
+  transition:all .22s;min-height:44px;
+}
+#chatInput::placeholder{color:var(--tx4)}
+#chatInput:focus{border-color:var(--bdr3);box-shadow:0 0 0 3px rgba(124,58,237,.12);background:var(--sur)}
+.icon-btn{
+  width:40px;height:40px;border-radius:var(--r1);
+  background:var(--sur3);border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--tx3);transition:all .2s var(--spring);flex-shrink:0;
+}
+.icon-btn:hover{border-color:var(--bdr3);color:var(--p3);background:rgba(124,58,237,.1);transform:scale(1.06)}
+.icon-btn svg{width:16px;height:16px}
+.send-btn{
+  display:flex;align-items:center;gap:8px;
+  height:40px;padding:0 20px;
+  background:var(--grad);border:none;border-radius:var(--r2);
+  color:#fff;font-size:13px;font-weight:700;
+  letter-spacing:.03em;flex-shrink:0;
+  transition:all .22s var(--ease);position:relative;overflow:hidden;
+}
+.send-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14),transparent 55%);opacity:0;transition:.2s}
+.send-btn:hover::after{opacity:1}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(124,58,237,.55)}
+.send-btn:active{transform:none}
+.send-btn svg{width:14px;height:14px}
+
+/* ── Sidebar ── */
+.chat-side{display:flex;flex-direction:column;gap:14px}
+.side-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.side-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx4);font-family:var(--mono)}
+.cnt-badge{font-size:11px;font-weight:700;background:rgba(124,58,237,.12);color:var(--p3);border:1px solid rgba(124,58,237,.22);border-radius:99px;padding:2px 9px;font-family:var(--mono)}
+#onlineList{display:flex;flex-direction:column;gap:8px}
+.mem-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:var(--r1);transition:background .18s;cursor:default}
+.mem-row:hover{background:var(--sur2)}
+.mem-av-wrap{position:relative;flex-shrink:0}
+.mem-av-wrap .avatar{width:30px;height:30px}
+.status-dot{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;border:2px solid var(--sur);transition:border-color .3s}
+.status-dot.on{background:var(--emerald)}
+.status-dot.off{background:var(--tx4)}
+.mem-info{flex:1;min-width:0}
+.mem-name{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mem-sub{font-size:10px;color:var(--tx4);font-family:var(--mono)}
+.short-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:11px 14px;background:var(--sur2);border:1px solid var(--bdr);
+  border-radius:var(--r2);color:var(--tx2);
+  font-size:13px;font-weight:600;text-align:left;
+  transition:all .22s var(--ease);margin-bottom:8px;
+}
+.short-btn:last-child{margin-bottom:0}
+.short-btn svg{width:16px;height:16px;color:var(--p3);flex-shrink:0;transition:transform .22s var(--spring)}
+.short-btn:hover{border-color:var(--bdr3);background:rgba(124,58,237,.1);color:var(--tx);transform:translateX(4px)}
+.short-btn:hover svg{transform:scale(1.18)}
+
+/* ═══════════════════════════════════════════
+   POSTS
+═══════════════════════════════════════════ */
+.posts-grid{display:grid;grid-template-columns:1fr 290px;gap:18px}
+
+/* Composer */
+.post-composer{padding:22px;margin-bottom:18px}
+.post-composer:focus-within{border-color:var(--bdr2)}
+.pc-top{display:flex;gap:14px}
+#postAvatar{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bdr2)}
+.pc-right{flex:1}
+#postContent{
+  width:100%;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r2);
+  padding:14px 16px;color:var(--tx);font-size:14px;resize:vertical;min-height:84px;
+  outline:none;line-height:1.6;transition:all .22s;
+}
+#postContent::placeholder{color:var(--tx4)}
+#postContent:focus{border-color:var(--bdr3);box-shadow:0 0 0 3px rgba(124,58,237,.1);background:var(--sur)}
+.pc-actions{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr)}
+.pc-tools{display:flex;gap:8px;align-items:center}
+#postTags{
+  background:var(--sur2);border:1px solid var(--bdr);border-radius:99px;
+  padding:7px 14px;color:var(--tx);font-family:var(--mono);font-size:12px;
+  outline:none;width:130px;transition:all .22s;
+}
+#postTags::placeholder{color:var(--tx4)}
+#postTags:focus{border-color:var(--bdr3);background:var(--sur)}
+#postAttach{
+  display:flex;align-items:center;gap:7px;
+  background:var(--sur2);border:1px solid var(--bdr);border-radius:99px;
+  padding:7px 14px;color:var(--tx3);font-size:12px;font-weight:600;
+  transition:all .22s;
+}
+#postAttach svg{width:13px;height:13px}
+#postAttach:hover{border-color:var(--bdr3);color:var(--p3);background:rgba(124,58,237,.08)}
+#submitPost{
+  display:flex;align-items:center;gap:8px;
+  background:var(--grad);border:none;border-radius:var(--r2);
+  padding:10px 22px;color:#fff;font-size:13px;font-weight:700;
+  letter-spacing:.03em;transition:all .22s var(--ease);position:relative;overflow:hidden;
+}
+#submitPost::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14),transparent 55%);opacity:0;transition:.2s}
+#submitPost:hover::after{opacity:1}
+#submitPost:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(124,58,237,.55)}
+#submitPost svg{width:14px;height:14px}
+
+/* Post cards */
+#communityPosts{display:flex;flex-direction:column;gap:14px}
+.post-card{padding:22px}
+.post-card:hover{transform:translateY(-2px);box-shadow:var(--sh2),var(--glow)}
+@keyframes card-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.post-card{animation:card-in .4s var(--spring) both}
+.pci{display:flex;gap:14px}
+.pc-av{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--bdr2)}
+.pc-cnt{flex:1;min-width:0}
+.pc-meta{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pc-name{font-size:14px;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pc-time{font-size:11px;color:var(--tx4);font-family:var(--mono);margin-left:auto}
+.pc-body{font-size:14px;color:var(--tx2);line-height:1.7;margin-bottom:12px}
+.pc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ptag{font-family:var(--mono);font-size:11px;color:var(--p3);background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:99px;padding:3px 10px;transition:all .2s}
+.ptag:hover{background:rgba(124,58,237,.2);border-color:rgba(124,58,237,.4)}
+.pc-rxns{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.pc-foot{border-top:1px solid var(--bdr);padding-top:14px}
+.cmt-cnt-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx4);font-family:var(--mono);margin-bottom:12px}
+.cmt-cnt-row svg{width:14px;height:14px;color:var(--p3)}
+.cmts-area{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.cmt-item{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r2);padding:10px 14px;animation:card-in .3s var(--spring) both;transition:border-color .2s}
+.cmt-item:hover{border-color:var(--bdr2)}
+.cmt-name{font-size:12px;font-weight:700;color:var(--p3);margin-bottom:4px}
+.cmt-txt{font-size:13px;color:var(--tx2);line-height:1.6}
+.cmt-ts{font-size:10px;color:var(--tx4);font-family:var(--mono);margin-top:4px}
+.cmt-comp{display:flex;gap:8px}
+.cmt-comp input{
+  flex:1;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r2);
+  padding:9px 14px;color:var(--tx);font-size:13px;outline:none;transition:all .22s;
+}
+.cmt-comp input::placeholder{color:var(--tx4)}
+.cmt-comp input:focus{border-color:var(--bdr3);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+.cmt-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r2);
+  padding:9px 16px;color:var(--tx3);font-size:13px;font-weight:600;
+  transition:all .22s;
+}
+.cmt-btn svg{width:13px;height:13px}
+.cmt-btn:hover{color:var(--p3);border-color:var(--bdr3);background:rgba(124,58,237,.1)}
+
+/* ═══════════════════════════════════════════
+   ANNOUNCEMENTS
+═══════════════════════════════════════════ */
+#announcementsList{display:flex;flex-direction:column;gap:16px}
+.ann-card{padding:26px 28px;animation:card-in .4s var(--spring) both}
+.ann-card:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.ann-icon-box{
+  width:46px;height:46px;border-radius:var(--r2);
+  background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.22);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;color:var(--p3);
+}
+.ann-icon-box svg{width:22px;height:22px}
+.ann-title{font-size:20px;font-weight:800;color:var(--tx);letter-spacing:-.03em;margin-bottom:8px}
+.ann-body{font-size:14px;color:var(--tx3);line-height:1.7}
+.ann-time{font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:14px;display:flex;align-items:center;gap:7px}
+.ann-time svg{width:13px;height:13px}
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+.mention{background:rgba(124,58,237,.12);color:var(--p3);border-radius:5px;padding:1px 6px;font-weight:700;border:1px solid rgba(124,58,237,.2)}
+.hidden-by-admin{opacity:.35;font-style:italic}
+.posts-side-info{font-size:13px;color:var(--tx3);line-height:1.7}
+
+/* ── Footer ── */
+footer{text-align:center;padding:36px 28px;border-top:1px solid var(--bdr);position:relative;z-index:2}
+footer span{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.07em}
+footer .fg{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+
+/* ── Responsive ── */
+@media(max-width:1100px){.chat-grid,.posts-grid{grid-template-columns:1fr}.chat-side,.posts-side{display:none}.hero-r{display:none}}
+@media(max-width:700px){
+  .hd-inner .hd-search{display:none}
+  .hero{padding:90px 16px 40px;flex-direction:column}
+  .hero-stats{gap:16px}
+  .tabs-wrap,.main-wrap{padding-left:16px;padding-right:16px}
+  .tabs-bar{gap:2px}.tab-btn{padding:8px 13px;font-size:12px}
+}
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-  <!-- HEADER -->
-  <header id="mainHeader" class="fixed w-full top-0 bg-white/30 backdrop-blur-md z-50 border-b">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-      <h1 class="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-fuchsia-500">Books Coffee Dreams</h1>
-      <div class="flex items-center gap-3">
-        <img id="headerPhoto" class="hidden w-9 h-9 rounded-full border-2 border-purple-500 cursor-pointer" onclick="location.href='profile.html'">
-        <button id="loginBtn" onclick="location.href='login.html'" class="hidden bg-purple-600 text-white px-3 py-1 rounded-full">Login</button>
+<!-- BG layers (pure CSS animated) -->
+<div class="bg-canvas"></div>
+<div class="orb2"></div>
+<div class="orb3"></div>
+<div class="bg-noise"></div>
+<!-- Sparkles -->
+<div class="spark"></div>
+<div class="spark"></div>
+<div class="spark"></div>
+<div class="spark"></div>
+<div class="spark"></div>
+
+<div class="page-wrap">
+
+<!-- ══════════ HEADER ══════════ -->
+<header id="mainHeader">
+  <div class="hd-inner">
+
+    <a class="logo" href="#">
+      <div class="logo-box">
+        <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
       </div>
+      <div class="logo-name">Books<span>&amp;Dreams</span></div>
+    </a>
+
+    <div class="hd-search">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input placeholder="Search community…"/>
     </div>
-  </header>
 
-  <div style="height:72px"></div>
+    <div class="hd-right">
+      <button class="theme-btn" id="themeToggle">
+        <span class="t-sun">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </span>
+        <span class="t-moon">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </span>
+      </button>
+      <img id="headerPhoto" class="hidden" onclick="location.href='profile.html'" alt="avatar"/>
+      <button id="loginBtn" class="hidden" onclick="location.href='login.html'">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+    </div>
 
-  <main class="max-w-7xl mx-auto px-6 py-6">
+  </div>
+</header>
 
-    <section class="text-center mb-6">
-      <h2 class="text-4xl font-extrabold">🌐 Community Hub</h2>
-      <p class="text-gray-600">Chat, post, react and collaborate with the community.</p>
-    </section>
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="hero-l">
+    <div class="hero-chip"><span class="chip-dot"></span>Community Hub — Live Now</div>
+    <h1 class="hero-title">Where readers<br><span class="ht-grad">connect &amp; grow.</span></h1>
+    <p class="hero-sub">Chat in real-time, share discoveries, and dive deep into books with fellow dreamers worldwide.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-n" id="onlineCount">0</div><div class="stat-l">Online Now</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><div class="stat-n">∞</div><div class="stat-l">Discussions</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><div class="stat-n">24/7</div><div class="stat-l">Active</div></div>
+    </div>
+  </div>
+  <div class="hero-r">
+    <div class="hcard">
+      <div class="hcard-dots"><div class="hc-dot r"></div><div class="hc-dot y"></div><div class="hc-dot g"></div></div>
+      <div class="hc-msg"><div class="hc-av a"></div><div class="hc-bub">"The Midnight Library" — absolutely stunning read.</div></div>
+      <div class="hc-msg"><div class="hc-av b"></div><div class="hc-bub">The multiverse concept was mind-bending!</div></div>
+      <div class="hc-msg" style="flex-direction:row-reverse"><div class="hc-av c"></div><div class="hc-bub own">Adding it to my list right now</div></div>
+    </div>
+  </div>
+</section>
 
-    <!-- Tabs -->
-    <section class="mb-6 flex gap-3 items-center">
-      <button class="tab-btn active" data-tab="chatTab">💬 Chat</button>
-      <button class="tab-btn" data-tab="postsTab">📝 Posts</button>
-      <button class="tab-btn" data-tab="annTab">📣 Announcements</button>
-      <div class="ml-auto small-muted">Signed in as <span id="signedName">Guest</span></div>
-    </section>
+<!-- ══════════ TABS ══════════ -->
+<div class="tabs-wrap">
+  <div class="tabs-bar">
+    <button class="tab-btn active" data-tab="chatTab">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Live Chat
+    </button>
+    <button class="tab-btn" data-tab="postsTab">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Posts
+    </button>
+    <button class="tab-btn" data-tab="annTab">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Announcements
+    </button>
+    <div class="tabs-meta">
+      <span class="online-dot"></span>
+      Signed in as<span id="signedName">Guest</span>
+    </div>
+  </div>
+</div>
 
-    <!-- Chat / Posts / Announcements containers -->
-    <div id="chatTab" class="tab-content">
-      <div class="grid lg:grid-cols-4 gap-6">
-        <div class="lg:col-span-3">
-          <div id="chatMessages" class="white-card h-[520px] overflow-y-auto mb-3"></div>
+<!-- ══════════ MAIN ══════════ -->
+<main class="main-wrap">
 
-          <!-- typing / file upload / input -->
-          <div class="composer">
-            <input id="chatInput" class="flex-1 px-4 py-2 rounded-lg border" placeholder="Say hi — use @ to mention someone..." />
-            <input id="chatFile" type="file" class="hidden" />
-            <button id="attachBtn" class="px-3 py-2 bg-gray-100 rounded-lg small-muted">📎</button>
-            <button id="sendChatBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Send</button>
-          </div>
-
-          <div class="mt-2 small-muted"><span id="typingIndicator"></span></div>
+  <!-- ── CHAT ── -->
+  <div id="chatTab" class="tab-content active">
+    <div class="chat-grid">
+      <div class="card chat-panel">
+        <div class="cp-head">
+          <div class="live-ind"><div class="live-ring"></div> Live</div>
+          <div class="cp-title">Community Chat</div>
+          <div class="cp-sub" id="typingIndicator"></div>
         </div>
-
-        <aside class="white-card">
-          <h4 class="font-bold mb-2">Community</h4>
-          <div class="mb-3">
-            <p class="small-muted">Online <span id="onlineCount">0</span></p>
-            <div id="onlineList" class="mt-2 space-y-2"></div>
-          </div>
-
-          <div>
-            <p class="small-muted">Shortcuts</p>
-            <button id="focusChat" class="mt-2 px-3 py-2 rounded bg-gray-100 w-full">Focus Chat</button>
-            <button id="newPostBtn" class="mt-2 px-3 py-2 rounded bg-gray-100 w-full">New Post</button>
-          </div>
-        </aside>
+        <div id="chatMessages"></div>
+        <div class="typing-strip" id="typingStrip">
+          <div class="tdots"><span></span><span></span><span></span></div>
+          <span class="typing-txt" id="typingTxt"></span>
+        </div>
+        <div class="composer">
+          <input id="chatFile" type="file" class="hidden"/>
+          <button id="attachBtn" class="icon-btn" title="Attach file">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <input id="chatInput" placeholder="Say something — use @ to mention someone…" autocomplete="off"/>
+          <button id="sendChatBtn" class="send-btn">
+            Send
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
       </div>
-    </div>
 
-    <div id="postsTab" class="tab-content hidden">
-      <div class="white-card mb-4">
-        <div class="flex gap-3">
-          <img id="postAvatar" class="avatar" src="">
-          <div class="flex-1">
-            <textarea id="postContent" class="w-full px-3 py-2 border rounded" placeholder="Share something..."></textarea>
-            <div class="flex items-center justify-between mt-3">
-              <div>
-                <input id="postTags" placeholder="#tags" class="px-2 py-1 border rounded small-muted" />
-                <button id="postAttach" class="px-2 py-1 border rounded small-muted">Attach</button>
-                <input id="postFile" type="file" class="hidden" />
-              </div>
-              <div>
-                <button id="submitPost" class="px-4 py-2 bg-fuchsia-600 text-white rounded">Post</button>
-              </div>
+      <aside class="chat-side">
+        <div class="card" style="padding:20px">
+          <div class="side-hd"><span class="side-label">Members</span><span class="cnt-badge" id="onlineCountBadge">0</span></div>
+          <div id="onlineList"></div>
+        </div>
+        <div class="card" style="padding:20px">
+          <div class="side-hd" style="margin-bottom:14px"><span class="side-label">Quick Actions</span></div>
+          <button id="focusChat" class="short-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Focus Chat
+          </button>
+          <button id="newPostBtn" class="short-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            New Post
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ── POSTS ── -->
+  <div id="postsTab" class="tab-content">
+    <div class="posts-grid">
+      <div>
+        <div class="card post-composer">
+          <div class="pc-top">
+            <img id="postAvatar" class="avatar" src="" alt="avatar" style="width:42px;height:42px"/>
+            <div class="pc-right">
+              <textarea id="postContent" placeholder="Share a thought, discovery, or question with the community…"></textarea>
             </div>
           </div>
+          <div class="pc-actions">
+            <div class="pc-tools">
+              <input id="postTags" placeholder="#tags"/>
+              <button id="postAttach">
+                <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                Attach
+              </button>
+              <input id="postFile" type="file" class="hidden"/>
+            </div>
+            <button id="submitPost">
+              Publish
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
         </div>
+        <div id="communityPosts"></div>
       </div>
-
-      <div id="communityPosts" class="space-y-4"></div>
+      <aside class="posts-side">
+        <div class="card" style="padding:20px">
+          <div class="side-hd"><span class="side-label">About Posts</span></div>
+          <p class="posts-side-info">Share reading notes, discoveries, reviews and questions. The community is here to engage with your ideas.</p>
+        </div>
+      </aside>
     </div>
-
-    <div id="annTab" class="tab-content hidden">
-      <div id="announcementsList" class="space-y-4"></div>
-    </div>
-
-  </main>
-
-  <!-- footer -->
-  <footer class="text-center py-6 small-muted">© 2025 Books Coffee and Dreams</footer>
-
-  <!-- SCRIPTS -->
-  <script type="module">
-    // -------------------------
-    // CONFIG + IMPORTS
-    // -------------------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy,
-      serverTimestamp, doc, setDoc, getDoc, where, updateDoc, deleteDoc,
-      increment, arrayUnion, arrayRemove
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    // --------- CONFIG (replace if needed) ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-      authDomain: "bcd-discord.firebaseapp.com",
-      projectId: "bcd-discord",
-      storageBucket: "bcd-discord.firebasestorage.app",
-      messagingSenderId: "278895155371",
-      appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
-    };
-
-    // Cloudinary unsigned upload (your values)
-    const CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/dkxuilgai/auto/upload";
-    const CLOUDINARY_UPLOAD_PRESET = "bcd_courses";
-
-    // Default avatar (GitHub raw)
-    const DEFAULT_AVATAR = "https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // -------------------------
-    // UI Elements
-    // -------------------------
-    const chatInput = document.getElementById("chatInput");
-    const sendChatBtn = document.getElementById("sendChatBtn");
-    const chatMessages = document.getElementById("chatMessages");
-    const typingIndicator = document.getElementById("typingIndicator");
-    const onlineList = document.getElementById("onlineList");
-    const onlineCount = document.getElementById("onlineCount");
-    const signedName = document.getElementById("signedName");
-    const headerPhoto = document.getElementById("headerPhoto");
-    const loginBtn = document.getElementById("loginBtn");
-
-    const postAvatar = document.getElementById("postAvatar");
-    const postContent = document.getElementById("postContent");
-    const submitPost = document.getElementById("submitPost");
-    const communityPosts = document.getElementById("communityPosts");
-
-    const attachBtn = document.getElementById("attachBtn");
-    const chatFile = document.getElementById("chatFile");
-    const postAttach = document.getElementById("postAttach");
-    const postFile = document.getElementById("postFile");
-    const postTags = document.getElementById("postTags");
-
-    let currentUser = null;
-    let currentUserRole = null; // 'admin' or undefined
-    let typingTimeout = null;
-
-    // cache for user profiles (uid -> {profileURL, name, photo, active})
-    const userCache = {};
-
-    // -------------------------
-    // Helper: fetch user profile (cached) + active check
-    // Implementation detail for H1:
-    // - We mark user as inactive if the user doc is missing OR has deleted==true || disabled==true
-    // - Admins should mark deleted users with deleted:true when they remove them from Auth if they prefer.
-    // -------------------------
-    async function getUserProfile(uid) {
-      if (!uid) return null;
-      if (userCache[uid]) return userCache[uid];
-
-      try {
-        const uRef = doc(db, "users", uid);
-        const snap = await getDoc(uRef);
-        if (!snap.exists()) {
-          // user doc missing -> treat as removed (inactive)
-          const profile = { profileURL: null, photo: null, displayName: null, active: false };
-          userCache[uid] = profile;
-          return profile;
-        }
-        const data = snap.data();
-
-        // if admin set flags deleted/disabled -> treat as inactive (H1)
-        const inactive = !!(data.deleted === true || data.disabled === true);
-        const profile = {
-          profileURL: data.profileURL || null,
-          photo: data.photo || null,
-          displayName: data.displayName || data.name || null,
-          role: data.role || null,
-          active: !inactive
-        };
-        userCache[uid] = profile;
-        return profile;
-      } catch (e) {
-        // on error, assume inactive fail-safe
-        const profile = { profileURL: null, photo: null, displayName: null, active: false };
-        userCache[uid] = profile;
-        return profile;
-      }
-    }
-
-    // -------------------------
-    // Tabs
-    // -------------------------
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const tab = btn.dataset.tab || (btn.textContent.trim().includes('Chat') ? 'chatTab' : btn.textContent.trim().includes('Posts') ? 'postsTab' : 'annTab');
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-        document.getElementById(tab).classList.remove('hidden');
-      });
-    });
-
-    document.getElementById('focusChat').addEventListener('click', () => {
-      document.querySelector('[data-tab="chatTab"]').click();
-      chatInput.focus();
-    });
-    document.getElementById('newPostBtn').addEventListener('click', () => {
-      document.querySelector('[data-tab="postsTab"]').click();
-      postContent.focus();
-    });
-
-    // attach buttons
-    attachBtn.addEventListener('click', () => chatFile.click());
-    postAttach.addEventListener('click', () => postFile.click());
-
-    chatFile.addEventListener('change', async (e) => {
-      const f = e.target.files[0];
-      if (!f) return;
-      await uploadFileToCloudinaryAndSend(f, "chat");
-      chatFile.value = "";
-    });
-
-    postFile.addEventListener('change', async (e) => {
-      const f = e.target.files[0];
-      if (!f) return;
-      postFile._file = f;
-    });
-
-    // -------------------------
-    // Auth state & header avatar (with profile fallback)
-    // Also fetch currentUserRole from users/{uid}.role
-    // -------------------------
-    onAuthStateChanged(auth, async user => {
-      currentUser = user;
-      currentUserRole = null;
-
-      if (user) {
-        // fetch Firestore profile if any (cached)
-        const uProfile = await getUserProfile(user.uid);
-
-        // determine role if set in users doc
-        currentUserRole = uProfile?.role || null;
-
-        const finalPhoto = user.photoURL || (uProfile && (uProfile.profileURL || uProfile.photo)) || DEFAULT_AVATAR;
-        headerPhoto.src = finalPhoto;
-        headerPhoto.classList.remove("hidden");
-        loginBtn.classList.add("hidden");
-        signedName.textContent = user.displayName || user.email || "User";
-        postAvatar.src = finalPhoto; // composer avatar
-      } else {
-        headerPhoto.classList.add("hidden");
-        loginBtn.classList.remove("hidden");
-        signedName.textContent = "Guest";
-        postAvatar.src = DEFAULT_AVATAR;
-      }
-    });
-
-    // HEARTBEAT PRESENCE SYSTEM
-let heartbeatInterval = null;
-
-function startHeartbeat(uid) {
-  stopHeartbeat();
-
-  const pRef = doc(db, "presence", uid);
-
-  heartbeatInterval = setInterval(() => {
-    setDoc(pRef, {
-      name: currentUser.displayName || currentUser.email || "User",
-      photo: currentUser.photoURL || null,
-      lastSeen: serverTimestamp()
-    }, { merge: true });
-  }, 20000); // every 20 seconds
-}
-
-function stopHeartbeat() {
-  if (heartbeatInterval) clearInterval(heartbeatInterval);
-}
-
-// hook into auth
-onAuthStateChanged(auth, async user => {
-  currentUser = user;
-  currentUserRole = null;
-
-  if (user) {
-    const uProfile = await getUserProfile(user.uid);
-    currentUserRole = uProfile?.role || null;
-
-    const finalPhoto =
-      user.photoURL || uProfile.profileURL || uProfile.photo || DEFAULT_AVATAR;
-
-    headerPhoto.src = finalPhoto;
-    headerPhoto.classList.remove("hidden");
-    loginBtn.classList.add("hidden");
-    signedName.textContent = user.displayName || user.email;
-
-    postAvatar.src = finalPhoto;
-
-    startHeartbeat(user.uid);
-  } else {
-    stopHeartbeat();
-    headerPhoto.classList.add("hidden");
-    loginBtn.classList.remove("hidden");
-    signedName.textContent = "Guest";
-    postAvatar.src = DEFAULT_AVATAR;
-  }
-});
-
-    // typing indicator (update presence.typing)
-    function indicateTyping(isTyping) {
-      if (!currentUser) return;
-      const pRef = doc(db, "presence", currentUser.uid);
-      setDoc(pRef, { typing: isTyping, lastSeen: serverTimestamp() }, { merge: true }).catch(()=>{});
-    }
-
-    chatInput.addEventListener('input', () => {
-      indicateTyping(true);
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => indicateTyping(false), 1200);
-    });
-
-    // -------------------------
-    // Notifications helper (correct path)
-    // -------------------------
-    async function createNotificationFor(uid, payload) {
-      if (!uid) return;
-      try {
-        const nRef = collection(db, "notifications", uid, "items");
-        await addDoc(nRef, {
-          ...payload,
-          read: false,
-          createdAt: serverTimestamp()
-        });
-      } catch (e) {
-        console.warn("notify failed", e);
-      }
-    }
-
-    // -------------------------
-    // Cloudinary upload helper
-    // -------------------------
-    async function uploadToCloudinary(file) {
-      if (!CLOUDINARY_UPLOAD_PRESET || CLOUDINARY_UPLOAD_PRESET.includes("YOUR")) {
-        alert("Set CLOUDINARY_UPLOAD_PRESET and CLOUDINARY_UPLOAD_URL in the file.");
-        throw new Error("Cloudinary not configured");
-      }
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-      const res = await fetch(CLOUDINARY_UPLOAD_URL, { method: "POST", body: fd });
-      if (!res.ok) throw new Error("Upload failed");
-      const body = await res.json();
-      return body; // contains secure_url etc.
-    }
-
-    async function uploadFileToCloudinaryAndSend(file, mode = "chat") {
-      try {
-        const body = await uploadToCloudinary(file);
-        const secure_url = body.secure_url || body.secureUrl || body.url;
-        const resource_type = body.resource_type || body.format || "auto";
-        if (mode === "chat") {
-          await sendMessage({ text: "", fileUrl: secure_url, fileType: resource_type, fileName: file.name });
-        } else {
-          postFile._uploaded = { url: secure_url, type: resource_type, name: file.name };
-          alert("File attached to post. Click Post to publish.");
-        }
-      } catch (e) {
-        console.error("cloud upload failed", e);
-        alert("File upload failed.");
-      }
-    }
-
-    // -------------------------
-    // Send message
-    // -------------------------
-    async function sendMessage({ text, fileUrl, fileType, fileName } = {}) {
-      const contentText = (text !== undefined) ? text : chatInput.value.trim();
-      if (!currentUser && !contentText && !fileUrl) {
-        alert("Sign in to chat.");
-        return;
-      }
-      if (!contentText && !fileUrl) return;
-
-      // mentions (visual only)
-      const mentions = Array.from((contentText || "").matchAll(/@([a-zA-Z0-9_\-\.]{2,50})/g)).map(m => m[1]);
-
-      try {
-        await addDoc(collection(db, "communityChat"), {
-          message: contentText || "",
-          by: currentUser?.displayName || currentUser?.email || "Guest",
-          uid: currentUser?.uid || null,
-          photo: currentUser?.photoURL || null,
-          createdAt: serverTimestamp(),
-          fileUrl: fileUrl || null,
-          fileType: fileType || null,
-          fileName: fileName || null,
-          reactions: {} // map emoji -> array of uids
-        });
-
-        if (currentUser) {
-          try { await updateUserXp(currentUser.uid, 2); } catch(e) {}
-        }
-
-        chatInput.value = "";
-        indicateTyping(false);
-      } catch (err) {
-        console.error("send failed", err);
-        alert("Message failed to send. Check permissions.");
-      }
-    }
-
-    sendChatBtn.addEventListener('click', () => sendMessage({}));
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage({}); }
-    });
-
-    // -------------------------
-    // Render chat (live)
-    // -------------------------
-    const chatQ = query(collection(db, "communityChat"), orderBy("createdAt", "asc"));
-    onSnapshot(chatQ, snap => {
-      chatMessages.innerHTML = "";
-      snap.forEach(async docSnap => {
-        const d = docSnap.data();
-        const id = docSnap.id;
-
-        const wrap = document.createElement('div');
-        wrap.className = "message flex items-start gap-3 mb-3";
-
-        const img = document.createElement('img');
-        img.className = "avatar";
-        img.src = DEFAULT_AVATAR; // default until resolved
-        wrap.appendChild(img);
-
-        const body = document.createElement('div');
-        body.className = "flex-1";
-
-        const header = document.createElement('div');
-        header.className = "flex items-center gap-3";
-
-        const nameEl = document.createElement('div');
-        nameEl.innerHTML = `<div class="font-semibold">${escapeHtml(d.by || 'User')}</div><div class="meta small-muted">${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleString() : ''}</div>`;
-        header.appendChild(nameEl);
-
-        // admin actions - only show for admins
-        const adminActions = document.createElement('div');
-        adminActions.className = "admin-actions ml-auto";
-        if (currentUserRole === 'admin') {
-          const delBtn = document.createElement('button');
-          delBtn.textContent = "Delete";
-          delBtn.className = "px-2 py-1 rounded bg-red-100 small-muted";
-          delBtn.onclick = async () => {
-            if (!confirm("Delete message?")) return;
-            try {
-              await deleteDoc(doc(db, "communityChat", id));
-            } catch (e) { alert("Delete failed (permissions)."); }
-          };
-          adminActions.appendChild(delBtn);
-        }
-        header.appendChild(adminActions);
-
-        const msgText = document.createElement('div');
-        msgText.className = "mt-2";
-        msgText.innerHTML = highlightMentionsAndLinks(escapeHtml(d.message || ""));
-
-        body.appendChild(header);
-        body.appendChild(msgText);
-
-        // file preview
-        if (d.fileUrl) {
-          const fDiv = document.createElement('div');
-          fDiv.className = "mt-2";
-          if ((d.fileType || "").startsWith("image") || /\.(jpe?g|png|gif|webp|svg)$/i.test(d.fileName || "")) {
-            fDiv.innerHTML = `<a href="${d.fileUrl}" target="_blank"><img src="${d.fileUrl}" class="file-preview" /></a>`;
-          } else {
-            fDiv.innerHTML = `<a class="small-muted" href="${d.fileUrl}" target="_blank">📎 ${escapeHtml(d.fileName || 'file')}</a>`;
-          }
-          body.appendChild(fDiv);
-        }
-
-        // reactions UI (R2 - Discord-like minimal)
-        const reactionsDiv = document.createElement('div');
-        reactionsDiv.className = "mt-3 flex gap-2 items-center";
-        const EMOJIS = ['👍','❤️','😂','😮'];
-        EMOJIS.forEach(emoji => {
-          const rbtn = document.createElement('button');
-          rbtn.className = "reaction-btn small small-muted";
-          rbtn.innerHTML = `${emoji} <span class="react-count">0</span>`;
-
-          rbtn.onclick = async () => {
-            if (!currentUser) return alert("Sign in to react.");
-            const msgRef = doc(db, "communityChat", id);
-            const uid = currentUser.uid;
-            const path = `reactions.${emoji}`;
-
-            // compute current reacted state from latest local snapshot (d)
-            const reactedNow = (d.reactions && Array.isArray(d.reactions[emoji]) && d.reactions[emoji].includes(uid));
-
-            try {
-              if (reactedNow) {
-                await updateDoc(msgRef, { [path]: arrayRemove(uid) });
-              } else {
-                await updateDoc(msgRef, { [path]: arrayUnion(uid) });
-              }
-            } catch (e) {
-              console.warn("reaction write failed", e);
-            }
-          };
-
-          reactionsDiv.appendChild(rbtn);
-        });
-
-        body.appendChild(reactionsDiv);
-
-        wrap.appendChild(body);
-        chatMessages.appendChild(wrap);
-
-        // fetch profile fallback (uid -> profileURL) and update avatar
-        (async () => {
-          try {
-            let avatar = d.photo || null;
-            if (!avatar && d.uid) {
-              const p = await getUserProfile(d.uid);
-              // IMPORTANT: H1 behavior: hide user from lists if p.active === false.
-              // For messages we DO NOT hide the message; we still display the message with stored by/photo.
-              // But if you also want author name to be replaced on messages, we would need to change.
-              if (p && (p.profileURL || p.photo)) avatar = p.profileURL || p.photo;
-            }
-            avatar = avatar || DEFAULT_AVATAR;
-            img.src = avatar;
-          } catch (e) {
-            img.src = DEFAULT_AVATAR;
-          }
-        })();
-
-        // fill reaction counts and highlight if reacted
-        (function renderReactionsLocal(d, container) {
-          const reactBtns = container.querySelectorAll('.reaction-btn');
-          reactBtns.forEach((btn, idx) => {
-            const emoji = EMOJIS[idx];
-            const users = (d.reactions && d.reactions[emoji]) ? d.reactions[emoji] : [];
-            const count = users.length || 0;
-            const uid = currentUser?.uid || null;
-            btn.querySelector('.react-count').textContent = String(count);
-            if (uid && users.includes(uid)) {
-              btn.classList.add('reacted');
-            } else {
-              btn.classList.remove('reacted');
-            }
-          });
-        })(d, reactionsDiv);
-
-      }); // end forEach (chat)
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }, err => {
-      console.error("chat snapshot failed", err);
-    });
-
-    // -------------------------
-    // Presence & online list (H1: hide removed users)
-    // We will filter presence entries by checking users/{uid} active flag.
-    // If the users doc is missing OR deleted/disabled==true => we exclude that uid from lists.
-    // -------------------------
-    // Presence using lastSeen (offline after 40s)
-const presenceQ = query(collection(db, "presence"));
-
-onSnapshot(presenceQ, async snap => {
-  onlineList.innerHTML = "";
-  let online = 0;
-  const typingUsers = [];
-
-  const now = Date.now() / 1000;
-
-  const uids = [];
-  snap.forEach(s => uids.push(s.id));
-  await Promise.all(uids.map(async uid => {
-    if (!userCache[uid]) await getUserProfile(uid);
-  }));
-
-  snap.forEach(docSnap => {
-    const d = docSnap.data();
-    const uid = docSnap.id;
-    const profile = userCache[uid];
-
-    if (!profile || profile.active === false) return;
-
-    const last = d.lastSeen?.seconds || 0;
-    const isOnline = (now - last) < 40;
-
-    if (isOnline) online++;
-
-    const li = document.createElement("div");
-    li.className = "flex items-center gap-2";
-
-    const img = document.createElement("img");
-    img.className = "avatar";
-    img.src = d.photo || profile.profileURL || profile.photo || DEFAULT_AVATAR;
-
-    const name = document.createElement("div");
-    name.innerHTML = `
-      <div class="font-semibold">${escapeHtml(d.name || profile.displayName || "User")}</div>
-      <div class="small-muted">${isOnline ? "online" : "last seen " + timeAgo(new Date(last * 1000))}</div>
-    `;
-
-    li.appendChild(img);
-    li.appendChild(name);
-    onlineList.appendChild(li);
-
-    if (d.typing && isOnline) typingUsers.push(d.name || profile.displayName);
+  </div>
+
+  <!-- ── ANNOUNCEMENTS ── -->
+  <div id="annTab" class="tab-content">
+    <div id="announcementsList"></div>
+  </div>
+
+</main>
+
+<footer><span>© 2025 <span class="fg">Books Coffee and Dreams</span> — All rights reserved</span></footer>
+</div>
+
+<!-- ══════════ THEME SCRIPT ══════════ -->
+<script>
+  const TG=document.getElementById('themeToggle'),H=document.documentElement;
+  const sv=localStorage.getItem('bcd-theme');if(sv)H.setAttribute('data-theme',sv);
+  TG.addEventListener('click',()=>{const c=H.getAttribute('data-theme'),n=c==='dark'?'light':'dark';H.setAttribute('data-theme',n);localStorage.setItem('bcd-theme',n)});
+</script>
+
+<!-- ══════════ FIREBASE SCRIPT ══════════ -->
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,collection,addDoc,onSnapshot,query,orderBy,serverTimestamp,doc,setDoc,getDoc,updateDoc,deleteDoc,increment,arrayUnion,arrayRemove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FC={apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",authDomain:"bcd-discord.firebaseapp.com",projectId:"bcd-discord",storageBucket:"bcd-discord.firebasestorage.app",messagingSenderId:"278895155371",appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"};
+const CU="https://api.cloudinary.com/v1_1/dkxuilgai/auto/upload",CP="bcd_courses";
+const DA="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png";
+const app=initializeApp(FC),auth=getAuth(app),db=getFirestore(app);
+
+const $=id=>document.getElementById(id);
+const chatInput=$('chatInput'),sendChatBtn=$('sendChatBtn'),chatMessages=$('chatMessages');
+const typingStrip=$('typingStrip'),typingTxt=$('typingTxt');
+const onlineList=$('onlineList'),onlineCount=$('onlineCount'),onlineCountBadge=$('onlineCountBadge');
+const signedName=$('signedName'),headerPhoto=$('headerPhoto'),loginBtn=$('loginBtn');
+const postAvatar=$('postAvatar'),postContent=$('postContent'),submitPost=$('submitPost');
+const communityPosts=$('communityPosts'),attachBtn=$('attachBtn'),chatFile=$('chatFile');
+const postAttach=$('postAttach'),postFile=$('postFile'),postTags=$('postTags');
+
+let CUR=null,ROLE=null,TTO=null;
+const UC={};
+const EMOJIS=['👍','❤️','😂','😮'];
+const RICS=[
+  `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>`,
+  `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`,
+  `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
+  `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`
+];
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+    $(b.dataset.tab).classList.add('active');
   });
+});
+$('focusChat').addEventListener('click',()=>{document.querySelector('[data-tab="chatTab"]').click();chatInput.focus()});
+$('newPostBtn').addEventListener('click',()=>{document.querySelector('[data-tab="postsTab"]').click();postContent.focus()});
+attachBtn.addEventListener('click',()=>chatFile.click());
+postAttach.addEventListener('click',()=>postFile.click());
+chatFile.addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;await upAndSend(f,"chat");chatFile.value=""});
+postFile.addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;postFile._file=f});
 
-  onlineCount.textContent = online;
-  typingIndicator.textContent =
-    typingUsers.length ? typingUsers.join(", ") + " typing…" : "";
+// User profile
+async function getUP(uid){
+  if(!uid)return null;if(UC[uid])return UC[uid];
+  try{const s=await getDoc(doc(db,"users",uid));if(!s.exists()){UC[uid]={profileURL:null,photo:null,displayName:null,active:false};return UC[uid]}
+  const d=s.data();const i=!!(d.deleted||d.disabled);UC[uid]={profileURL:d.profileURL||null,photo:d.photo||null,displayName:d.displayName||d.name||null,role:d.role||null,active:!i};return UC[uid]}
+  catch{UC[uid]={profileURL:null,photo:null,displayName:null,active:false};return UC[uid]}
+}
+
+// Heartbeat
+let HBI=null;
+function startHB(uid){stopHB();const pr=doc(db,"presence",uid);HBI=setInterval(()=>setDoc(pr,{name:CUR.displayName||CUR.email||"User",photo:CUR.photoURL||null,lastSeen:serverTimestamp()},{merge:true}),20000)}
+function stopHB(){if(HBI)clearInterval(HBI)}
+
+// Auth
+onAuthStateChanged(auth,async u=>{
+  CUR=u;ROLE=null;
+  if(u){const p=await getUP(u.uid);ROLE=p?.role||null;
+    const ph=u.photoURL||p?.profileURL||p?.photo||DA;
+    headerPhoto.src=ph;headerPhoto.classList.remove("hidden");loginBtn.classList.add("hidden");
+    signedName.textContent=u.displayName||u.email||"User";postAvatar.src=ph;startHB(u.uid);
+  }else{stopHB();headerPhoto.classList.add("hidden");loginBtn.classList.remove("hidden");signedName.textContent="Guest";postAvatar.src=DA}
 });
 
-    // -------------------------
-    // Posts & comments
-    // Posts display author info from stored doc fields (by/photo). Those remain even if author is removed.
-    // Only admin can delete posts/comments.
-    // -------------------------
-    submitPost.addEventListener('click', async () => {
-      if (!currentUser) return alert("Sign in to post.");
-      const text = postContent.value.trim();
-      if (!text && !postFile._uploaded) return alert("Write something or attach a file.");
-      const tags = (postTags.value || "").split(/[\s,]+/).filter(Boolean).map(t => t.startsWith('#') ? t : '#'+t);
+// Typing
+function indicateTyping(v){if(!CUR)return;setDoc(doc(db,"presence",CUR.uid),{typing:v,lastSeen:serverTimestamp()},{merge:true}).catch(()=>{})}
+chatInput.addEventListener('input',()=>{indicateTyping(true);clearTimeout(TTO);TTO=setTimeout(()=>indicateTyping(false),1200)});
 
-      let attached = null;
-      if (postFile._file && !postFile._uploaded) {
-        try {
-          const up = await uploadToCloudinary(postFile._file);
-          postFile._uploaded = { url: up.secure_url, type: up.resource_type, name: postFile._file.name };
-        } catch (e) { console.error("post file upload failed", e); alert("Upload failed"); return; }
-      }
-      if (postFile._uploaded) attached = postFile._uploaded;
+// Cloudinary
+async function uploadCL(file){const fd=new FormData();fd.append("file",file);fd.append("upload_preset",CP);const r=await fetch(CU,{method:"POST",body:fd});if(!r.ok)throw new Error("Upload failed");return r.json()}
+async function upAndSend(file,mode="chat"){
+  try{const b=await uploadCL(file);const url=b.secure_url||b.url;const type=b.resource_type||"auto";
+    if(mode==="chat")await sendMsg({text:"",fileUrl:url,fileType:type,fileName:file.name});
+    else{postFile._uploaded={url,type,name:file.name};alert("File attached. Click Publish.")}
+  }catch(e){console.error(e);alert("Upload failed")}
+}
 
-      try {
-        await addDoc(collection(db, "communityPosts"), {
-          content: text || "",
-          by: currentUser.displayName || currentUser.email,
-          uid: currentUser.uid,
-          photo: currentUser.photoURL || null,
-          createdAt: serverTimestamp(),
-          tags: tags,
-          attached: attached || null,
-          reactions: {},
-          commentsCount: 0
-        });
+// Send message
+async function sendMsg({text,fileUrl,fileType,fileName}={}){
+  const ct=(text!==undefined)?text:chatInput.value.trim();
+  if(!CUR&&!ct&&!fileUrl){alert("Sign in to chat.");return}if(!ct&&!fileUrl)return;
+  try{
+    await addDoc(collection(db,"communityChat"),{message:ct||"",by:CUR?.displayName||CUR?.email||"Guest",uid:CUR?.uid||null,photo:CUR?.photoURL||null,createdAt:serverTimestamp(),fileUrl:fileUrl||null,fileType:fileType||null,fileName:fileName||null,reactions:{}});
+    if(CUR)updateXP(CUR.uid,2).catch(()=>{});chatInput.value="";indicateTyping(false);
+  }catch(e){console.error(e);alert("Message failed")}
+}
+sendChatBtn.addEventListener('click',()=>sendMsg({}));
+chatInput.addEventListener('keydown',e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg({})}});
 
-        await updateUserXp(currentUser.uid, 10);
-        postContent.value = "";
-        postFile._file = null;
-        postFile._uploaded = null;
-      } catch (e) {
-        console.error("post failed", e);
-        alert("Post failed - permissions?");
-      }
-    });
+// Render chat
+const chatQ=query(collection(db,"communityChat"),orderBy("createdAt","asc"));
+onSnapshot(chatQ,snap=>{
+  chatMessages.innerHTML="";
+  snap.forEach(async ds=>{
+    const d=ds.data();const id=ds.id;
+    const wrap=document.createElement('div');wrap.className="message";
+    const img=document.createElement('img');img.className="avatar";img.src=DA;img.alt="avatar";wrap.appendChild(img);
+    const bd=document.createElement('div');bd.className="msg-bd";
+    const top=document.createElement('div');top.className="msg-top";
+    top.innerHTML=`<span class="msg-name">${esc(d.by||'User')}</span><span class="msg-time">${d.createdAt?ago(new Date(d.createdAt.seconds*1000)):''}</span>`;
+    if(ROLE==='admin'){const aa=document.createElement('div');aa.className="adm-acts";const db2=document.createElement('button');db2.className="adm-del";db2.innerHTML=`<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Delete`;db2.onclick=async()=>{if(!confirm("Delete?"))return;try{await deleteDoc(doc(db,"communityChat",id))}catch{alert("Failed")}};aa.appendChild(db2);top.appendChild(aa)}
+    bd.appendChild(top);
+    const mt=document.createElement('div');mt.className="msg-txt";mt.innerHTML=hlMentions(esc(d.message||""));bd.appendChild(mt);
+    if(d.fileUrl){const fd=document.createElement('div');if((d.fileType||"").startsWith("image")||/\.(jpe?g|png|gif|webp|svg)$/i.test(d.fileName||"")){fd.innerHTML=`<a href="${d.fileUrl}" target="_blank"><img src="${d.fileUrl}" class="file-preview"/></a>`}else{fd.innerHTML=`<a class="file-link" href="${d.fileUrl}" target="_blank"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${esc(d.fileName||'file')}</a>`}bd.appendChild(fd)}
+    const rr=document.createElement('div');rr.className="rxn-row";
+    EMOJIS.forEach((em,i)=>{const rb=document.createElement('button');rb.className="rxn-btn";rb.innerHTML=`${RICS[i]}<span class="react-count">0</span>`;rb.onclick=async()=>{if(!CUR)return alert("Sign in.");const mr=doc(db,"communityChat",id);const reacted=d.reactions&&Array.isArray(d.reactions[em])&&d.reactions[em].includes(CUR.uid);try{if(reacted)await updateDoc(mr,{[`reactions.${em}`]:arrayRemove(CUR.uid)});else await updateDoc(mr,{[`reactions.${em}`]:arrayUnion(CUR.uid)})}catch(e){console.warn(e)}};rr.appendChild(rb)});
+    bd.appendChild(rr);wrap.appendChild(bd);chatMessages.appendChild(wrap);
+    (async()=>{let av=d.photo||null;if(!av&&d.uid){const p=await getUP(d.uid);if(p&&(p.profileURL||p.photo))av=p.profileURL||p.photo}img.src=av||DA})();
+    (function rr2(d,con){con.querySelectorAll('.rxn-btn').forEach((b,i)=>{const em=EMOJIS[i];const us=(d.reactions&&d.reactions[em])?d.reactions[em]:[];b.querySelector('.react-count').textContent=String(us.length||0);if(CUR?.uid&&us.includes(CUR.uid))b.classList.add('reacted');else b.classList.remove('reacted')})})(d,rr);
+  });
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+});
 
-    // load posts
-    const postsQ = query(collection(db, "communityPosts"), orderBy("createdAt", "desc"));
-    onSnapshot(postsQ, snap => {
-      communityPosts.innerHTML = "";
-      snap.forEach(async docSnap => {
-        const d = docSnap.data();
-        const id = docSnap.id;
-        const el = document.createElement('div');
-        el.className = "white-card";
+// Presence
+const presQ=query(collection(db,"presence"));
+onSnapshot(presQ,async snap=>{
+  onlineList.innerHTML="";let online=0;const tus=[];const now=Date.now()/1000;
+  const uids=[];snap.forEach(s=>uids.push(s.id));
+  await Promise.all(uids.map(async uid=>{if(!UC[uid])await getUP(uid)}));
+  snap.forEach(ds=>{
+    const d=ds.data();const uid=ds.id;const p=UC[uid];
+    if(!p||p.active===false)return;
+    const last=d.lastSeen?.seconds||0;const ion=(now-last)<40;if(ion)online++;
+    const li=document.createElement('div');li.className="mem-row";
+    const aw=document.createElement('div');aw.className="mem-av-wrap";
+    const ai=document.createElement('img');ai.className="avatar";ai.src=d.photo||p.profileURL||p.photo||DA;
+    aw.appendChild(ai);const sd=document.createElement('div');sd.className=`status-dot ${ion?'on':'off'}`;aw.appendChild(sd);
+    const inf=document.createElement('div');inf.className="mem-info";inf.innerHTML=`<div class="mem-name">${esc(d.name||p.displayName||"User")}</div><div class="mem-sub">${ion?"online now":"last seen "+ago(new Date(last*1000))}</div>`;
+    li.appendChild(aw);li.appendChild(inf);onlineList.appendChild(li);
+    if(d.typing&&ion)tus.push(d.name||p.displayName||"Someone");
+  });
+  onlineCount.textContent=online;onlineCountBadge.textContent=online;
+  if(tus.length){typingTxt.textContent=tus.join(", ")+" is typing…";typingStrip.classList.add('show')}else typingStrip.classList.remove('show');
+});
 
-        // build reactions summary HTML
-        const reactionsHtml = buildReactionsHtml(d.reactions || {});
+// Posts
+submitPost.addEventListener('click',async()=>{
+  if(!CUR)return alert("Sign in to post.");const text=postContent.value.trim();
+  if(!text&&!postFile._uploaded)return alert("Write something first.");
+  const tags=(postTags.value||"").split(/[\s,]+/).filter(Boolean).map(t=>t.startsWith('#')?t:'#'+t);
+  let attached=null;
+  if(postFile._file&&!postFile._uploaded){try{const up=await uploadCL(postFile._file);postFile._uploaded={url:up.secure_url,type:up.resource_type,name:postFile._file.name}}catch{alert("Upload failed");return}}
+  if(postFile._uploaded)attached=postFile._uploaded;
+  try{
+    await addDoc(collection(db,"communityPosts"),{content:text||"",by:CUR.displayName||CUR.email,uid:CUR.uid,photo:CUR.photoURL||null,createdAt:serverTimestamp(),tags,attached:attached||null,reactions:{},commentsCount:0});
+    await updateXP(CUR.uid,10);postContent.value="";postTags.value="";postFile._file=null;postFile._uploaded=null;
+  }catch(e){console.error(e);alert("Post failed")}
+});
 
-        el.innerHTML = `
-          <div class="flex items-start gap-3">
-            <img id="post_img_${id}" src="${DEFAULT_AVATAR}" class="avatar" />
-            <div class="flex-1">
-              <div class="flex items-center gap-3">
-                <div class="font-semibold">${escapeHtml(d.by || 'User')}</div>
-                <div class="small-muted">${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleString() : ''}</div>
-                <div class="admin-actions" style="margin-left:auto;"></div>
-              </div>
-              <div class="mt-2">${highlightMentionsAndLinks(escapeHtml(d.content || ""))}</div>
-              ${d.attached ? (d.attached.type && d.attached.type.startsWith("image") ? `<div class="mt-3"><img src="${d.attached.url}" class="file-preview"/></div>` : `<div class="mt-2 small-muted"><a href="${d.attached.url}" target="_blank">📎 ${escapeHtml(d.attached.name || 'file')}</a></div>`) : ''}
-              <div class="mt-3">${reactionsHtml}</div>
-              <div class="mt-3 small-muted">Comments: <span id="commentsCount_${id}">${d.commentsCount || 0}</span></div>
-              <div class="mt-3">
-                <div id="comments_area_${id}" class="space-y-2"></div>
-                <div class="flex gap-2 mt-2">
-                  <input id="comment_input_${id}" class="flex-1 px-3 py-2 border rounded" placeholder="Reply..." />
-                  <button data-postid="${id}" class="comment-btn px-3 py-2 bg-gray-100 rounded">Reply</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-        communityPosts.appendChild(el);
+const postsQ=query(collection(db,"communityPosts"),orderBy("createdAt","desc"));
+onSnapshot(postsQ,snap=>{
+  communityPosts.innerHTML="";
+  snap.forEach(async ds=>{
+    const d=ds.data();const id=ds.id;
+    const rxhtml=buildRxns(d.reactions||{});
+    const tagsHtml=(d.tags||[]).map(t=>`<span class="ptag">${esc(t)}</span>`).join('');
+    const el=document.createElement('div');el.className="card post-card";
+    el.innerHTML=`<div class="pci"><img id="post_img_${id}" src="${DA}" class="avatar" style="width:44px;height:44px;flex-shrink:0" alt="avatar"/><div class="pc-cnt"><div class="pc-meta"><span class="pc-name">${esc(d.by||'User')}</span><span class="pc-time">${d.createdAt?ago(new Date(d.createdAt.seconds*1000)):''}</span><div class="adm-acts"></div></div><div class="pc-body">${hlMentions(esc(d.content||""))}</div>${tagsHtml?`<div class="pc-tags">${tagsHtml}</div>`:''}${d.attached?(d.attached.type&&d.attached.type.startsWith("image")?`<div style="margin-bottom:14px"><img src="${d.attached.url}" class="file-preview"/></div>`:`<div style="margin-bottom:14px"><a class="file-link" href="${d.attached.url}" target="_blank"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${esc(d.attached.name||'file')}</a></div>`):''}
+    <div class="pc-rxns">${rxhtml}</div><div class="pc-foot"><div class="cmt-cnt-row"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span id="commentsCount_${id}">${d.commentsCount||0}</span> comments</div><div class="cmts-area" id="comments_area_${id}"></div><div class="cmt-comp"><input id="comment_input_${id}" placeholder="Add a reply…"/><button data-postid="${id}" class="cmt-btn"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Reply</button></div></div></div></div>`;
+    communityPosts.appendChild(el);
+    const aa=el.querySelector('.adm-acts');if(ROLE==='admin'){const db2=document.createElement('button');db2.className="adm-del";db2.innerHTML=`<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Delete`;db2.onclick=async()=>{if(!confirm("Delete post?"))return;try{await deleteDoc(doc(db,"communityPosts",id))}catch{alert("Failed")}};aa.appendChild(db2)}
+    el.querySelector('.cmt-btn').addEventListener('click',async ev=>{const pid=ev.currentTarget.dataset.postid;const inp=$(  'comment_input_'+pid);const text=inp.value.trim();if(!text)return;try{await addDoc(collection(db,"communityPosts",pid,"comments"),{content:text,by:CUR?.displayName||CUR?.email||"Guest",uid:CUR?.uid||null,createdAt:serverTimestamp()});await updateDoc(doc(db,"communityPosts",pid),{commentsCount:increment(1)}).catch(()=>{});inp.value="";if(CUR)await updateXP(CUR.uid,5)}catch(e){console.error(e);alert("Comment failed")}});
+    const cQ=query(collection(db,"communityPosts",id,"comments"),orderBy("createdAt","asc"));
+    onSnapshot(cQ,cs=>{const area=$('comments_area_'+id);area.innerHTML="";cs.forEach(cd=>{const c=cd.data();const cdiv=document.createElement('div');cdiv.className="cmt-item";cdiv.innerHTML=`<div class="cmt-name">${esc(c.by||'User')}</div><div class="cmt-txt">${esc(c.content)}</div><div class="cmt-ts">${c.createdAt?ago(new Date(c.createdAt.seconds*1000)):''}</div>`;area.appendChild(cdiv)});const ce=$('commentsCount_'+id);if(ce)ce.textContent=String(area.childElementCount)});
+    (async()=>{let av=d.photo||null;if(!av&&d.uid){const p=await getUP(d.uid);if(p&&(p.profileURL||p.photo))av=p.profileURL||p.photo}const ie=$('post_img_'+id);if(ie)ie.src=av||DA})();
+    (function wPR(ld,ce){ce.querySelectorAll('.rxn-btn').forEach((b,i)=>{const em=EMOJIS[i];b.addEventListener('click',async()=>{if(!CUR)return alert("Sign in.");const pr=doc(db,"communityPosts",id);const us=(ld.reactions&&ld.reactions[em])?ld.reactions[em]:[];const reacted=us.includes(CUR.uid);try{if(reacted)await updateDoc(pr,{[`reactions.${em}`]:arrayRemove(CUR.uid)});else await updateDoc(pr,{[`reactions.${em}`]:arrayUnion(CUR.uid)})}catch(e){console.warn(e)}})})})(d,el);
+  });
+});
 
-        // admin delete button (only visible to admins)
-        const adminActionsContainer = el.querySelector('.admin-actions');
-        if (currentUserRole === 'admin') {
-          const delBtn = document.createElement('button');
-          delBtn.className = "px-2 py-1 rounded bg-red-100 small-muted";
-          delBtn.textContent = "Delete";
-          delBtn.onclick = async () => {
-            if (!confirm("Delete post?")) return;
-            try { await deleteDoc(doc(db, "communityPosts", id)); } catch(e){ alert("Could not delete (permissions)"); }
-          };
-          adminActionsContainer.appendChild(delBtn);
-        }
+// Announcements
+const annQ=query(collection(db,"announcements"),orderBy("createdAt","desc"));
+onSnapshot(annQ,snap=>{
+  const con=$('announcementsList');con.innerHTML="";
+  snap.forEach(d=>{const data=d.data();const el=document.createElement('div');el.className="card ann-card";
+  el.innerHTML=`<div class="ann-icon-box"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="ann-title">${esc(data.title||'Announcement')}</div><div class="ann-body">${esc(data.message||'')}</div><div class="ann-time"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${data.createdAt?new Date(data.createdAt.seconds*1000).toLocaleString():''}</div>`;
+  con.appendChild(el)});
+});
 
-        // wire comment btn
-        el.querySelector('.comment-btn').addEventListener('click', async (ev) => {
-          const pid = ev.currentTarget.dataset.postid;
-          const input = document.getElementById('comment_input_' + pid);
-          const text = input.value.trim();
-          if (!text) return;
-          try {
-            await addDoc(collection(db, "communityPosts", pid, "comments"), {
-              content: text,
-              by: currentUser?.displayName || currentUser?.email || "Guest",
-              uid: currentUser?.uid || null,
-              createdAt: serverTimestamp()
-            });
+async function updateXP(uid,amt){if(!uid||!amt)return;try{await updateDoc(doc(db,"users",uid),{xp:increment(amt)})}catch{try{await setDoc(doc(db,"users",uid),{xp:amt},{merge:true})}catch{}}}
 
-            const pRef = doc(db, "communityPosts", pid);
-            await updateDoc(pRef, { commentsCount: increment(1) }).catch(()=>{});
-            input.value = "";
-            if (currentUser) await updateUserXp(currentUser.uid, 5);
-          } catch(e){ console.error("comment failed", e); alert("Comment failed"); }
-        });
-
-        // load comments live
-        const commentsQ = query(collection(db, "communityPosts", id, "comments"), orderBy("createdAt","asc"));
-        onSnapshot(commentsQ, csnap => {
-          const area = document.getElementById('comments_area_' + id);
-          area.innerHTML = "";
-          csnap.forEach(cDoc => {
-            const cd = cDoc.data();
-            const cdiv = document.createElement('div');
-            cdiv.className = "p-2 border rounded";
-            cdiv.innerHTML = `<div class="font-semibold">${escapeHtml(cd.by || 'User')}</div><div class="small-muted">${escapeHtml(cd.content)}</div><div class="small-muted">${cd.createdAt ? new Date(cd.createdAt.seconds*1000).toLocaleString() : ''}</div>`;
-            area.appendChild(cdiv);
-          });
-          document.getElementById('commentsCount_' + id).textContent = String(area.childElementCount);
-        });
-
-        // resolve avatar for post author (use the stored photo first, otherwise fall back to profile)
-        (async () => {
-          try {
-            let avatar = d.photo || null;
-            if (!avatar && d.uid) {
-              const p = await getUserProfile(d.uid);
-              if (p && (p.profileURL || p.photo)) avatar = p.profileURL || p.photo;
-            }
-            avatar = avatar || DEFAULT_AVATAR;
-            const imgEl = document.getElementById('post_img_' + id);
-            if (imgEl) imgEl.src = avatar;
-          } catch (e) {
-            const imgEl = document.getElementById('post_img_' + id);
-            if (imgEl) imgEl.src = DEFAULT_AVATAR;
-          }
-        })();
-
-        // wire post reactions toggles
-        (function wirePostReactions(localDoc, containerEl) {
-          const EMOJIS = ['👍','❤️','😂','😮'];
-          const reactButtons = containerEl.querySelectorAll('.reaction-btn');
-          reactButtons.forEach((btn, idx) => {
-            const emoji = EMOJIS[idx];
-            btn.addEventListener('click', async () => {
-              if (!currentUser) return alert("Sign in to react.");
-              const pRef = doc(db, "communityPosts", id);
-              const uid = currentUser.uid;
-              const path = `reactions.${emoji}`;
-              const users = (localDoc.reactions && localDoc.reactions[emoji]) ? localDoc.reactions[emoji] : [];
-              const reacted = users.includes(uid);
-              try {
-                if (reacted) await updateDoc(pRef, { [path]: arrayRemove(uid) });
-                else await updateDoc(pRef, { [path]: arrayUnion(uid) });
-              } catch(e) { console.warn("post reaction failed", e); }
-            });
-          });
-        })(d, el);
-
-      }); // end posts loop
-    });
-
-    // -------------------------
-    // Announcements
-    // -------------------------
-    const annQ = query(collection(db, "announcements"), orderBy("createdAt","desc"));
-    onSnapshot(annQ, snap => {
-      const container = document.getElementById('announcementsList');
-      container.innerHTML = "";
-      snap.forEach(d => {
-        const data = d.data();
-        const el = document.createElement('div');
-        el.className = "white-card";
-        el.innerHTML = `<div class="font-semibold">📣 ${escapeHtml(data.title || 'Announcement')}</div><div class="mt-2">${escapeHtml(data.message || '')}</div><div class="small-muted mt-2">${data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleString() : ''}</div>`;
-        container.appendChild(el);
-      });
-    });
-
-    // -------------------------
-    // XP helper
-    // -------------------------
-    async function updateUserXp(uid, amount) {
-      if (!uid || !amount) return;
-      try {
-        const uRef = doc(db, "users", uid);
-        await updateDoc(uRef, { xp: increment(amount) });
-      } catch (e) {
-        try { await setDoc(doc(db, "users", uid), { xp: amount }, { merge: true }); } catch {}
-      }
-    }
-
-    // -------------------------
-    // Utilities
-    // -------------------------
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function timeAgo(date) {
-      if (!date) return "";
-      const s = Math.floor((Date.now() - date.getTime())/1000);
-      if (s < 60) return s + "s ago";
-      if (s < 3600) return Math.floor(s/60) + "m ago";
-      if (s < 86400) return Math.floor(s/3600) + "h ago";
-      return Math.floor(s/86400) + "d ago";
-    }
-
-    function highlightMentionsAndLinks(txt) {
-      let res = txt.replace(/@([a-zA-Z0-9_\-\.]{2,50})/g, `<span class="mention">@$1</span>`);
-      res = res.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="small-muted">$1</a>');
-      return res;
-    }
-
-    function buildReactionsHtml(reactionsMap) {
-      const EMOJIS = ['👍','❤️','😂','😮'];
-      let html = '';
-      EMOJIS.forEach(e => {
-        const users = reactionsMap[e] || [];
-        const count = users.length || 0;
-        html += `<button class="reaction-btn small">${e} <span class="react-count">${count}</span></button>`;
-      });
-      return html;
-    }
-
-    /* ===========================
-       NOTES & ADMIN ACTIONS
-       - H1 behavior (hide removed users): Client hides presence/members if users/{uid} doc missing OR has deleted===true/disabled===true.
-         -> Recommended admin workflow: when you remove a user from Firebase Auth, ALSO set users/{uid}.deleted = true (or delete the users doc). If you want this automated, I can provide a Cloud Function that sets deleted:true when an auth user is deleted.
-       - Only users with users/{uid}.role === "admin" see delete buttons and can delete messages/posts/comments.
-       - For secure reaction updates, ensure your Firestore rules allow authenticated users to update reactions (or use Cloud Function).
-    =========================== */
-
-  </script>
-
-  <!-- AOS -->
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script>AOS.init({ duration: 800 });</script>
+function esc(s){if(!s)return"";return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function ago(d){if(!d)return"";const s=Math.floor((Date.now()-d.getTime())/1000);if(s<60)return s+"s ago";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return Math.floor(s/86400)+"d ago"}
+function hlMentions(t){let r=t.replace(/@([a-zA-Z0-9_\-\.]{2,50})/g,'<span class="mention">@$1</span>');return r.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" class="file-link">$1</a>')}
+function buildRxns(rm){return EMOJIS.map((e,i)=>`<button class="rxn-btn">${RICS[i]}<span class="react-count">${(rm[e]||[]).length}</span></button>`).join('')}
+</script>
 </body>
 </html>
