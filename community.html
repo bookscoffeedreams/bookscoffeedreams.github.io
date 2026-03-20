@@ -1100,9 +1100,9 @@ TG.addEventListener('click',()=>{const c=H.getAttribute('data-theme'),n=c==='dar
 
 <!-- FIREBASE + APP SCRIPT -->
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,collection,addDoc,onSnapshot,query,orderBy,serverTimestamp,doc,setDoc,getDoc,updateDoc,deleteDoc,increment,arrayUnion,arrayRemove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import{getFirestore,collection,addDoc,onSnapshot,query,orderBy,serverTimestamp,doc,setDoc,getDoc,updateDoc,deleteDoc,increment,arrayUnion,arrayRemove}from"https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 const FC={apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",authDomain:"bcd-discord.firebaseapp.com",projectId:"bcd-discord",storageBucket:"bcd-discord.firebasestorage.app",messagingSenderId:"278895155371",appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"};
 const CU="https://api.cloudinary.com/v1_1/dkxuilgai/auto/upload",CP="bcd_courses";
@@ -1407,7 +1407,7 @@ function showProfileCard(uid,name,photo,anchorEl){
       }
     }).catch(()=>{});
     // count posts
-    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({query:q2,collection:col2,where:w,getCountFromServer})=>{
+    import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js').then(({query:q2,collection:col2,where:w,getCountFromServer})=>{
       getCountFromServer(q2(col2(db,'communityPosts'),w('uid','==',uid))).then(r=>phcPosts.textContent=r.data().count).catch(()=>{phcPosts.textContent='—'});
     }).catch(()=>{});
   }
