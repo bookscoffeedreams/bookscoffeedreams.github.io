@@ -300,128 +300,181 @@ header{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display:flex;
 /* ── PROFILE HOVER CARD ── */
 .profile-hcard{
   position:fixed;z-index:600;
-  width:280px;
+  width:300px;
   background:var(--sur);
   border:1px solid var(--bdr2);
-  border-radius:24px;
-  box-shadow:var(--sh2), 0 0 0 1px rgba(139,92,246,.08), 0 0 60px rgba(124,58,237,.18);
-  overflow:hidden;pointer-events:none;
-  opacity:0;transform:scale(.9) translateY(10px);
-  transition:opacity .25s var(--spring), transform .3s var(--spring);
+  border-radius:20px;
+  box-shadow:0 24px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(139,92,246,.12), 0 0 80px rgba(124,58,237,.2);
+  overflow:visible;
+  pointer-events:none;
+  opacity:0;transform:scale(.88) translateY(14px);
+  transition:opacity .28s var(--spring), transform .32s var(--spring);
 }
 .profile-hcard.show{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
 
+/* Card inner clips overflow except avatar wrap */
+.phc-inner{border-radius:20px;overflow:hidden;position:relative}
+
 /* Animated gradient banner */
 .phc-banner{
-  height:80px;position:relative;overflow:hidden;
-  background:linear-gradient(135deg,#7c3aed 0%,#a855f7 40%,#ec4899 70%,#f59e0b 100%);
+  height:90px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#4f1dab 0%,#7c3aed 30%,#a855f7 60%,#ec4899 100%);
   background-size:300% 300%;
-  animation:phc-grad 6s ease infinite;
+  animation:phc-grad 5s ease infinite;
 }
 @keyframes phc-grad{
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
 }
-/* Sheen sweep */
 .phc-banner::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);
-  animation:phc-sheen 3s ease-in-out infinite;
+  background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:20px 20px;
 }
-@keyframes phc-sheen{
-  0%{transform:translateX(-100%)}
-  60%,100%{transform:translateX(160%)}
-}
-/* Grid pattern overlay */
 .phc-banner::after{
   content:'';position:absolute;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
-  background-size:18px 18px;
+  background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.15) 50%,transparent 75%);
+  animation:phc-sheen 3.5s ease-in-out infinite;
+}
+@keyframes phc-sheen{
+  0%{transform:translateX(-150%)}65%,100%{transform:translateX(200%)}
 }
 
-/* Avatar ring */
+/* Avatar — positioned to overlap banner and body */
 .phc-av-wrap{
-  position:absolute;bottom:-24px;left:18px;
-  width:52px;height:52px;
+  position:absolute;
+  top:54px;left:20px;
+  width:60px;height:60px;
   border-radius:50%;
-  padding:3px;
   background:var(--grad);
-  box-shadow:0 0 0 3px var(--sur), 0 4px 16px rgba(0,0,0,.4);
-  animation:phc-av-in .35s var(--spring) both;
+  padding:2.5px;
+  box-shadow:0 0 0 3px var(--sur), 0 6px 20px rgba(0,0,0,.5);
+  z-index:10;
+  animation:phc-av-in .4s var(--spring) .05s both;
 }
-@keyframes phc-av-in{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes phc-av-in{from{transform:scale(.5) translateY(10px);opacity:0}to{transform:none;opacity:1}}
 .phc-av{
   width:100%;height:100%;border-radius:50%;
   object-fit:cover;display:block;
 }
-
-/* Online badge on avatar */
 .phc-av-status{
-  position:absolute;bottom:2px;right:2px;
-  width:11px;height:11px;border-radius:50%;
+  position:absolute;bottom:1px;right:1px;
+  width:13px;height:13px;border-radius:50%;
   background:var(--emerald);
-  border:2px solid var(--sur);
+  border:2.5px solid var(--sur);
   display:none;
+  box-shadow:0 0 6px rgba(16,185,129,.6);
 }
 .phc-av-status.visible{display:block;animation:badge-pop .3s var(--spring)}
 
-.phc-body{padding:32px 18px 18px}
+/* Body */
+.phc-body{
+  padding:20px 20px 20px;
+  padding-top:40px;
+  background:var(--sur);
+}
 
-/* Name + role row */
-.phc-name-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
-.phc-name{font-size:16px;font-weight:800;color:var(--tx);letter-spacing:-.03em;line-height:1}
+.phc-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.phc-name{
+  font-size:17px;font-weight:800;
+  color:var(--tx);letter-spacing:-.03em;line-height:1;
+}
 .phc-role-badge{
   font-family:var(--mono);font-size:9px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;
-  padding:2px 7px;border-radius:99px;
-  background:rgba(124,58,237,.15);color:var(--p3);
-  border:1px solid rgba(124,58,237,.25);
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 8px;border-radius:99px;
+  background:rgba(124,58,237,.15);
+  color:var(--p3);
+  border:1px solid rgba(124,58,237,.3);
+  white-space:nowrap;
 }
-.phc-role-badge.admin{background:rgba(245,158,11,.12);color:var(--amber);border-color:rgba(245,158,11,.25)}
+.phc-role-badge.admin{
+  background:rgba(245,158,11,.12);
+  color:var(--amber);
+  border-color:rgba(245,158,11,.3);
+}
 
-.phc-sub{font-size:11px;color:var(--tx4);font-family:var(--mono);margin-bottom:10px}
+.phc-sub{
+  font-size:12px;color:var(--tx4);
+  font-family:var(--mono);
+  margin-bottom:12px;
+  margin-top:2px;
+}
 
 /* Online pill */
 .phc-online{
-  display:none;align-items:center;gap:5px;
-  font-size:11px;color:var(--emerald);
-  font-family:var(--mono);font-weight:500;
+  display:none;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;
+  color:var(--emerald);font-family:var(--mono);
   background:rgba(16,185,129,.08);
   border:1px solid rgba(16,185,129,.2);
-  border-radius:99px;padding:3px 10px;
-  width:fit-content;margin-bottom:14px;
+  border-radius:99px;padding:4px 11px;
+  width:fit-content;
+  margin-bottom:16px;
 }
 .phc-online.visible{display:flex}
-.phc-online-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:cdot 2s infinite}
-
-/* Divider */
-.phc-divider{height:1px;background:var(--bdr);margin-bottom:14px}
-
-/* Stats row */
-.phc-stats{display:flex;gap:0}
-.phc-stat{
-  flex:1;text-align:center;
-  padding:10px 8px;
-  border-radius:12px;
-  transition:background .18s;
-  cursor:default;
+.phc-online-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--emerald);
+  animation:cdot 2s infinite;
 }
-.phc-stat:hover{background:var(--sur2)}
+
+/* Stats */
+.phc-stats{
+  display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;
+  background:var(--sur2);
+  border:1px solid var(--bdr);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:14px;
+}
+.phc-stat{
+  padding:12px 8px;text-align:center;
+  transition:background .18s;cursor:default;
+}
+.phc-stat:hover{background:var(--sur3)}
 .phc-stat-n{
-  font-size:18px;font-weight:800;line-height:1;
+  font-size:20px;font-weight:800;line-height:1;margin-bottom:4px;
   background:var(--grad);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-bottom:3px;
 }
-.phc-stat-l{font-size:9px;color:var(--tx4);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em}
-.phc-stat-sep{width:1px;background:var(--bdr);align-self:stretch;margin:8px 0}
+.phc-stat-l{
+  font-size:9px;color:var(--tx4);
+  font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:.1em;
+}
+.phc-stat-sep{background:var(--bdr);width:1px}
 
-/* XP progress bar */
-.phc-xp-bar-wrap{margin-top:14px}
-.phc-xp-label{display:flex;justify-content:space-between;font-size:10px;color:var(--tx4);font-family:var(--mono);margin-bottom:5px}
-.phc-xp-track{height:4px;background:var(--sur3);border-radius:99px;overflow:hidden}
-.phc-xp-fill{height:100%;border-radius:99px;background:var(--grad);width:0%;transition:width .6s var(--spring)}
+/* XP bar */
+.phc-xp-bar-wrap{margin-top:2px}
+.phc-xp-label{
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--tx4);
+  font-family:var(--mono);margin-bottom:6px;
+}
+.phc-xp-track{
+  height:5px;background:var(--sur2);
+  border-radius:99px;overflow:hidden;
+  border:1px solid var(--bdr);
+}
+.phc-xp-fill{
+  height:100%;border-radius:99px;
+  background:var(--grad);
+  width:0%;
+  transition:width .7s var(--spring);
+  position:relative;
+  overflow:hidden;
+}
+.phc-xp-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  animation:xp-sheen 2s ease-in-out infinite;
+}
+@keyframes xp-sheen{
+  0%{transform:translateX(-100%)}
+  100%{transform:translateX(200%)}
+}
 
 /* ── POSTS ── */
 .posts-grid{display:grid;grid-template-columns:1fr 290px;gap:18px}
@@ -555,46 +608,48 @@ footer .fg{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill
 
 <!-- Profile hover card (global) -->
 <div class="profile-hcard" id="profileHCard">
-  <div class="phc-banner"></div>
-  <div class="phc-av-wrap">
+  <div class="phc-inner">
+    <div class="phc-banner"></div>
+    <div class="phc-body">
+      <div class="phc-name-row">
+        <div class="phc-name" id="phcName">—</div>
+        <span class="phc-role-badge" id="phcRoleBadge">Member</span>
+      </div>
+      <div class="phc-sub" id="phcSub">Community Member</div>
+      <div class="phc-online" id="phcOnline">
+        <span class="phc-online-dot"></span>Online now
+      </div>
+      <div class="phc-stats">
+        <div class="phc-stat">
+          <div class="phc-stat-n" id="phcXP">—</div>
+          <div class="phc-stat-l">XP</div>
+        </div>
+        <div class="phc-stat-sep"></div>
+        <div class="phc-stat">
+          <div class="phc-stat-n" id="phcPosts">—</div>
+          <div class="phc-stat-l">Posts</div>
+        </div>
+        <div class="phc-stat-sep"></div>
+        <div class="phc-stat">
+          <div class="phc-stat-n" id="phcReactions">—</div>
+          <div class="phc-stat-l">Reactions</div>
+        </div>
+      </div>
+      <div class="phc-xp-bar-wrap">
+        <div class="phc-xp-label">
+          <span>Level Progress</span>
+          <span id="phcXPLabel">0 / 500 XP</span>
+        </div>
+        <div class="phc-xp-track">
+          <div class="phc-xp-fill" id="phcXPFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Avatar sits outside .phc-inner so it overlaps the banner/body seam -->
+  <div class="phc-av-wrap" id="phcAvWrap">
     <img class="phc-av" id="phcAv" src="" alt=""/>
     <div class="phc-av-status" id="phcAvStatus"></div>
-  </div>
-  <div class="phc-body">
-    <div class="phc-name-row">
-      <div class="phc-name" id="phcName">—</div>
-      <span class="phc-role-badge" id="phcRoleBadge">Member</span>
-    </div>
-    <div class="phc-sub" id="phcSub">Community Member</div>
-    <div class="phc-online" id="phcOnline">
-      <span class="phc-online-dot"></span>Online now
-    </div>
-    <div class="phc-divider"></div>
-    <div class="phc-stats">
-      <div class="phc-stat">
-        <div class="phc-stat-n" id="phcXP">—</div>
-        <div class="phc-stat-l">XP</div>
-      </div>
-      <div class="phc-stat-sep"></div>
-      <div class="phc-stat">
-        <div class="phc-stat-n" id="phcPosts">—</div>
-        <div class="phc-stat-l">Posts</div>
-      </div>
-      <div class="phc-stat-sep"></div>
-      <div class="phc-stat">
-        <div class="phc-stat-n" id="phcReactions">—</div>
-        <div class="phc-stat-l">Reactions</div>
-      </div>
-    </div>
-    <div class="phc-xp-bar-wrap">
-      <div class="phc-xp-label">
-        <span>Level Progress</span>
-        <span id="phcXPLabel">0 / 500 XP</span>
-      </div>
-      <div class="phc-xp-track">
-        <div class="phc-xp-fill" id="phcXPFill"></div>
-      </div>
-    </div>
   </div>
 </div>
 
