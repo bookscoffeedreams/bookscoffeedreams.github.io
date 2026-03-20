@@ -850,20 +850,13 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
   animation:spin .8s linear infinite;flex-shrink:0;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-  .row-2{grid-template-columns:1fr}
-  .theme-grid{flex-direction:column}
-  .topbar-inner,.settings-hero,.tab-nav-wrap,.settings-body{padding-left:16px;padding-right:16px}
-  .tab-btn{padding:7px 13px;font-size:12px}
-}
+
 /* ── SKELETON LOADING ── */
-.skeleton{
-  background:linear-gradient(90deg,var(--sur3) 25%,var(--sur4) 50%,var(--sur3) 75%);
-  background-size:200% 100%;
-  animation:skeleton-shimmer 1.4s ease-in-out infinite;
-  border-radius:6px;
-}
+.skeleton{background:linear-gradient(90deg,var(--sur3) 25%,var(--sur4) 50%,var(--sur3) 75%);background-size:200% 100%;animation:skeleton-shimmer 1.4s ease-in-out infinite;border-radius:6px;}
 @keyframes skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .hero-avatar[src=""]{background:linear-gradient(135deg,#92400e55,#d9770644);}
+
+@media(max-width:768px){
   .hero-card-inner{grid-template-columns:1fr}
   .hero-left{border-right:none;border-bottom:1px solid var(--bdr);padding:24px 20px}
   .hero-right{width:100%;padding:24px 20px}
@@ -877,6 +870,7 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
   .data-stat-grid{grid-template-columns:1fr 1fr}
 }
 </style>
+</head>
 <body>
 
 <!-- Toast -->
@@ -1832,6 +1826,8 @@ async function loadBanner(uid){
     }
   }catch(e){console.warn('banner load',e)}
 }
+
+async function uploadImgbb(file){
   const fd=new FormData();fd.append('key',IMGBB);fd.append('image',file);
   const r=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});
   const d=await r.json();return d.success?d.data.url:null;
@@ -2185,9 +2181,14 @@ document.getElementById('exportAllBtn').addEventListener('click',async()=>{
 });
 
 // ── WIRE LOADERS INTO AUTH ──
-// (called after auth loads)
 function loadAllNewFeatures(){
   if(!CUR)return;
   loadStatus();
   loadSocial();
   buildActivityLog(CUR);
+  loadDataStats();
+}
+const _loadInterval=setInterval(()=>{if(CUR){loadAllNewFeatures();clearInterval(_loadInterval)}},300);
+</script>
+</body>
+</html>
