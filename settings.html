@@ -173,8 +173,9 @@ body::after{
 
 /* Left: text */
 .hero-left{
-  padding:32px 36px;
+  padding:36px 40px;
   border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;justify-content:center;
 }
 .hero-eyebrow{
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;
@@ -316,12 +317,19 @@ body::after{
   border-radius:16px;overflow:hidden;
   box-shadow:var(--sh);
   transition:border-color .2s;
+  position:relative;
 }
 .block:hover{border-color:var(--bdr2)}
+/* Top gradient accent line like community.html */
+.block::before{
+  content:'';display:block;height:2px;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent);
+  opacity:.7;
+}
 
 .block-header{
   display:flex;align-items:center;gap:14px;
-  padding:20px 24px;
+  padding:18px 24px;
   border-bottom:1px solid var(--bdr);
   background:var(--sur2);
 }
@@ -335,7 +343,7 @@ body::after{
 .block-header-icon svg{width:18px;height:18px}
 .block-title{font-family:var(--serif);font-size:18px;color:var(--tx);letter-spacing:-.01em}
 .block-desc{font-size:12px;color:var(--tx4);font-family:var(--mono);margin-top:2px}
-.block-body{padding:24px;display:flex;flex-direction:column;gap:16px}
+.block-body{padding:22px 24px 24px;display:flex;flex-direction:column;gap:16px}
 
 /* ═══════════════════════════════════════
    FORM ELEMENTS
@@ -447,25 +455,6 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 .pw-strength-track{height:4px;background:var(--sur3);border-radius:99px;overflow:hidden;border:1px solid var(--bdr)}
 .pw-strength-fill{height:100%;border-radius:99px;width:0%;transition:width .4s,background .4s}
 .pw-strength-label{font-size:11px;font-family:var(--mono);color:var(--tx4);margin-top:5px}
-
-/* ═══════════════════════════════════════
-   XP BAR
-═══════════════════════════════════════ */
-.xp-wrap{margin-top:6px;padding:14px 16px;background:var(--sur2);border:1px solid var(--bdr);border-radius:10px}
-.xp-labels{display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--tx4);margin-bottom:7px}
-.xp-track{height:6px;background:var(--sur3);border-radius:99px;overflow:hidden;border:1px solid var(--bdr)}
-.xp-fill{
-  height:100%;border-radius:99px;width:0%;
-  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);
-  transition:width .8s var(--spring);
-  position:relative;overflow:hidden;
-}
-.xp-fill::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
-  animation:xp-s 2s ease-in-out infinite;
-}
-@keyframes xp-s{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 
 /* ═══════════════════════════════════════
    SAVE ROW & BUTTON
@@ -752,12 +741,77 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 .social-icon svg{width:18px;height:18px}
 .social-icon.twitter{color:#1d9bf0}
 .social-icon.instagram{color:#e1306c}
-.social-icon.goodreads{color:#553b08}
+.social-icon.goodreads{color:#c8a96e}
+[data-mode="light"] .social-icon.goodreads{color:#92400e}
 .social-icon.linkedin{color:#0a66c2}
 .social-icon.github{color:var(--tx3)}
 .social-row:hover .social-icon{transform:scale(1.08)}
 .social-inp-wrap{flex:1}
 .social-prefix{font-size:12px;color:var(--tx4);font-family:var(--mono);margin-bottom:4px}
+
+/* ── PASSWORD MATCH INDICATOR ── */
+.pw-match-hint{
+  font-size:11px;font-family:var(--mono);margin-top:4px;
+  display:flex;align-items:center;gap:5px;
+  transition:all .2s;
+}
+.pw-match-hint.match{color:var(--green)}
+.pw-match-hint.mismatch{color:var(--red)}
+.pw-match-hint svg{width:12px;height:12px}
+
+/* ── UNSAVED CHANGES BANNER ── */
+.unsaved-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:linear-gradient(135deg,#92400e,#d97706);
+  color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 32px;
+  transform:translateY(100%);
+  transition:transform .3s var(--spring);
+  box-shadow:0 -4px 24px rgba(0,0,0,.4);
+}
+.unsaved-bar.show{transform:translateY(0)}
+.unsaved-bar-text{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.unsaved-bar-text svg{width:15px;height:15px}
+.unsaved-bar-actions{display:flex;gap:10px}
+.unsaved-bar-save{
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+  color:#fff;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .18s;
+}
+.unsaved-bar-save:hover{background:rgba(255,255,255,.32)}
+.unsaved-bar-discard{
+  background:transparent;border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.7);border-radius:8px;padding:6px 14px;font-size:12px;
+  cursor:pointer;transition:all .18s;
+}
+.unsaved-bar-discard:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+
+/* ── AUTO-SAVE TIMESTAMP ── */
+.autosave-ts{
+  font-size:11px;font-family:var(--mono);color:var(--tx4);
+  display:flex;align-items:center;gap:5px;
+  transition:color .2s;
+}
+.autosave-ts svg{width:12px;height:12px}
+.autosave-ts.fresh{color:var(--green)}
+
+/* ── TAB SCROLL FADE INDICATOR ── */
+.tab-nav-wrap{position:relative}
+.tab-fade{
+  position:absolute;right:32px;top:20px;bottom:0;
+  width:60px;
+  background:linear-gradient(90deg,transparent,var(--bg));
+  pointer-events:none;z-index:1;
+  opacity:0;transition:opacity .2s;
+}
+.tab-fade.show{opacity:1}
+
+/* ── INLINE VALIDATION ── */
+.inp.invalid{border-color:rgba(220,38,38,.5)!important;box-shadow:0 0 0 3px rgba(220,38,38,.08)!important}
+.inp.valid{border-color:rgba(22,163,74,.4)!important}
+.field-error{font-size:11px;color:var(--red);font-family:var(--mono);margin-top:4px;display:flex;align-items:center;gap:5px}
+.field-error svg{width:11px;height:11px;flex-shrink:0}
 .verified-badge{
   display:inline-flex;align-items:center;gap:4px;
   font-size:10px;font-family:var(--mono);color:var(--green);
@@ -873,6 +927,18 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 </head>
 <body>
 
+<!-- Unsaved changes bar -->
+<div class="unsaved-bar" id="unsavedBar">
+  <div class="unsaved-bar-text">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    You have unsaved changes
+  </div>
+  <div class="unsaved-bar-actions">
+    <button class="unsaved-bar-discard" id="unsavedDiscard">Discard</button>
+    <button class="unsaved-bar-save" id="unsavedSave">Save now</button>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast">
   <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" id="toastIcon"></svg>
@@ -947,7 +1013,8 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
 
 <!-- ══ TAB NAV ══ -->
 <div class="tab-nav-wrap">
-  <div class="tab-nav">
+  <div class="tab-nav" id="tabNav">
+    <div class="tab-fade" id="tabFade"></div>
     <button class="tab-btn active" data-panel="profile">
       <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Profile
@@ -1136,11 +1203,14 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
           </button>
         </div>
         <div class="save-row">
-          <span class="save-status" id="profileStatus"></span>
-          <button class="btn-primary" id="saveProfileBtn">
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            Save Profile
-          </button>
+          <span class="autosave-ts" id="profileSaveTs"></span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="save-status" id="profileStatus"></span>
+            <button class="btn-primary" id="saveProfileBtn">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Save Profile
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1175,6 +1245,7 @@ textarea.inp{resize:vertical;min-height:90px;line-height:1.65}
               <input class="inp" id="confirmPassword" type="password" placeholder="Repeat new password"/>
               <button class="pw-eye" type="button" onclick="togglePw('confirmPassword',this)"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
+            <div class="pw-match-hint" id="pwMatchHint"></div>
           </div>
         </div>
         <div class="field">
@@ -1598,6 +1669,119 @@ function togglePw(id,btn){
   btn.style.color=inp.type==='text'?'var(--amber)':'var(--tx4)';
 }
 
+/* ── PASSWORD MATCH INDICATOR ── */
+function checkPwMatch(){
+  const np=document.getElementById('newPassword').value;
+  const cp=document.getElementById('confirmPassword').value;
+  const hint=document.getElementById('pwMatchHint');
+  if(!cp){hint.innerHTML='';hint.className='pw-match-hint';return}
+  if(np===cp){
+    hint.className='pw-match-hint match';
+    hint.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Passwords match';
+  }else{
+    hint.className='pw-match-hint mismatch';
+    hint.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Passwords do not match';
+  }
+}
+document.getElementById('confirmPassword').addEventListener('input',checkPwMatch);
+document.getElementById('newPassword').addEventListener('input',checkPwMatch);
+
+/* ── INLINE FORM VALIDATION ── */
+function validateField(inp,test,msg){
+  const existing=inp.parentElement.querySelector('.field-error');
+  if(existing)existing.remove();
+  inp.classList.remove('invalid','valid');
+  if(!test){
+    inp.classList.add('invalid');
+    const err=document.createElement('div');err.className='field-error';
+    err.innerHTML=`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${msg}`;
+    inp.parentElement.appendChild(err);return false;
+  }
+  inp.classList.add('valid');return true;
+}
+function clearValidation(inp){inp.classList.remove('invalid','valid');const e=inp.parentElement.querySelector('.field-error');if(e)e.remove()}
+document.getElementById('displayName').addEventListener('blur',function(){
+  if(this.value.trim())clearValidation(this);
+  else validateField(this,false,'Name cannot be empty');
+});
+document.getElementById('websiteField').addEventListener('blur',function(){
+  if(!this.value.trim()){clearValidation(this);return}
+  const ok=/^https?:\/\/.+/.test(this.value.trim());
+  if(!ok)validateField(this,false,'Must start with https://');
+  else clearValidation(this);
+});
+
+/* ── AUTOSAVE TIMESTAMP ── */
+const saveTimes={};
+function updateSaveTs(elId,label){
+  saveTimes[elId]=Date.now();
+  const el=document.getElementById(elId);if(!el)return;
+  el.className='autosave-ts fresh';
+  el.innerHTML=`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ${label} just now`;
+  setTimeout(()=>{if(el)el.classList.remove('fresh')},3000);
+}
+setInterval(()=>{
+  Object.keys(saveTimes).forEach(id=>{
+    const el=document.getElementById(id);if(!el||el.classList.contains('fresh'))return;
+    const diff=Math.round((Date.now()-saveTimes[id])/60000);
+    if(diff<1)return;
+    el.innerHTML=`<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Saved ${diff}m ago`;
+  });
+},30000);
+
+/* ── UNSAVED CHANGES ── */
+const TRACKED_FIELDS=['displayName','bioField','locationField','websiteField','readingField'];
+let originalValues={};
+let hasUnsaved=false;
+let activePanel='profile';
+
+function captureOriginals(){
+  TRACKED_FIELDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)originalValues[id]=el.value;
+  });
+}
+function checkUnsaved(){
+  const dirty=TRACKED_FIELDS.some(id=>{
+    const el=document.getElementById(id);
+    return el&&el.value!==originalValues[id];
+  });
+  hasUnsaved=dirty;
+  document.getElementById('unsavedBar').classList.toggle('show',dirty);
+}
+TRACKED_FIELDS.forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',checkUnsaved);
+});
+document.getElementById('unsavedDiscard').addEventListener('click',()=>{
+  TRACKED_FIELDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value=originalValues[id]||'';
+  });
+  hasUnsaved=false;
+  document.getElementById('unsavedBar').classList.remove('show');
+  syncPreview();
+});
+document.getElementById('unsavedSave').addEventListener('click',()=>{
+  document.getElementById('saveProfileBtn').click();
+});
+window.addEventListener('beforeunload',e=>{
+  if(hasUnsaved){e.preventDefault();e.returnValue=''}
+});
+
+/* ── TAB SCROLL FADE ── */
+const tabNav=document.getElementById('tabNav');
+const tabFade=document.getElementById('tabFade');
+if(tabNav&&tabFade){
+  function updateTabFade(){
+    const canScroll=tabNav.scrollWidth>tabNav.clientWidth;
+    const atEnd=tabNav.scrollLeft+tabNav.clientWidth>=tabNav.scrollWidth-4;
+    tabFade.classList.toggle('show',canScroll&&!atEnd);
+  }
+  tabNav.addEventListener('scroll',updateTabFade);
+  window.addEventListener('resize',updateTabFade);
+  setTimeout(updateTabFade,200);
+}
+
 /* ── PASSWORD STRENGTH ── */
 document.getElementById('newPassword').addEventListener('input',function(){
   const v=this.value,bar=document.getElementById('pwBar'),lbl=document.getElementById('pwLabel');
@@ -1675,6 +1859,7 @@ auth.onAuthStateChanged(async u=>{
       if(a.fontSize)document.getElementById('fontSizeSelect').value=a.fontSize;
       if(a.language)document.getElementById('languageSelect').value=a.language;
       syncPreview();
+      captureOriginals();
     }
   }catch(e){console.warn(e)}
 });
@@ -1843,6 +2028,9 @@ document.getElementById('saveProfileBtn').addEventListener('click',async()=>{
     await CUR.updateProfile({displayName:name,photoURL:photo});
     await db.collection('users').doc(CUR.uid).set({name,photoURL:photo,bio:document.getElementById('bioField').value.trim(),location:document.getElementById('locationField').value.trim(),website:document.getElementById('websiteField').value.trim(),currentlyReading:document.getElementById('readingField').value.trim()},{merge:true});
     pendingFile=null;document.getElementById('heroName').textContent=name;
+    captureOriginals();
+    hasUnsaved=false;document.getElementById('unsavedBar').classList.remove('show');
+    updateSaveTs('profileSaveTs','Profile saved');
     toast('Profile saved','ok');setSave('profileStatus','success','Saved');
   }catch(e){toast(e.message,'err');setSave('profileStatus','error',e.message)}
   finally{btn.disabled=false}
@@ -2100,14 +2288,20 @@ document.getElementById('refreshActivityBtn').addEventListener('click',()=>{
 async function loadDataStats(){
   try{
     const uid=CUR.uid;
-    // posts count
-    const posts=await db.collection('communityPosts').where('uid','==',uid).get();
-    document.getElementById('statPosts').textContent=posts.size;
-    // xp from user doc
-    const userDoc=await db.collection('users').doc(uid).get();
+    const [postsSnap,userDoc]=await Promise.all([
+      db.collection('communityPosts').where('uid','==',uid).get(),
+      db.collection('users').doc(uid).get()
+    ]);
+    document.getElementById('statPosts').textContent=postsSnap.size;
     if(userDoc.exists)document.getElementById('statXP').textContent=userDoc.data().xp||0;
-    // comments are in subcollections — estimate from known posts
-    document.getElementById('statComments').textContent='—';
+    // Count comments across all posts
+    let totalComments=0;
+    const commentPromises=postsSnap.docs.map(postDoc=>
+      db.collection('communityPosts').doc(postDoc.id).collection('comments').where('uid','==',uid).get()
+    );
+    const commentResults=await Promise.all(commentPromises);
+    commentResults.forEach(r=>totalComments+=r.size);
+    document.getElementById('statComments').textContent=totalComments;
   }catch(e){console.warn(e)}
 }
 
