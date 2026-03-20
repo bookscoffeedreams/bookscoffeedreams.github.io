@@ -1163,20 +1163,22 @@ const RXN_FLOATS=['👍','❤️','😂','😮'];
 function spawnReactionFloat(emoji,anchorEl){
   const rect=anchorEl.getBoundingClientRect();
   const el=document.createElement('div');
-  el.className='rxn-float';
   el.textContent=emoji;
-  const x=rect.left+rect.width/2-11;
-  const y=rect.top-14;
-  el.style.position='fixed';
-  el.style.left=x+'px';
-  el.style.top=y+'px';
-  el.style.zIndex='99999';
-  el.style.pointerEvents='none';
-  el.style.fontSize='22px';
-  el.style.lineHeight='1';
-  el.style.animation='rxn-pop .75s cubic-bezier(.34,1.56,.64,1) forwards';
+  const x=Math.round(rect.left+(rect.width/2)-12);
+  const y=Math.round(rect.top-10);
+  el.setAttribute('style',
+    `position:fixed;`+
+    `left:${x}px;`+
+    `top:${y}px;`+
+    `z-index:999999;`+
+    `pointer-events:none;`+
+    `font-size:24px;`+
+    `line-height:1;`+
+    `user-select:none;`+
+    `animation:rxn-pop .8s cubic-bezier(.34,1.56,.64,1) forwards;`
+  );
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),800);
+  setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el)},900);
 }
 
 // ══════════════════════════════════
@@ -1587,13 +1589,15 @@ onSnapshot(chatQ,snap=>{
         if(!CUR)return alert('Sign in.');
         const mr=doc(db,'communityChat',id);
         const reacted=d.reactions&&Array.isArray(d.reactions[em])&&d.reactions[em].includes(CUR.uid);
+        if(!reacted){
+          // spawn IMMEDIATELY before any async — capture position right now
+          spawnReactionFloat(em,rb);
+          rb.classList.remove('popping');void rb.offsetWidth;rb.classList.add('popping');
+        }
         try{
-          if(reacted){await updateDoc(mr,{[`reactions.${em}`]:arrayRemove(CUR.uid)})}
+          if(reacted)await updateDoc(mr,{[`reactions.${em}`]:arrayRemove(CUR.uid)});
           else{
             await updateDoc(mr,{[`reactions.${em}`]:arrayUnion(CUR.uid)});
-            // pop animation
-            rb.classList.remove('popping');void rb.offsetWidth;rb.classList.add('popping');
-            spawnReactionFloat(em,rb);
             if(d.uid&&d.uid!==CUR.uid)addNotif(`${CUR.displayName||'Someone'} reacted to your message`);
           }
         }catch(e){console.warn(e)}
@@ -1716,7 +1720,7 @@ function renderSinglePost(id,d){
   (async()=>{let av=d.photo||null;if(!av&&d.uid){const p=await getUP(d.uid);if(p&&(p.profileURL||p.photo))av=p.profileURL||p.photo}const ie=$('post_img_'+id);if(ie)ie.src=av||DA})();
 
   // Wire reactions
-  (function wPR(ld,ce){ce.querySelectorAll('.rxn-btn').forEach((b,i)=>{const em=EMOJIS[i];b.addEventListener('click',async()=>{if(!CUR)return alert('Sign in.');const pr=doc(db,'communityPosts',id);const us=(ld.reactions&&ld.reactions[em])?ld.reactions[em]:[];const reacted=us.includes(CUR.uid);try{if(reacted)await updateDoc(pr,{[`reactions.${em}`]:arrayRemove(CUR.uid)});else{b.classList.remove('popping');void b.offsetWidth;b.classList.add('popping');spawnReactionFloat(em,b);await updateDoc(pr,{[`reactions.${em}`]:arrayUnion(CUR.uid)});if(ld.uid&&ld.uid!==CUR.uid)addNotif(`${CUR.displayName||'Someone'} reacted to your post`)}}catch(e){console.warn(e)}})})})(d,el);
+  (function wPR(ld,ce){ce.querySelectorAll('.rxn-btn').forEach((b,i)=>{const em=EMOJIS[i];b.addEventListener('click',async()=>{if(!CUR)return alert('Sign in.');const pr=doc(db,'communityPosts',id);const us=(ld.reactions&&ld.reactions[em])?ld.reactions[em]:[];const reacted=us.includes(CUR.uid);if(!reacted){spawnReactionFloat(em,b);b.classList.remove('popping');void b.offsetWidth;b.classList.add('popping')}try{if(reacted)await updateDoc(pr,{[`reactions.${em}`]:arrayRemove(CUR.uid)});else{await updateDoc(pr,{[`reactions.${em}`]:arrayUnion(CUR.uid)});if(ld.uid&&ld.uid!==CUR.uid)addNotif(`${CUR.displayName||'Someone'} reacted to your post`)}}catch(e){console.warn(e)}})})})(d,el);
 }
 
 function renderPosts(){
