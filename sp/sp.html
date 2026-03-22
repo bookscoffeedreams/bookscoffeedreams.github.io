@@ -201,6 +201,7 @@ body.hov .cd{transform:translate(-50%,-50%) scale(1.5)}
   animation:navBtnSheen 3.5s ease-in-out infinite 1s;
 }
 @keyframes navBtnSheen{0%,100%{left:-100%}40%,60%{left:160%}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .nav-btn span,.nav-btn svg{position:relative;z-index:1}
 .nav-btn:hover{
   background:var(--sun);color:var(--ink);border-color:var(--sun);
@@ -440,7 +441,7 @@ body.hov .cd{transform:translate(-50%,-50%) scale(1.5)}
   background-size:200%;
   color:var(--ink);padding:15px 40px;
   border:2px solid var(--sun);
-  animation:navBtnSheen 5s ease-in-out infinite;
+  animation:gradShift 4s ease-in-out infinite;
   box-shadow:0 4px 16px rgba(245,197,24,.25);
 }
 .BTN-sun::after{
@@ -528,9 +529,9 @@ body.hov .cd{transform:translate(-50%,-50%) scale(1.5)}
 /* animated gradient overlay */
 #ABOUT::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(232,180,0,.3),transparent,rgba(232,180,0,.3));
-  background-size:200%;
-  animation:navBtnSheen 8s ease-in-out infinite;
+  background:linear-gradient(90deg,rgba(232,180,0,.25),transparent,rgba(232,180,0,.25));
+  background-size:300%;
+  animation:gradShift 10s ease-in-out infinite;
   pointer-events:none;
 }
 .about-bg{
@@ -725,7 +726,6 @@ body.hov .cd{transform:translate(-50%,-50%) scale(1.5)}
   transition:transform .5s cubic-bezier(.16,1,.3,1);
   animation:gradShift 3s ease-in-out infinite;
 }
-@keyframes gradShift{0%,100%{background-position:0%}50%{background-position:100%}}
 .tch-card:hover::before{transform:scaleX(1)}
 /* left accent on hover */
 .tch-card::after{
@@ -830,7 +830,7 @@ body.hov .cd{transform:translate(-50%,-50%) scale(1.5)}
   letter-spacing:1.5px;color:var(--ink);
   flex-shrink:0;
   box-shadow:0 3px 12px rgba(245,197,24,.3);
-  animation:navBtnSheen 4s ease-in-out infinite;
+  animation:gradShift 4s ease-in-out infinite;
   position:relative;overflow:hidden;
 }
 .res-badge::after{
@@ -966,7 +966,7 @@ footer{
 .ft-topband{
   background:linear-gradient(90deg,var(--sun2),var(--sun),var(--sun2));
   background-size:200%;
-  animation:navBtnSheen 6s ease-in-out infinite;
+  animation:gradShift 6s ease-in-out infinite;
   padding:36px 64px;
   display:flex;align-items:center;justify-content:space-between;
   position:relative;overflow:hidden;
