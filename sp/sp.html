@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Scholar Pathshala — Where Brilliance Begins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden;scroll-behavior:smooth}
+:root{
+  /* Scholar Pathshala palette — warm, academic, prestigious */
+  --sun:   #F5C518;  /* signature yellow */
+  --sun2:  #E8B400;  /* deep gold */
+  --sun3:  #FFF8DC;  /* warm cream */
+  --sun4:  #FFFAED;  /* pale yellow bg */
+  --ivory: #FEFCF5;  /* page white */
+  --paper: #F7F3E8;  /* warm paper */
+  --paper2:#EDE8D8;  /* darker paper */
+  --ink:   #1A1508;  /* rich dark */
+  --ink2:  #2C2410;  /* medium dark */
+  --brown: #5C4A1E;  /* warm brown */
+  --sage:  #8B7D5C;  /* muted warm gray */
+  --rule:  rgba(26,21,8,0.08);
+  --rule2: rgba(26,21,8,0.15);
+
+  --display: 'Playfair Display', Georgia, serif;
+  --body:    'Lora', serif;
+  --ui:      'DM Sans', sans-serif;
+  --mono:    'Fira Code', monospace;
+}
+
+body{
+  background:var(--ivory);
+  color:var(--ink);
+  font-family:var(--body);
+  font-weight:400;
+  cursor:none;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--paper)}
+::-webkit-scrollbar-thumb{background:var(--sun)}
+
+/* ── CURSOR — warm golden ── */
+#CUR{position:fixed;z-index:99999;pointer-events:none;top:0;left:0}
+.cd{
+  position:absolute;width:12px;height:12px;
+  background:var(--sun);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:transform .12s,width .3s,height .3s;
+  box-shadow:0 0 8px rgba(245,197,24,.6);
+}
+.cr{
+  position:absolute;width:48px;height:48px;
+  border:1.5px solid rgba(245,197,24,.5);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .5s cubic-bezier(.16,1,.3,1),height .5s,border-color .3s,background .3s;
+}
+body.hov .cr{width:86px;height:86px;border-color:var(--sun);background:rgba(245,197,24,.05)}
+body.hov .cd{transform:translate(-50%,-50%) scale(1.5)}
+
+/* ── LOADER — totally different: full yellow plate ── */
+#LOAD{
+  position:fixed;inset:0;z-index:99000;
+  background:var(--sun);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:24px;
+}
+#LOAD.out{animation:ldOut 1.1s cubic-bezier(.77,0,.18,1) forwards}
+@keyframes ldOut{
+  0%{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+  100%{clip-path:polygon(50% 0,50% 0,50% 100%,50% 100%);opacity:0;pointer-events:none}
+}
+.ld-icon{
+  width:60px;height:60px;
+  background:var(--ink);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  animation:iconPop .6s cubic-bezier(.16,1,.3,1) .2s both;
+}
+@keyframes iconPop{from{transform:scale(0)}to{transform:scale(1)}}
+.ld-name{
+  font-family:var(--display);
+  font-size:clamp(36px,6vw,80px);
+  font-weight:900;
+  letter-spacing:-2px;
+  color:var(--ink);
+  line-height:.92;
+  overflow:hidden;
+  text-align:center;
+}
+.ld-name span{display:block;animation:ldU .8s cubic-bezier(.16,1,.3,1) .4s both}
+.ld-sub{
+  font-family:var(--body);
+  font-size:18px;
+  font-style:italic;
+  color:rgba(26,21,8,.6);
+  overflow:hidden;
+}
+.ld-sub span{display:block;animation:ldU .8s cubic-bezier(.16,1,.3,1) .55s both}
+.ld-bar{width:180px;height:2px;background:rgba(26,21,8,.15);overflow:hidden}
+.ld-fill{height:100%;background:var(--ink);animation:ldBar 2s ease .4s both}
+@keyframes ldU{from{transform:translateY(110%)}to{transform:translateY(0)}}
+@keyframes ldBar{from{width:0}to{width:100%}}
+
+/* ── THREE.JS CANVAS ── */
+#GL{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+
+/* ══════════════════════════════════════
+   NAV — completely different: editorial top bar
+══════════════════════════════════════ */
+#NAV{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  background:var(--ivory);
+  border-bottom:1px solid var(--rule);
+}
+/* top accent line */
+#NAV::before{
+  content:'';
+  display:block;height:4px;
+  background:linear-gradient(90deg,var(--sun),var(--sun2),var(--sun));
+}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 64px;
+  transition:padding .4s;
+}
+#NAV.compact .nav-inner{padding:10px 64px}
+
+.nlo{
+  display:flex;align-items:center;gap:12px;
+  text-decoration:none;
+}
+.nlo-emblem{
+  width:40px;height:40px;
+  background:var(--sun);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.nlo-text{
+  display:flex;flex-direction:column;gap:1px;
+}
+.nlo-name{
+  font-family:var(--display);
+  font-size:17px;font-weight:700;
+  letter-spacing:-.3px;color:var(--ink);
+  line-height:1;
+}
+.nlo-tagline{
+  font-family:var(--mono);
+  font-size:8px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--sage);
+  line-height:1;
+}
+
+.nav-menu{display:flex;align-items:center;gap:0;list-style:none}
+.nav-menu a{
+  font-family:var(--ui);font-size:13px;font-weight:400;
+  color:var(--sage);text-decoration:none;
+  padding:8px 20px;
+  transition:color .3s,background .3s;
+  position:relative;
+}
+.nav-menu a:hover{color:var(--ink);background:var(--sun4)}
+/* active indicator */
+.nav-menu li.active a{color:var(--ink);font-weight:500}
+.nav-menu li.active a::after{content:'';position:absolute;bottom:-17px;left:20px;right:20px;height:3px;background:var(--sun)}
+
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  color:var(--sage);display:flex;align-items:center;gap:8px;
+}
+.nav-live{width:6px;height:6px;border-radius:50%;background:var(--sun);animation:livePulse 2s ease-in-out infinite}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,.6)}50%{box-shadow:0 0 0 6px rgba(245,197,24,0)}}
+.nav-btn{
+  font-family:var(--ui);font-size:11px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--ink);color:var(--sun);
+  padding:11px 26px;
+  text-decoration:none;cursor:none;
+  border:2px solid var(--ink);
+  position:relative;overflow:hidden;
+  display:inline-flex;align-items:center;gap:10px;
+  transition:letter-spacing .4s,box-shadow .4s,transform .3s;
+}
+/* yellow sheen sweep */
+.nav-btn::after{
+  content:'';position:absolute;
+  top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(245,197,24,.2),transparent);
+  transform:skewX(-20deg);
+  animation:navBtnSheen 3.5s ease-in-out infinite 1s;
+}
+@keyframes navBtnSheen{0%,100%{left:-100%}40%,60%{left:160%}}
+.nav-btn span,.nav-btn svg{position:relative;z-index:1}
+.nav-btn:hover{
+  background:var(--sun);color:var(--ink);border-color:var(--sun);
+  letter-spacing:2px;
+  box-shadow:0 6px 20px rgba(245,197,24,.35);
+  transform:translateY(-1px);
+}
+
+/* ══════════════════════════════════════
+   HERO — magazine editorial layout
+   NOT bottom-anchored title, instead split layout
+══════════════════════════════════════ */
+#HERO{
+  position:relative;z-index:1;
+  min-height:100vh;
+  padding-top:90px;/* nav height */
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr auto;
+  overflow:hidden;
+}
+
+/* left panel — deep ink with yellow accents */
+.hero-left{
+  background:var(--ink);
+  padding:80px 70px 80px 64px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:hidden;
+  grid-row:span 1;
+}
+/* vertical yellow rule */
+.hero-left::after{
+  content:'';
+  position:absolute;right:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(to bottom,var(--sun),var(--sun2));
+}
+/* background pattern */
+.hl-pattern{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(245,197,24,.06) 1px,transparent 1px);
+  background-size:36px 36px;
+}
+.hl-watermark{
+  position:absolute;bottom:-40px;right:-30px;
+  font-family:var(--display);
+  font-size:260px;font-weight:900;
+  color:rgba(245,197,24,.04);
+  line-height:1;letter-spacing:-10px;
+  pointer-events:none;white-space:nowrap;
+}
+
+.hero-eyebrow{
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--sun);
+  margin-bottom:36px;
+}
+.hero-eyebrow::before{content:'';display:block;width:28px;height:2px;background:var(--sun)}
+
+.hero-title{
+  font-family:var(--display);
+  font-size:clamp(52px,6.5vw,88px);
+  font-weight:900;line-height:.95;letter-spacing:-3px;
+  color:#fff;
+  margin-bottom:32px;
+}
+.hero-title em{
+  font-style:italic;font-weight:400;
+  color:var(--sun);display:block;
+}
+.hero-title .ht-stroke{
+  -webkit-text-stroke:1.5px rgba(255,255,255,.3);
+  color:transparent;display:block;
+}
+
+.hero-desc{
+  font-family:var(--body);font-size:16px;line-height:1.85;
+  color:rgba(255,255,255,.55);margin-bottom:48px;
+  max-width:380px;font-style:italic;
+}
+.hero-desc strong{color:rgba(255,255,255,.85);font-style:normal}
+
+.hero-ctas{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+/* stats row at bottom of left */
+.hero-stats{
+  display:flex;gap:0;margin-top:60px;padding-top:32px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.hstat{padding:0 32px;border-right:1px solid rgba(255,255,255,.08)}
+.hstat:first-child{padding-left:0}
+.hstat:last-child{border-right:none}
+.hstat-n{
+  font-family:var(--display);font-size:40px;font-weight:700;
+  letter-spacing:-2px;line-height:1;color:#fff;margin-bottom:4px;
+}
+.hstat-n sup{font-size:20px;color:var(--sun);letter-spacing:0}
+.hstat-l{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+
+/* right panel — warm cream with floating cards */
+.hero-right{
+  background:var(--paper);
+  padding:60px 64px 60px 60px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.hr-pattern{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(26,21,8,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,21,8,.04) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+/* decorative rings */
+.hr-rings{position:absolute;bottom:-100px;right:-100px;pointer-events:none}
+.hr-ring{position:absolute;border-radius:50%;border:1px solid rgba(245,197,24,.2);top:50%;left:50%;transform:translate(-50%,-50%)}
+.hrr1{width:300px;height:300px;animation:rSpin 30s linear infinite}
+.hrr2{width:450px;height:450px;border-color:rgba(245,197,24,.1);animation:rSpin 50s linear infinite reverse}
+.hrr3{width:600px;height:600px;border-color:rgba(245,197,24,.06);animation:rSpin 70s linear infinite}
+@keyframes rSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+.hr-label{
+  font-family:var(--display);font-size:14px;font-style:italic;
+  color:var(--sage);margin-bottom:28px;
+  display:flex;align-items:center;gap:12px;
+}
+.hr-label::before{content:'';display:block;width:24px;height:1px;background:var(--sun2)}
+
+/* floating subject chips */
+.subject-cloud{
+  display:flex;flex-wrap:wrap;gap:10px;
+  margin-bottom:40px;
+  position:relative;z-index:1;
+}
+.s-chip{
+  font-family:var(--ui);font-size:12px;font-weight:500;
+  padding:8px 18px;
+  border:1.5px solid var(--rule2);
+  color:var(--ink2);
+  background:var(--ivory);
+  cursor:none;
+  transition:all .3s;
+  animation:chipFloat linear infinite;
+}
+.s-chip:hover{background:var(--sun);border-color:var(--sun);color:var(--ink)}
+.s-chip.hot{background:var(--sun);border-color:var(--sun);color:var(--ink);font-weight:600}
+@keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* announcement card */
+.ann-card{
+  background:var(--ivory);
+  border:1px solid var(--rule);
+  border-left:4px solid var(--sun);
+  padding:24px 28px;
+  margin-bottom:20px;
+  position:relative;z-index:1;
+  transition:box-shadow .4s,border-left-color .4s;
+  overflow:hidden;
+}
+.ann-card::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:0;
+  background:linear-gradient(to left,rgba(245,197,24,.04),transparent);
+  transition:width .5s ease;
+}
+.ann-card:hover{box-shadow:0 4px 24px rgba(245,197,24,.1);border-left-color:var(--sun2)}
+.ann-card:hover::after{width:100%}
+.ann-tag{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--sun2);
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.ann-tag::before{
+  content:'';display:block;width:14px;height:2px;
+  background:var(--sun);border-radius:1px;
+}
+.ann-text{
+  font-family:var(--body);font-size:14px;line-height:1.7;
+  color:var(--ink2);
+}
+.ann-text strong{color:var(--ink);font-weight:600}
+
+/* mini testimonial */
+.mini-test{
+  background:linear-gradient(135deg,var(--sun3),rgba(255,248,220,.6));
+  border:1px solid rgba(245,197,24,.25);
+  border-top:3px solid var(--sun);
+  padding:22px 26px;
+  position:relative;z-index:1;
+  box-shadow:0 4px 20px rgba(245,197,24,.08);
+  transition:box-shadow .4s,transform .4s;
+}
+.mini-test:hover{box-shadow:0 8px 32px rgba(245,197,24,.15);transform:translateY(-2px)}
+.mt-q{
+  font-family:var(--body);font-size:13px;font-style:italic;
+  line-height:1.75;color:var(--brown);margin-bottom:14px;
+}
+.mt-au{display:flex;align-items:center;gap:10px}
+.mt-av{
+  width:36px;height:36px;background:var(--sun);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:15px;font-weight:700;color:var(--ink);
+  box-shadow:0 0 0 3px rgba(245,197,24,.2);
+  flex-shrink:0;
+}
+.mt-nm{font-family:var(--ui);font-size:12px;font-weight:600;color:var(--ink)}
+.mt-rl{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage)}
+
+/* scroll hint */
+.hscr{
+  position:absolute;left:64px;bottom:40px;z-index:2;
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:rgba(255,255,255,.3);
+}
+.hscr-line{width:50px;height:1px;background:rgba(255,255,255,.2);position:relative;overflow:hidden}
+.hscr-fill{position:absolute;top:0;left:0;height:100%;width:30%;background:var(--sun);animation:scrl 2s ease-in-out infinite}
+@keyframes scrl{0%{left:-30%}100%{left:130%}}
+
+/* HERO ANIMATIONS */
+.reveal-l{opacity:0;transform:translateX(-30px);animation:fromL .9s cubic-bezier(.16,1,.3,1) both}
+.reveal-r{opacity:0;transform:translateX(30px);animation:fromR .9s cubic-bezier(.16,1,.3,1) both}
+@keyframes fromL{to{opacity:1;transform:translateX(0)}}
+@keyframes fromR{to{opacity:1;transform:translateX(0)}}
+
+/* ── BUTTONS ── */
+.BTN{
+  display:inline-flex;align-items:center;gap:12px;
+  font-family:var(--ui);font-weight:600;font-size:13px;
+  letter-spacing:.5px;text-decoration:none;cursor:none;
+  position:relative;overflow:hidden;
+  transition:color .4s,letter-spacing .3s,box-shadow .4s,transform .3s;
+}
+.Bf{position:absolute;inset:0;transition:transform .55s cubic-bezier(.16,1,.3,1)}
+.BTN span,.BTN svg{position:relative;z-index:1}
+
+/* primary sun button — animated gradient + sheen */
+.BTN-sun{
+  background:linear-gradient(135deg,var(--sun2),var(--sun),var(--sun2));
+  background-size:200%;
+  color:var(--ink);padding:15px 40px;
+  border:2px solid var(--sun);
+  animation:navBtnSheen 5s ease-in-out infinite;
+  box-shadow:0 4px 16px rgba(245,197,24,.25);
+}
+.BTN-sun::after{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  transform:skewX(-20deg);
+  animation:navBtnSheen 4s ease-in-out infinite 1.5s;
+}
+.BTN-sun .Bf{background:var(--ink);transform:translateY(101%)}
+.BTN-sun:hover{
+  color:var(--sun);letter-spacing:1px;
+  box-shadow:0 8px 28px rgba(245,197,24,.4);
+  transform:translateY(-2px);
+}
+.BTN-sun:hover .Bf{transform:translateY(0)}
+
+/* outline on dark hero */
+.BTN-out{
+  color:rgba(255,255,255,.8);padding:15px 40px;
+  border:1.5px solid rgba(255,255,255,.25);
+  transition:color .4s,border-color .4s,background .4s,transform .3s;
+}
+.BTN-out:hover{
+  border-color:var(--sun);color:var(--sun);
+  background:rgba(245,197,24,.06);
+  transform:translateY(-2px);
+}
+
+/* ink button — for CTA section */
+.BTN-ink{
+  background:var(--ink);color:var(--sun);
+  padding:17px 48px;border:2px solid var(--ink);
+  box-shadow:0 4px 20px rgba(26,21,8,.2);
+}
+.BTN-ink .Bf{
+  background:linear-gradient(135deg,var(--sun2),var(--sun));
+  transform:translateY(101%);
+}
+.BTN-ink:hover{
+  color:var(--ink);letter-spacing:1px;
+  box-shadow:0 8px 32px rgba(245,197,24,.3);
+  transform:translateY(-2px);
+}
+.BTN-ink:hover .Bf{transform:translateY(0)}
+
+/* ghost */
+.BTN-ghost{
+  color:var(--sage);font-size:13px;font-weight:400;
+  transition:color .3s,letter-spacing .3s;
+}
+.BTN-ghost:hover{color:var(--ink);letter-spacing:1px}
+
+/* ── TICKER — white with ink text, yellow bullets ── */
+.TK{position:relative;z-index:1;background:var(--ivory);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);overflow:hidden}
+.TKt{display:flex;width:max-content;animation:tkr 32s linear infinite}
+.TKi{display:inline-flex;align-items:center;gap:18px;padding:14px 48px;font-family:var(--ui);font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage);white-space:nowrap;border-right:1px solid var(--rule)}
+.TKi .td{width:6px;height:6px;border-radius:50%;background:var(--sun);flex-shrink:0}
+@keyframes tkr{to{transform:translateX(-50%)}}
+
+/* ── SECTION COMMONS ── */
+.SEC{position:relative;z-index:1}
+.stg{
+  font-family:var(--ui);font-size:11px;font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;
+  color:var(--sun2);
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+}
+.stg::before{content:'';display:block;width:24px;height:3px;background:var(--sun);border-radius:2px}
+.R{opacity:0;transform:translateY(40px);transition:opacity .9s ease,transform .9s cubic-bezier(.16,1,.3,1)}
+.R.on{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}.d5{transition-delay:.4s}
+
+/* ══════════════════════════════════════
+   ABOUT — full width editorial strip
+══════════════════════════════════════ */
+#ABOUT{
+  background:var(--sun);
+  padding:70px 64px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:60px;
+  position:relative;z-index:1;
+  overflow:hidden;
+  box-shadow:inset 0 -4px 30px rgba(26,21,8,.08);
+}
+/* animated gradient overlay */
+#ABOUT::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(232,180,0,.3),transparent,rgba(232,180,0,.3));
+  background-size:200%;
+  animation:navBtnSheen 8s ease-in-out infinite;
+  pointer-events:none;
+}
+.about-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(26,21,8,.055) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+/* opening quote mark */
+.about-quote{
+  font-family:var(--display);font-size:clamp(22px,3vw,42px);
+  font-weight:700;font-style:italic;
+  color:var(--ink);line-height:1.25;
+  max-width:580px;position:relative;z-index:1;
+}
+.about-quote::before{
+  content:'\201C';
+  font-family:var(--body);
+  font-size:80px;line-height:0;
+  color:rgba(26,21,8,.2);
+  display:block;margin-bottom:16px;margin-top:20px;
+  font-style:normal;
+}
+.about-quote span{
+  display:inline;
+  background:var(--ink);
+  color:var(--sun);padding:2px 8px;
+  font-style:normal;
+  box-shadow:0 2px 8px rgba(26,21,8,.2);
+}
+.about-nums{
+  display:flex;gap:0;flex-shrink:0;
+  position:relative;z-index:1;
+  border:1px solid rgba(26,21,8,.1);
+}
+.an{
+  text-align:center;padding:28px 36px;
+  border-right:1px solid rgba(26,21,8,.1);
+  cursor:none;
+  transition:background .3s;
+}
+.an:last-child{border-right:none}
+.an:hover{background:rgba(26,21,8,.06)}
+.an-n{
+  font-family:var(--display);font-size:52px;font-weight:900;
+  letter-spacing:-3px;color:var(--ink);line-height:1;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.an:hover .an-n{transform:scale(1.06)}
+.an-l{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(26,21,8,.5);margin-top:6px;
+}
+
+/* ══════════════════════════════════════
+   COURSES — magazine grid layout
+   NOT a horizontal scroll — DIFFERENT LAYOUT
+══════════════════════════════════════ */
+#CRS{background:var(--ivory);padding:120px 64px}
+.crs-head{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:60px;align-items:end;margin-bottom:80px;
+}
+.crs-ttl{
+  font-family:var(--display);
+  font-size:clamp(44px,5.5vw,76px);
+  font-weight:900;line-height:.95;letter-spacing:-3px;
+  color:var(--ink);
+}
+.crs-ttl em{font-style:italic;color:var(--sun2)}
+.crs-desc{
+  font-family:var(--body);font-size:16px;line-height:1.85;
+  color:var(--sage);padding-left:40px;
+  border-left:3px solid var(--sun);
+}
+
+/* MAGAZINE GRID — asymmetric, NOT cards in a row */
+.crs-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:3px;
+}
+.cc{
+  background:var(--paper);
+  padding:50px 44px;
+  position:relative;overflow:hidden;
+  cursor:none;
+  transition:background .4s,box-shadow .4s;
+  border:1px solid var(--rule);
+}
+.cc:hover{background:var(--ivory);box-shadow:0 8px 40px rgba(245,197,24,.12)}
+/* TOP yellow accent bar */
+.cc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--sun);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+}
+.cc:hover::before{transform:scaleX(1)}
+/* featured spans 2 rows */
+.cc.feat{
+  grid-row:span 2;
+  background:var(--ink);
+  color:#fff;
+}
+.cc.feat:hover{background:var(--ink2);box-shadow:0 12px 60px rgba(0,0,0,.2)}
+.cc.feat::before{background:var(--sun)}
+
+.cc-num{
+  font-family:var(--display);font-size:80px;font-weight:900;
+  color:rgba(26,21,8,.05);letter-spacing:-5px;line-height:1;
+  position:absolute;top:-10px;right:16px;pointer-events:none;
+}
+.cc.feat .cc-num{color:rgba(255,255,255,.04)}
+.cc:hover .cc-num{color:rgba(245,197,24,.12)}
+
+.cc-tag{
+  font-family:var(--mono);font-size:9px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--sage);
+  margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;
+}
+.cc.feat .cc-tag{color:rgba(255,255,255,.4)}
+.cc-tag .dot{width:5px;height:5px;border-radius:50%;background:var(--sun);flex-shrink:0}
+
+.cc-name{
+  font-family:var(--display);font-size:28px;font-weight:700;
+  line-height:1.15;letter-spacing:-.5px;
+  color:var(--ink);margin-bottom:16px;
+}
+.cc.feat .cc-name{color:#fff;font-size:36px}
+.cc-desc{
+  font-family:var(--body);font-size:14px;line-height:1.8;
+  color:var(--sage);margin-bottom:36px;font-style:italic;
+}
+.cc.feat .cc-desc{color:rgba(255,255,255,.55)}
+.cc-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--rule);padding-top:20px;
+}
+.cc.feat .cc-footer{border-color:rgba(255,255,255,.1)}
+.cc-meta{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--sage)}
+.cc.feat .cc-meta{color:rgba(255,255,255,.35)}
+.cc-arr{
+  width:36px;height:36px;
+  background:transparent;border:1.5px solid var(--rule2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--sage);transition:all .3s;
+}
+.cc:hover .cc-arr{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+.cc.feat .cc-arr{border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.5)}
+.cc.feat:hover .cc-arr{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+
+/* ══════════════════════════════════════
+   TEACHERS — unique section, not in Coding Bhaiya
+══════════════════════════════════════ */
+#TEACHERS{
+  background:var(--paper);
+  padding:120px 64px;
+  border-top:1px solid var(--rule);
+}
+.tch-head{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:70px;
+}
+.tch-ttl{
+  font-family:var(--display);font-size:clamp(44px,5.5vw,76px);
+  font-weight:900;line-height:.95;letter-spacing:-3px;color:var(--ink);
+}
+.tch-ttl em{font-style:italic;color:var(--sun2)}
+.tch-sub{max-width:280px;font-family:var(--body);font-size:15px;line-height:1.8;color:var(--sage);font-style:italic}
+
+.tch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.tch-card{
+  background:var(--ivory);padding:40px 32px;
+  border:1px solid var(--rule);
+  position:relative;overflow:hidden;
+  cursor:none;
+  transition:background .4s,transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s;
+}
+.tch-card:hover{
+  background:#fff;
+  transform:translateY(-8px);
+  box-shadow:0 24px 60px rgba(245,197,24,.14),0 8px 20px rgba(0,0,0,.06);
+}
+/* animated bottom bar */
+.tch-card::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--sun2),var(--sun),var(--sun2));
+  background-size:200%;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+  animation:navBtnSheen 3s ease-in-out infinite;
+}
+.tch-card:hover::before{transform:scaleX(1)}
+/* left accent on hover */
+.tch-card::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(to bottom,var(--sun),var(--sun2));
+  opacity:0;transition:opacity .4s;
+}
+.tch-card:hover::after{opacity:1}
+.tch-av{
+  width:68px;height:68px;background:linear-gradient(135deg,var(--sun3),rgba(245,197,24,.2));
+  border:2px solid var(--sun);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:26px;font-weight:700;
+  color:var(--ink2);margin-bottom:20px;
+  transition:box-shadow .4s,border-color .4s,transform .4s;
+}
+.tch-card:hover .tch-av{
+  box-shadow:0 0 0 4px rgba(245,197,24,.15),0 0 20px rgba(245,197,24,.2);
+  border-color:var(--sun2);
+  transform:scale(1.05);
+}
+.tch-name{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:-.5px;color:var(--ink)}
+.tch-sub2{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sun2);margin-bottom:14px}
+.tch-bio{font-family:var(--body);font-size:13px;line-height:1.7;color:var(--sage);font-style:italic;margin-bottom:20px}
+.tch-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--sun3),rgba(245,197,24,.15));
+  padding:6px 14px;
+  border:1px solid rgba(245,197,24,.3);
+  font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--brown);
+  transition:background .3s,border-color .3s,box-shadow .3s;
+}
+.tch-card:hover .tch-tag{
+  background:var(--sun);border-color:var(--sun2);color:var(--ink2);
+  box-shadow:0 2px 8px rgba(245,197,24,.3);
+}
+
+/* ══════════════════════════════════════
+   RESULTS — yellow band, different vibe
+══════════════════════════════════════ */
+#RESULTS{
+  background:var(--ink2);
+  padding:120px 64px;
+  position:relative;overflow:hidden;
+}
+/* gold decorative lines */
+.res-deco{
+  position:absolute;top:0;left:0;right:0;
+  height:4px;
+  background:repeating-linear-gradient(90deg,var(--sun) 0,var(--sun) 60px,transparent 60px,transparent 80px);
+}
+.res-head{
+  text-align:center;margin-bottom:80px;
+}
+.res-ttl{
+  font-family:var(--display);font-size:clamp(44px,5.5vw,76px);
+  font-weight:900;line-height:.95;letter-spacing:-3px;color:#fff;
+}
+.res-ttl em{font-style:italic;color:var(--sun)}
+.res-sub{font-family:var(--body);font-size:15px;color:rgba(255,255,255,.45);font-style:italic;margin-top:16px}
+
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:rgba(255,255,255,.04)}
+.res-card{
+  background:var(--ink2);padding:54px 44px;
+  position:relative;overflow:hidden;
+  transition:background .4s,box-shadow .4s;cursor:none;
+}
+.res-card:hover{
+  background:rgba(255,255,255,.04);
+  box-shadow:inset 0 0 60px rgba(245,197,24,.03);
+}
+.res-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--sun2),var(--sun),var(--sun2));
+  background-size:200%;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .55s cubic-bezier(.16,1,.3,1);
+}
+.res-card:hover::before{transform:scaleX(1);animation:navBtnSheen 2.5s ease-in-out infinite}
+.res-qm{font-family:var(--display);font-size:120px;font-weight:700;line-height:1;color:rgba(245,197,24,.06);position:absolute;top:-20px;left:16px;pointer-events:none}
+.res-q{font-family:var(--body);font-size:16px;font-style:italic;line-height:1.8;color:rgba(255,255,255,.65);margin-bottom:36px;position:relative;z-index:1}
+.res-au{display:flex;align-items:center;gap:16px}
+.res-av{
+  width:50px;height:50px;
+  background:linear-gradient(135deg,var(--sun3),rgba(245,197,24,.2));
+  border:2px solid var(--sun);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:20px;font-weight:700;color:var(--ink);
+  flex-shrink:0;
+  transition:box-shadow .4s;
+}
+.res-card:hover .res-av{box-shadow:0 0 0 4px rgba(245,197,24,.15),0 0 16px rgba(245,197,24,.2)}
+.res-nm{font-family:var(--ui);font-size:13px;font-weight:600;color:#fff;margin-bottom:4px}
+.res-rl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+/* UPGRADED BADGE */
+.res-badge{
+  margin-left:auto;
+  background:linear-gradient(135deg,var(--sun2),var(--sun),var(--sun2));
+  background-size:200%;
+  padding:7px 16px;
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:1.5px;color:var(--ink);
+  flex-shrink:0;
+  box-shadow:0 3px 12px rgba(245,197,24,.3);
+  animation:navBtnSheen 4s ease-in-out infinite;
+  position:relative;overflow:hidden;
+}
+.res-badge::after{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
+  transform:skewX(-20deg);
+  animation:navBtnSheen 3s ease-in-out infinite 1.5s;
+}
+
+/* ══════════════════════════════════════
+   PROCESS — horizontal timeline, different
+══════════════════════════════════════ */
+#PROCESS{background:var(--ivory);padding:120px 64px}
+.proc-head{text-align:center;margin-bottom:90px}
+.proc-ttl{
+  font-family:var(--display);font-size:clamp(44px,5.5vw,76px);
+  font-weight:900;line-height:.95;letter-spacing:-3px;color:var(--ink);
+}
+.proc-ttl em{font-style:italic;color:var(--sun2)}
+
+/* HORIZONTAL TIMELINE */
+.proc-timeline{
+  position:relative;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;
+}
+/* connecting line */
+.proc-timeline::before{
+  content:'';position:absolute;
+  top:40px;left:12.5%;right:12.5%;
+  height:2px;
+  background:linear-gradient(90deg,var(--sun),var(--sun2));
+  z-index:0;
+}
+.proc-step{
+  padding:0 24px;text-align:center;
+  position:relative;z-index:1;cursor:none;
+}
+.proc-circle{
+  width:84px;height:84px;
+  background:var(--ivory);
+  border:3px solid var(--sun);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 32px;
+  font-family:var(--display);font-size:28px;font-weight:700;
+  color:var(--ink);
+  transition:background .4s,transform .5s cubic-bezier(.16,1,.3,1),box-shadow .4s;
+  position:relative;z-index:1;
+  box-shadow:0 0 0 0 rgba(245,197,24,.3);
+}
+/* idle pulse ring */
+.proc-circle::before{
+  content:'';position:absolute;inset:-8px;border-radius:50%;
+  border:1px solid rgba(245,197,24,.15);
+  animation:circleRing 3s ease-in-out infinite;
+}
+.proc-circle::after{
+  content:'';position:absolute;inset:-16px;border-radius:50%;
+  border:1px solid rgba(245,197,24,.07);
+  animation:circleRing 3s ease-in-out infinite .5s;
+}
+@keyframes circleRing{
+  0%,100%{transform:scale(1);opacity:.5}
+  50%{transform:scale(1.06);opacity:1}
+}
+.proc-step:hover .proc-circle{
+  background:var(--sun);
+  transform:scale(1.12);
+  box-shadow:0 0 0 8px rgba(245,197,24,.12),0 8px 24px rgba(245,197,24,.3);
+}
+.proc-step:hover .proc-circle::before{animation:none;border-color:rgba(245,197,24,.3)}
+.proc-step:hover .proc-circle::after{animation:none;border-color:rgba(245,197,24,.15)}
+.proc-nm{
+  font-family:var(--display);font-size:22px;font-weight:700;
+  letter-spacing:-.5px;margin-bottom:12px;color:var(--ink);
+}
+.proc-ds{
+  font-family:var(--body);font-size:13px;line-height:1.75;
+  color:var(--sage);font-style:italic;
+}
+
+/* ══════════════════════════════════════
+   CTA — big yellow plate
+══════════════════════════════════════ */
+#CTA{
+  background:var(--sun);
+  padding:140px 64px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-bg-pattern{
+  position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(26,21,8,.05) 1px,transparent 1px);
+  background-size:32px 32px;pointer-events:none;
+}
+.cta-bg-txt{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--display);font-weight:900;
+  font-size:clamp(160px,20vw,300px);
+  letter-spacing:-15px;color:rgba(26,21,8,.05);
+  white-space:nowrap;pointer-events:none;user-select:none;
+}
+.cta-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:4px;
+  text-transform:uppercase;color:rgba(26,21,8,.45);
+  margin-bottom:24px;position:relative;z-index:1;
+}
+.cta-ttl{
+  font-family:var(--display);font-size:clamp(52px,8vw,120px);
+  font-weight:900;line-height:.92;letter-spacing:-5px;
+  color:var(--ink);margin-bottom:20px;position:relative;z-index:1;
+}
+.cta-ttl em{font-style:italic;font-weight:400}
+.cta-sub{
+  font-family:var(--body);font-size:17px;font-style:italic;
+  color:rgba(26,21,8,.55);margin-bottom:56px;
+  position:relative;z-index:1;
+}
+.cta-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:16px;position:relative;z-index:1;
+}
+
+/* ══════════════════════════════════════
+   FOOTER — completely different: warm with yellow accent
+══════════════════════════════════════ */
+footer{
+  background:var(--ink);
+  padding:0;position:relative;z-index:1;
+}
+/* yellow top band */
+.ft-topband{
+  background:linear-gradient(90deg,var(--sun2),var(--sun),var(--sun2));
+  background-size:200%;
+  animation:navBtnSheen 6s ease-in-out infinite;
+  padding:36px 64px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+/* subtle dot pattern overlay */
+.ft-topband::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(26,21,8,.06) 1px,transparent 1px);
+  background-size:24px 24px;
+  pointer-events:none;
+}
+/* sheen sweep */
+.ft-topband::after{
+  content:'';position:absolute;
+  top:0;left:-100%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  transform:skewX(-20deg);
+  animation:navBtnSheen 5s ease-in-out infinite 2s;
+}
+.ftb-left{
+  font-family:var(--display);font-size:24px;font-weight:700;
+  font-style:italic;color:var(--ink);
+  position:relative;z-index:1;
+}
+.ftb-right{
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  color:rgba(26,21,8,.55);
+  display:flex;align-items:center;gap:10px;
+  position:relative;z-index:1;
+}
+.ft-main{
+  padding:80px 64px 48px;
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:80px;
+}
+.ft-brand .ft-logo{
+  font-family:var(--display);font-size:24px;font-weight:700;
+  color:#fff;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.ft-logo-dot{
+  width:10px;height:10px;background:var(--sun);border-radius:50%;
+  box-shadow:0 0 0 3px rgba(245,197,24,.2);
+  animation:ydot 2.5s ease-in-out infinite;
+}
+.ft-brand p{
+  font-family:var(--body);font-size:13px;line-height:1.85;
+  color:rgba(255,255,255,.4);max-width:280px;font-style:italic;margin-bottom:28px;
+}
+.ft-soc{display:flex;gap:10px}
+.ft-sa{
+  width:40px;height:40px;
+  border:1.5px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.4);text-decoration:none;
+  transition:all .4s cubic-bezier(.16,1,.3,1);cursor:none;
+  position:relative;overflow:hidden;
+}
+.ft-sa::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(245,197,24,.1);
+  opacity:0;transition:opacity .4s;
+}
+.ft-sa:hover{
+  border-color:var(--sun);color:var(--sun);
+  transform:translateY(-3px);
+  box-shadow:0 6px 18px rgba(245,197,24,.2);
+}
+.ft-sa:hover::before{opacity:1}
+.ft-col-h{
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,255,255,.3);margin-bottom:22px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(245,197,24,.12);
+}
+.ft-col ul{list-style:none}
+.ft-col ul li{margin-bottom:12px}
+.ft-col ul a{
+  font-family:var(--body);font-size:14px;color:rgba(255,255,255,.5);
+  text-decoration:none;transition:color .3s,padding-left .3s;cursor:none;
+  display:block;
+}
+.ft-col ul a:hover{color:var(--sun);padding-left:6px}
+.ft-bottom{
+  border-top:1px solid rgba(255,255,255,.07);
+  padding:24px 64px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(0,0,0,.1);
+}
+.ft-copy{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,.25)}
+.ft-made{
+  font-family:var(--body);font-style:italic;font-size:13px;
+  color:rgba(245,197,24,.5);
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .nav-inner{padding:14px 24px}
+  .nav-menu{display:none}.nav-btn{display:none}
+  #HERO{grid-template-columns:1fr;padding-top:76px}
+  .hero-left{padding:60px 24px}
+  .hero-right{padding:40px 24px}
+  .hero-stats{flex-wrap:wrap;gap:20px}
+  #ABOUT{flex-direction:column;padding:50px 24px;gap:30px}
+  #CRS{padding:80px 24px}
+  .crs-head{grid-template-columns:1fr;gap:24px}.crs-desc{padding-left:16px}
+  .crs-grid{grid-template-columns:1fr 1fr}
+  .cc.feat{grid-row:auto}
+  #TEACHERS{padding:80px 24px}.tch-grid{grid-template-columns:1fr 1fr}
+  #RESULTS{padding:80px 24px}.res-grid{grid-template-columns:1fr}
+  #PROCESS{padding:80px 24px}
+  .proc-timeline{grid-template-columns:1fr 1fr;gap:40px}
+  .proc-timeline::before{display:none}
+  #CTA{padding:80px 24px}.cta-row{flex-direction:column}
+  .ft-topband{flex-direction:column;gap:12px;text-align:center;padding:24px}
+  .ft-main{grid-template-columns:1fr 1fr;gap:40px;padding:60px 24px 40px}
+  .ft-bottom{flex-direction:column;gap:10px;padding:20px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="CUR"><div class="cr"></div><div class="cd"></div></div>
+
+<!-- LOADER — YELLOW full screen -->
+<div id="LOAD">
+  <div class="ld-icon">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <path d="M13 3L3 8v10l10 5 10-5V8L13 3z" stroke="#F5C518" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M3 8l10 5 10-5M13 13v8" stroke="#F5C518" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div>
+    <div class="ld-name"><span>Scholar Pathshala</span></div>
+    <div class="ld-sub"><span>Where Brilliance Begins</span></div>
+  </div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+</div>
+
+<!-- THREE.JS CANVAS -->
+<canvas id="GL"></canvas>
+
+<!-- NAV -->
+<nav id="NAV">
+  <div class="nav-inner">
+    <a href="#" class="nlo">
+      <div class="nlo-emblem">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L2 7v8l9 5 9-5V7L11 2z" stroke="#1A1508" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M2 7l9 5 9-5M11 12v8" stroke="#1A1508" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="nlo-text">
+        <span class="nlo-name">Scholar Pathshala</span>
+        <span class="nlo-tagline">Est. 2019 · India</span>
+      </div>
+    </a>
+    <ul class="nav-menu">
+      <li class="active"><a href="#CRS">Courses</a></li>
+      <li><a href="#TEACHERS">Faculty</a></li>
+      <li><a href="#RESULTS">Results</a></li>
+      <li><a href="#PROCESS">How It Works</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="nav-tag"><span class="nav-live"></span><span id="CLK">00:00:00</span></div>
+      <a href="#" class="nav-btn">Free Demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO — split layout -->
+<section id="HERO">
+  <!-- LEFT: dark panel -->
+  <div class="hero-left">
+    <div class="hl-pattern"></div>
+    <div class="hl-watermark">SP</div>
+    <div class="hero-eyebrow reveal-l" style="animation-delay:.6s">India's Premier Learning Platform</div>
+    <h1 class="hero-title reveal-l" style="animation-delay:.75s">
+      Where Every<br>
+      <em>Scholar</em>
+      <span class="ht-stroke">Flourishes.</span>
+    </h1>
+    <p class="hero-desc reveal-l" style="animation-delay:.9s">
+      From Class 6 to competitive exams —<br>
+      <strong>expert teachers, proven methods,</strong> and a community that believes in your potential.
+    </p>
+    <div class="hero-ctas reveal-l" style="animation-delay:1.05s">
+      <a href="#CRS" class="BTN BTN-sun">
+        <div class="Bf"></div>
+        <span>Explore Courses</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#" class="BTN BTN-out">Free Demo Class</a>
+    </div>
+    <div class="hero-stats reveal-l" style="animation-delay:1.2s">
+      <div class="hstat">
+        <div class="hstat-n"><span class="CNT" data-to="120" data-s="">0</span><sup>K+</sup></div>
+        <div class="hstat-l">Students</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-n"><span class="CNT" data-to="98" data-s="">0</span><sup>%</sup></div>
+        <div class="hstat-l">Success Rate</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-n"><span class="CNT" data-to="500" data-s="">0</span><sup>+</sup></div>
+        <div class="hstat-l">Expert Teachers</div>
+      </div>
+    </div>
+    <div class="hscr">
+      <div class="hscr-line"><div class="hscr-fill"></div></div>
+      Scroll to explore
+    </div>
+  </div>
+
+  <!-- RIGHT: warm cream panel -->
+  <div class="hero-right">
+    <div class="hr-pattern"></div>
+    <div class="hr-rings">
+      <div class="hr-ring hrr1"></div>
+      <div class="hr-ring hrr2"></div>
+      <div class="hr-ring hrr3"></div>
+    </div>
+    <div class="hr-label reveal-r" style="animation-delay:.8s">Popular Subjects</div>
+    <div class="subject-cloud reveal-r" style="animation-delay:.9s">
+      <span class="s-chip hot" style="animation-duration:4s">Mathematics</span>
+      <span class="s-chip" style="animation-duration:5s;animation-delay:.5s">Physics</span>
+      <span class="s-chip hot" style="animation-duration:4.5s;animation-delay:.2s">JEE Mains</span>
+      <span class="s-chip" style="animation-duration:6s;animation-delay:.8s">Chemistry</span>
+      <span class="s-chip" style="animation-duration:5.5s;animation-delay:.3s">Biology</span>
+      <span class="s-chip hot" style="animation-duration:4.2s;animation-delay:.6s">NEET Prep</span>
+      <span class="s-chip" style="animation-duration:5.8s;animation-delay:.1s">English</span>
+      <span class="s-chip" style="animation-duration:4.8s;animation-delay:.9s">Class 10</span>
+      <span class="s-chip" style="animation-duration:5.2s;animation-delay:.4s">SSC / UPSC</span>
+      <span class="s-chip hot" style="animation-duration:4.6s;animation-delay:.7s">Board Exams</span>
+    </div>
+    <div class="ann-card reveal-r" style="animation-delay:1s">
+      <div class="ann-tag">New Batch Starting</div>
+      <div class="ann-text"><strong>JEE 2026 Foundation Batch</strong> — Enrollments open for Class 11 students. Limited seats available. Early bird discount: 30% off.</div>
+    </div>
+    <div class="mini-test reveal-r" style="animation-delay:1.1s">
+      <p class="mt-q">"Cleared JEE Advanced with AIR 847. Couldn't have done it without Scholar Pathshala's systematic approach."</p>
+      <div class="mt-au">
+        <div class="mt-av">RK</div>
+        <div>
+          <div class="mt-nm">Rahul Khanna</div>
+          <div class="mt-rl">IIT Delhi · AIR 847</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="TK"><div class="TKt">
+  <span class="TKi"><span class="td"></span>Mathematics</span>
+  <span class="TKi"><span class="td"></span>Physics</span>
+  <span class="TKi"><span class="td"></span>Chemistry</span>
+  <span class="TKi"><span class="td"></span>Biology</span>
+  <span class="TKi"><span class="td"></span>JEE Mains + Advanced</span>
+  <span class="TKi"><span class="td"></span>NEET Preparation</span>
+  <span class="TKi"><span class="td"></span>Board Exams</span>
+  <span class="TKi"><span class="td"></span>SSC · UPSC · Banking</span>
+  <span class="TKi"><span class="td"></span>English Mastery</span>
+  <span class="TKi"><span class="td"></span>98% Success Rate</span>
+  <span class="TKi"><span class="td"></span>120K+ Students</span>
+  <span class="TKi"><span class="td"></span>Mathematics</span>
+  <span class="TKi"><span class="td"></span>Physics</span>
+  <span class="TKi"><span class="td"></span>Chemistry</span>
+  <span class="TKi"><span class="td"></span>Biology</span>
+  <span class="TKi"><span class="td"></span>JEE Mains + Advanced</span>
+  <span class="TKi"><span class="td"></span>NEET Preparation</span>
+  <span class="TKi"><span class="td"></span>Board Exams</span>
+  <span class="TKi"><span class="td"></span>SSC · UPSC · Banking</span>
+  <span class="TKi"><span class="td"></span>English Mastery</span>
+  <span class="TKi"><span class="td"></span>98% Success Rate</span>
+  <span class="TKi"><span class="td"></span>120K+ Students</span>
+</div></div>
+
+<!-- ABOUT STRIP -->
+<section id="ABOUT" class="SEC">
+  <div class="about-bg"></div>
+  <div class="about-quote R">"We don't just prepare students for exams. We prepare them for <span>life."</span></div>
+  <div class="about-nums R">
+    <div class="an"><div class="an-n"><span class="CNT" data-to="6" data-s="+">0</span></div><div class="an-l">Years of Excellence</div></div>
+    <div class="an"><div class="an-n"><span class="CNT" data-to="22" data-s="">0</span></div><div class="an-l">States Covered</div></div>
+    <div class="an"><div class="an-n"><span class="CNT" data-to="4.9" data-dec="1">0</span></div><div class="an-l">App Store Rating</div></div>
+  </div>
+</section>
+
+<!-- COURSES — magazine grid -->
+<section id="CRS" class="SEC">
+  <div class="crs-head">
+    <div><div class="stg R">Our Curriculum</div><h2 class="crs-ttl R">Courses Crafted<br>for <em>Every Scholar</em></h2></div>
+    <p class="crs-desc R">From school foundations to India's toughest entrance exams — every course designed by subject matter experts with decades of teaching experience.</p>
+  </div>
+  <div class="crs-grid">
+    <!-- FEATURED — spans 2 rows -->
+    <div class="cc feat R" data-tilt>
+      <div class="cc-num">01</div>
+      <div class="cc-tag"><span class="dot"></span>Most Enrolled · 2 Years</div>
+      <h3 class="cc-name">JEE Mains + Advanced Complete</h3>
+      <p class="cc-desc">The most comprehensive JEE preparation in India. Physics, Chemistry, Maths — from fundamentals to advanced problem-solving. 5000+ curated problems, 200+ mock tests, and personal mentors who've cracked IIT themselves.</p>
+      <div class="cc-footer">
+        <span class="cc-meta">2 Years · 800 hrs · Live + Recorded</span>
+        <div class="cc-arr"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      </div>
+    </div>
+    <!-- smaller cards -->
+    <div class="cc R d1" data-tilt>
+      <div class="cc-num">02</div>
+      <div class="cc-tag"><span class="dot"></span>Medical Entrance</div>
+      <h3 class="cc-name">NEET Complete Preparation</h3>
+      <p class="cc-desc">Biology, Chemistry, Physics. NCERT mastery + advanced concepts. Proven strategies from NEET toppers.</p>
+      <div class="cc-footer"><span class="cc-meta">2 Years · 700 hrs</span><div class="cc-arr"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="cc R d2" data-tilt>
+      <div class="cc-num">03</div>
+      <div class="cc-tag"><span class="dot"></span>Board Exams</div>
+      <h3 class="cc-name">Class 12 All Subjects</h3>
+      <p class="cc-desc">PCM, PCB, Commerce, Humanities. Targeted board prep with previous year analysis.</p>
+      <div class="cc-footer"><span class="cc-meta">1 Year · 400 hrs</span><div class="cc-arr"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="cc R d3" data-tilt>
+      <div class="cc-num">04</div>
+      <div class="cc-tag"><span class="dot"></span>Foundation · Class 6–10</div>
+      <h3 class="cc-name">Foundation Mathematics & Science</h3>
+      <p class="cc-desc">Crystal-clear concepts that build the base for everything that follows.</p>
+      <div class="cc-footer"><span class="cc-meta">Full Year · 200 hrs</span><div class="cc-arr"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="cc R d4" data-tilt>
+      <div class="cc-num">05</div>
+      <div class="cc-tag"><span class="dot"></span>Government Exams</div>
+      <h3 class="cc-name">SSC · UPSC · Banking</h3>
+      <p class="cc-desc">Structured plans, current affairs, full-length mocks. Clear on the first attempt.</p>
+      <div class="cc-footer"><span class="cc-meta">1 Year · 350 hrs</span><div class="cc-arr"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEACHERS -->
+<section id="TEACHERS" class="SEC">
+  <div class="tch-head">
+    <div><div class="stg R">Meet the Faculty</div><h2 class="tch-ttl R">Learn from<br><em>India's Best</em></h2></div>
+    <p class="tch-sub R">Every teacher at Scholar Pathshala has cleared the exams they teach. They know exactly what you're going through.</p>
+  </div>
+  <div class="tch-grid">
+    <div class="tch-card R">
+      <div class="tch-av">AV</div>
+      <div class="tch-name">Prof. Anil Verma</div>
+      <div class="tch-sub2">Mathematics · JEE</div>
+      <p class="tch-bio">IIT Bombay alumnus. 14 years of JEE coaching. 340+ students in top IITs.</p>
+      <div class="tch-tag">IIT Bombay · AIR 28</div>
+    </div>
+    <div class="tch-card R d1">
+      <div class="tch-av">SM</div>
+      <div class="tch-name">Dr. Sunita Mishra</div>
+      <div class="tch-sub2">Biology · NEET</div>
+      <p class="tch-bio">AIIMS graduate. 12 years teaching Biology. 200+ AIIMS selections.</p>
+      <div class="tch-tag">AIIMS New Delhi</div>
+    </div>
+    <div class="tch-card R d2">
+      <div class="tch-av">RG</div>
+      <div class="tch-name">Dr. Rohit Gupta</div>
+      <div class="tch-sub2">Physics · JEE + NEET</div>
+      <p class="tch-bio">IIT Delhi. Physics Olympiad trainer. Known for making complex simple.</p>
+      <div class="tch-tag">IIT Delhi · PhD</div>
+    </div>
+    <div class="tch-card R d3">
+      <div class="tch-av">PJ</div>
+      <div class="tch-name">Ms. Prachi Jain</div>
+      <div class="tch-sub2">English · All Exams</div>
+      <p class="tch-bio">Delhi University gold medalist. 10 years teaching English for competitive exams.</p>
+      <div class="tch-tag">DU Gold Medalist</div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="RESULTS" class="SEC">
+  <div class="res-deco"></div>
+  <div class="res-head R">
+    <div class="stg" style="justify-content:center;color:rgba(245,197,24,.7)">Student Stories</div>
+    <h2 class="res-ttl">What our <em>Scholars</em> Say</h2>
+    <p class="res-sub">Real students. Real results. No exaggeration.</p>
+  </div>
+  <div class="res-grid">
+    <div class="res-card R">
+      <div class="res-qm">"</div>
+      <p class="res-q">"Scholar Pathshala completely changed how I think about Mathematics. From terrified of calculus to solving JEE Advanced problems in three months. The teachers don't just teach — they make you fall in love with the subject."</p>
+      <div class="res-au"><div class="res-av">RK</div><div><div class="res-nm">Rahul Khanna</div><div class="res-rl">IIT Delhi</div></div><div class="res-badge">AIR 847</div></div>
+    </div>
+    <div class="res-card R d1">
+      <div class="res-qm">"</div>
+      <p class="res-q">"NEET was my dream and Scholar Pathshala made it real. The Biology classes are extraordinary. Every concept, every diagram — explained with such care that it just stays with you forever."</p>
+      <div class="res-au"><div class="res-av">PS</div><div><div class="res-nm">Priya Singh</div><div class="res-rl">AIIMS Delhi</div></div><div class="res-badge">NEET 2024</div></div>
+    </div>
+    <div class="res-card R d2">
+      <div class="res-qm">"</div>
+      <p class="res-q">"From 62% in Class 10 to 94% in Class 12 boards. The structured approach here is unlike anything else. The teachers genuinely care about every student's growth."</p>
+      <div class="res-au"><div class="res-av">AM</div><div><div class="res-nm">Aryan Mehta</div><div class="res-rl">CBSE Board</div></div><div class="res-badge">94% Boards</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="PROCESS" class="SEC">
+  <div class="proc-head R">
+    <div class="stg" style="justify-content:center">How It Works</div>
+    <h2 class="proc-ttl">Your Path to <em>Excellence</em></h2>
+  </div>
+  <div class="proc-timeline">
+    <div class="proc-step R">
+      <div class="proc-circle">01</div>
+      <h3 class="proc-nm">Free Assessment</h3>
+      <p class="proc-ds">A 30-minute diagnostic test maps your exact strengths and gaps so we build the perfect learning plan.</p>
+    </div>
+    <div class="proc-step R d1">
+      <div class="proc-circle">02</div>
+      <h3 class="proc-nm">Custom Path</h3>
+      <p class="proc-ds">Your schedule, your pace, your syllabus — designed around your goals and exam timeline.</p>
+    </div>
+    <div class="proc-step R d2">
+      <div class="proc-circle">03</div>
+      <h3 class="proc-nm">Learn & Practice</h3>
+      <p class="proc-ds">Live classes with India's best teachers. Daily doubt sessions. Thousands of practice problems.</p>
+    </div>
+    <div class="proc-step R d3">
+      <div class="proc-circle">04</div>
+      <h3 class="proc-nm">Test & Excel</h3>
+      <p class="proc-ds">Weekly tests. Full mocks. Detailed analytics. We celebrate every improvement, every milestone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA — BIG YELLOW PLATE -->
+<section id="CTA" class="SEC">
+  <div class="cta-bg-pattern"></div>
+  <div class="cta-bg-txt">SP</div>
+  <div class="cta-label">// Begin Your Journey Today</div>
+  <h2 class="cta-ttl R">Start Learning<br><em>For Free</em></h2>
+  <p class="cta-sub R">Join 120,000+ students who chose Scholar Pathshala. No credit card required.</p>
+  <div class="cta-row">
+    <a href="#" class="BTN BTN-ink">
+      <div class="Bf"></div>
+      <span>Join Free — No Card Needed</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#" class="BTN BTN-ghost">Talk to a Counsellor &nbsp;&#8594;</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-topband">
+    <div class="ftb-left">"Illuminating Minds Across India"</div>
+    <div class="ftb-right"><span class="nav-live"></span><span id="CLK2">00:00:00</span>&nbsp;IST</div>
+  </div>
+  <div class="ft-main">
+    <div class="ft-brand">
+      <div class="ft-logo"><span class="ft-logo-dot"></span>Scholar Pathshala</div>
+      <p>India's most trusted online learning platform. Expert teachers, proven results, and a community that believes every student can achieve excellence.</p>
+      <div class="ft-soc">
+        <a href="#" class="ft-sa"><svg width="14" height="14" fill="currentColor" viewBox="0 0 14 14"><path d="M1 1l5 5.8L1 13h1.3l4.3-5 3.9 5H13L8 7.2 13 1h-1.3L7.5 5.7 4.5 1H1z"/></svg></a>
+        <a href="#" class="ft-sa"><svg width="14" height="14" fill="none" viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" rx="3" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.2"/><circle cx="10.2" cy="3.8" r=".7" fill="currentColor"/></svg></a>
+        <a href="#" class="ft-sa"><svg width="14" height="14" fill="none" viewBox="0 0 14 14"><rect x="2" y="3" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M2 4l5 5 5-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></a>
+        <a href="#" class="ft-sa"><svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 10.5l2.8-7 3 5.5 1.7-2.5L12 10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+    <div class="ft-col"><div class="ft-col-h">Courses</div><ul><li><a href="#">JEE Preparation</a></li><li><a href="#">NEET Coaching</a></li><li><a href="#">Class 9–12</a></li><li><a href="#">Govt. Exams</a></li><li><a href="#">Language Skills</a></li></ul></div>
+    <div class="ft-col"><div class="ft-col-h">Company</div><ul><li><a href="#">About Us</a></li><li><a href="#">Our Faculty</a></li><li><a href="#">Results</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li></ul></div>
+    <div class="ft-col"><div class="ft-col-h">Support</div><ul><li><a href="#">Help Center</a></li><li><a href="#">Community</a></li><li><a href="#">Contact</a></li><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li></ul></div>
+  </div>
+  <div class="ft-bottom">
+    <span class="ft-copy">© 2024 Scholar Pathshala. All rights reserved.</span>
+    <span class="ft-made">Illuminating Minds Across India</span>
+  </div>
+</footer>
+
+<!-- THREE.JS — golden warm particles -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* LOADER */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('LOAD').classList.add('out');
+  },2200);
+});
+
+/* CLOCK */
+function tc(){
+  const n=new Date();
+  const i=new Date(n.getTime()+(5.5*3600000-n.getTimezoneOffset()*60000));
+  const f=v=>String(i['getUTC'+v]()).padStart(2,'0');
+  const t=`${f('Hours')}:${f('Minutes')}:${f('Seconds')}`;
+  document.getElementById('CLK').textContent=t;
+  const c2=document.getElementById('CLK2');
+  if(c2)c2.textContent=t;
+}
+setInterval(tc,1000);tc();
+
+/* CURSOR */
+const cdot=document.querySelector('.cd'),cring=document.querySelector('.cr');
+let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function ac(){
+  cdot.style.left=mx+'px';cdot.style.top=my+'px';
+  rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+  cring.style.left=rx+'px';cring.style.top=ry+'px';
+  requestAnimationFrame(ac);
+})();
+document.querySelectorAll('a,button,.cc,.s-chip,.tch-card,.res-card,.proc-step,.phs,.an').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'));
+});
+
+/* NAV */
+const nav=document.getElementById('NAV');
+window.addEventListener('scroll',()=>nav.classList.toggle('compact',scrollY>80));
+
+/* THREE.JS — warm golden particles (lighter, serves the light bg) */
+(function(){
+  const canvas=document.getElementById('GL');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,2000);
+  camera.position.set(0,0,90);
+
+  /* golden dust — warm amber palette, works on light bg */
+  const N=5000;
+  const pos=new Float32Array(N*3),col=new Float32Array(N*3),sz=new Float32Array(N);
+  for(let i=0;i<N;i++){
+    const br=Math.floor(Math.random()*3);
+    const ang=(br/3)*Math.PI*2;
+    const rad=Math.pow(Math.random(),.6)*110+1;
+    const spin=rad*.3;
+    const sp=(Math.random()-.5)*rad*.22;
+    pos[i*3]=Math.cos(ang+spin)*rad+sp;
+    pos[i*3+1]=(Math.random()-.5)*rad*.08;
+    pos[i*3+2]=Math.sin(ang+spin)*rad+sp;
+    const t=Math.random();
+    /* deep gold to amber — visible on cream/white */
+    col[i*3]=.85+t*.1;
+    col[i*3+1]=.65+t*.2;
+    col[i*3+2]=.02+t*.06;
+    sz[i]=Math.random()*1.6+.3;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  geo.setAttribute('size',new THREE.BufferAttribute(sz,1));
+
+  const mat=new THREE.ShaderMaterial({
+    vertexColors:true,transparent:true,depthWrite:false,
+    uniforms:{uT:{value:0},uM:{value:new THREE.Vector2()},uPR:{value:renderer.getPixelRatio()},uSc:{value:0}},
+    vertexShader:`
+      attribute float size;varying vec3 vC;varying float vA;
+      uniform float uT,uPR,uSc;uniform vec2 uM;
+      void main(){
+        vC=color;vec3 p=position;
+        float w=sin(length(p.xz)*.06+uT*.4)*1.5;
+        p.y+=w;p.y+=uSc*-.01;
+        vec4 mv=modelViewMatrix*vec4(p,1.);
+        vec2 sc=mv.xy/-mv.z;
+        vec2 diff=sc-uM*vec2(1.,-1.)*.8;
+        float d=length(diff);
+        if(d<.28)p.xy+=normalize(diff)*((.28-d)*15.);
+        vA=1.-length(p)/130.;
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);
+        gl_PointSize=size*uPR*(85./-mv.z);
+      }
+    `,
+    fragmentShader:`
+      varying vec3 vC;varying float vA;
+      void main(){
+        float d=length(gl_PointCoord-vec2(.5));
+        if(d>.5)discard;
+        float a=(1.-d*2.)*vA*.7;
+        gl_FragColor=vec4(vC,a);
+      }
+    `
+  });
+
+  const galaxy=new THREE.Points(geo,mat);
+  scene.add(galaxy);
+
+  let tmx=0,tmy=0,tSc=0;
+  const mouse=new THREE.Vector2();
+  document.addEventListener('mousemove',e=>{tmx=(e.clientX/innerWidth)*2-1;tmy=-(e.clientY/innerHeight)*2+1});
+  window.addEventListener('scroll',()=>{tSc=window.scrollY});
+  window.addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});
+
+  const clock=new THREE.Clock();
+  (function animate(){
+    requestAnimationFrame(animate);
+    const t=clock.getElapsedTime();
+    mouse.x+=(tmx-mouse.x)*.05;mouse.y+=(tmy-mouse.y)*.05;
+    mat.uniforms.uT.value=t;mat.uniforms.uM.value=mouse;
+    mat.uniforms.uSc.value+=(tSc-mat.uniforms.uSc.value)*.04;
+    galaxy.rotation.y=t*.025;galaxy.rotation.x=Math.sin(t*.06)*.04;
+    camera.position.x+=(mouse.x*4-camera.position.x)*.025;
+    camera.position.y+=(-mouse.y*3-camera.position.y+(-tSc*.018))*.025;
+    camera.lookAt(scene.position);
+    renderer.render(scene,camera);
+  })();
+})();
+
+/* SCROLL REVEAL */
+const obs=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')})},{threshold:.1});
+document.querySelectorAll('.R').forEach(el=>obs.observe(el));
+
+/* COUNTERS */
+const co=new IntersectionObserver(e=>{e.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const el=e.target,to=parseFloat(el.dataset.to),dec=parseInt(el.dataset.dec||0),s=el.dataset.s||'',dur=2000;let st=null;
+  (function step(ts){if(!st)st=ts;const p=Math.min((ts-st)/dur,1);el.textContent=((1-Math.pow(1-p,4))*to).toFixed(dec)+s;if(p<1)requestAnimationFrame(step)})(performance.now());
+  co.unobserve(el);
+})},{threshold:.5});
+document.querySelectorAll('.CNT').forEach(el=>co.observe(el));
+
+/* 3D TILT */
+document.querySelectorAll('[data-tilt]').forEach(c=>{
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;c.style.transform=`perspective(900px) rotateY(${x*12}deg) rotateX(${-y*12}deg) translateZ(10px)`;c.style.transition='transform .08s ease'});
+  c.addEventListener('mouseleave',()=>{c.style.transform='';c.style.transition='transform .7s cubic-bezier(.16,1,.3,1)'});
+});
+
+/* MAGNETIC BUTTONS */
+document.querySelectorAll('.BTN-sun,.BTN-ink,.BTN-out').forEach(b=>{
+  b.addEventListener('mousemove',e=>{const r=b.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)*.2;const y=(e.clientY-r.top-r.height/2)*.2;b.style.transform=`translate(${x}px,${y}px)`;b.style.transition='transform .08s linear'});
+  b.addEventListener('mouseleave',()=>{b.style.transform='';b.style.transition='transform .7s cubic-bezier(.16,1,.3,1)'});
+});
+
+/* ══════════════════════════════════════════
+   SCHOLAR PATHSHALA — UNIQUE SCROLL SYSTEM
+   NO skewY — instead:
+   1. Smooth vertical parallax on section backgrounds
+   2. Warm golden shimmer line that travels down on scroll
+   3. Section "lift" — cards gently rise as you scroll into them
+   4. Scroll-velocity based golden vignette pulse
+══════════════════════════════════════════ */
+
+/* 1. PARALLAX — each SEC's background shifts at different rate */
+const secEls = document.querySelectorAll('.SEC');
+function updateParallax(){
+  const sy = window.scrollY;
+  secEls.forEach((s, i) => {
+    const rect = s.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const viewCenter = window.innerHeight / 2;
+    const dist = (center - viewCenter) / window.innerHeight;
+    /* gentle vertical float — different per section */
+    const speed = (i % 2 === 0) ? 0.04 : 0.025;
+    const yShift = dist * speed * window.innerHeight * -0.3;
+    s.style.setProperty('--parallax-y', yShift.toFixed(2) + 'px');
+  });
+}
+
+/* Apply CSS variable for parallax on section inner backgrounds */
+document.querySelectorAll('.hl-pattern,.hr-pattern,.about-bg,.cta-bg-pattern').forEach(el=>{
+  el.style.willChange = 'transform';
+});
+
+window.addEventListener('scroll', updateParallax, {passive:true});
+updateParallax();
+
+/* 2. GOLDEN SHIMMER LINE — a warm horizontal light that sweeps down with scroll */
+const shimmerEl = document.createElement('div');
+shimmerEl.style.cssText = `
+  position:fixed;left:0;right:0;height:2px;z-index:9996;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(245,197,24,.6),rgba(255,220,80,.8),rgba(245,197,24,.6),transparent);
+  opacity:0;transition:opacity .3s ease;
+  box-shadow:0 0 12px 2px rgba(245,197,24,.3);
+`;
+document.body.appendChild(shimmerEl);
+
+let lastSY = 0, shimmerVel = 0, shimmerY = 0, shimmerOpacity = 0;
+window.addEventListener('scroll', () => {
+  shimmerVel = Math.abs(window.scrollY - lastSY);
+  lastSY = window.scrollY;
+}, {passive:true});
+
+(function shimmerLoop(){
+  shimmerVel *= 0.88;
+  shimmerY += (lastSY - shimmerY) * 0.12;
+  shimmerOpacity += (Math.min(shimmerVel * 0.04, 1) - shimmerOpacity) * 0.15;
+  shimmerEl.style.top = (shimmerY % window.innerHeight) + 'px';
+  shimmerEl.style.opacity = shimmerOpacity.toFixed(3);
+  requestAnimationFrame(shimmerLoop);
+})();
+
+/* 3. CARD LIFT — .cc, .tch-card, .res-card gently translate-Y on scroll-into-view */
+/* Already handled by .R/.on reveal — but add a continuous subtle float */
+const floatCards = document.querySelectorAll('.cc,.tch-card,.proc-circle');
+const floatObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const el = entry.target;
+      el.style.transition = (el.style.transition || '') + ',box-shadow .6s ease';
+      el.style.animation = `cardFloat ${3.5 + Math.random()}s ease-in-out infinite`;
+      /* inject unique delay */
+      el.style.animationDelay = (Math.random() * 1.5) + 's';
+    }
+  });
+}, {threshold: 0.3});
+floatCards.forEach(c => floatObs.observe(c));
+
+/* inject cardFloat keyframe */
+const kfStyle = document.createElement('style');
+kfStyle.textContent = `
+  @keyframes cardFloat {
+    0%,100%{ transform: translateY(0px); }
+    50%    { transform: translateY(-5px); }
+  }
+  /* Parallax helper */
+  .SEC > *:not(#GL){
+    transform: translateY(var(--parallax-y,0));
+    transition: transform 0.1s linear;
+  }
+`;
+document.head.appendChild(kfStyle);
+
+/* 4. SCROLL-VELOCITY GOLDEN VIGNETTE — warm amber glow on edges when scrolling fast */
+const vigEl = document.createElement('div');
+vigEl.style.cssText = `
+  position:fixed;inset:0;z-index:9995;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,transparent 60%,rgba(245,197,24,0.07) 100%);
+  transition:opacity .4s ease;
+`;
+document.body.appendChild(vigEl);
+
+let vigVel = 0, lastVigSY = 0;
+window.addEventListener('scroll', () => {
+  vigVel = Math.abs(window.scrollY - lastVigSY);
+  lastVigSY = window.scrollY;
+  vigEl.style.opacity = Math.min(vigVel * 0.06, 0.8).toFixed(2);
+  clearTimeout(vigEl._t);
+  vigEl._t = setTimeout(() => { vigEl.style.opacity = '0'; }, 150);
+}, {passive:true});
+</script>
+</body>
+</html>
