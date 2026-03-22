@@ -1,309 +1,559 @@
-<!-- Books Coffee and Dreams — Content (Upgraded: Premium white video cards, matching homepage UI) -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Books Coffee and Dreams — Content</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Content · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<style>
+/* ═══════════ TOKENS — same as index/settings/profile ═══════════ */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --scr:rgba(217,119,6,.2);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+img{display:block;max-width:100%}
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");background-size:60px 60px}
+body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh;background:radial-gradient(ellipse,rgba(217,119,6,.06) 0%,transparent 65%);z-index:0;pointer-events:none;animation:warm-drift 22s ease-in-out infinite alternate}
+@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(-6vw,5vh)}}
 
-  <!-- Swiper (kept available for parity) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes hero-line{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .65s var(--ease),transform .65s var(--ease)}
+.reveal.in{opacity:1;transform:none}
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+/* ═══════════ NAV ═══════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;background:rgba(16,15,14,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);transition:background .35s}
+[data-mode="light"] .nav{background:rgba(250,247,242,.92)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 36px;width:100%;display:flex;align-items:center;gap:20px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+.nav-logo svg{width:16px;height:16px}
+.nav-site-name{font-family:var(--serif);font-size:18px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
+.nav-site-name em{color:var(--amber);font-style:italic}
+.nav-links{display:flex;align-items:center;gap:2px;margin-left:28px}
+.nav-link{padding:6px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--tx3);transition:all .18s;white-space:nowrap}
+.nav-link:hover{color:var(--tx);background:var(--sur2)}
+.nav-link.active{color:var(--amber);background:rgba(217,119,6,.08)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-user{display:none;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .2s}
+.nav-user:hover{border-color:var(--bdr2)}
+.nav-user-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--amber2)}
+.nav-user-name{font-size:13px;font-weight:600;color:var(--tx2);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-login{display:none;align-items:center;gap:7px;padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:13px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3)}
+.nav-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+.mode-toggle{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s;white-space:nowrap}
+.mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-toggle svg{width:14px;height:14px}
+.icon-sun,.icon-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
+[data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
 
-  <!-- Particles -->
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+/* ═══════════ PAGE HERO ═══════════ */
+.page-hero{
+  position:relative;padding:120px 36px 60px;
+  max-width:1200px;margin:0 auto;
+  animation:fade-up .7s var(--spring) .1s both;
+}
+.page-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:20px}
+.page-eyebrow::before{content:'';display:block;width:22px;height:1px;background:var(--amber)}
+.page-h1{font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:400;letter-spacing:-.03em;line-height:1;color:var(--tx);margin-bottom:14px}
+.page-h1 em{font-style:italic;color:var(--amber)}
+.page-sub{font-size:16px;color:var(--tx3);max-width:540px;line-height:1.72}
 
-  <!-- AOS -->
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+/* ═══════════ SEARCH + FILTER BAR ═══════════ */
+.toolbar{
+  max-width:1200px;margin:0 auto;padding:0 36px 40px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  animation:fade-up .7s var(--spring) .2s both;
+}
+.search-wrap{flex:1;min-width:260px;position:relative}
+.search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--tx4);pointer-events:none}
+.search-inp{
+  width:100%;padding:11px 16px 11px 42px;
+  background:var(--sur);border:1px solid var(--bdr);border-radius:11px;
+  color:var(--tx);font-size:14px;font-family:var(--sans);
+  outline:none;transition:all .2s;
+}
+.search-inp::placeholder{color:var(--tx4)}
+.search-inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(217,119,6,.08)}
+.filter-count{font-family:var(--mono);font-size:12px;color:var(--tx4);white-space:nowrap;padding:10px 16px;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px}
 
-  <link href="/logo.png" rel="icon">
-  <link href="/logo.png" rel="apple-touch-icon">
+/* ═══════════ VIDEO GRID ═══════════ */
+.video-section{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:0 36px 24px}
+.video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 
-  <style>
-    :root { --glass-border: rgba(168,85,247,0.12); }
-    body { font-family: 'Outfit', sans-serif; background: linear-gradient(to bottom right, #f3e8ff, #ede9fe); background-size: 200% 200%; animation: bgLuxury 25s ease infinite; }
-    @keyframes bgLuxury { 0%,100%{background-position:top left}50%{background-position:bottom right} }
+/* ═══════════ VIDEO CARD ═══════════ */
+.vcard{
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:16px;overflow:hidden;
+  box-shadow:var(--sh);transition:all .25s var(--ease);
+  cursor:pointer;position:relative;
+}
+.vcard::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent);opacity:0;transition:opacity .25s}
+.vcard:hover{border-color:var(--bdr2);transform:translateY(-4px);box-shadow:var(--sh2)}
+.vcard:hover::before{opacity:.8}
 
-    #tsparticles { position: fixed; inset: 0; z-index: -1; }
+.vcard-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--sur3)}
+.vcard-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s var(--ease)}
+.vcard:hover .vcard-thumb img{transform:scale(1.04)}
 
-    .purple-gradient { background: linear-gradient(to right, #a855f7, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+/* Play overlay */
+.vcard-play{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(16,15,14,.3);
+  opacity:0;transition:opacity .25s;
+}
+.vcard:hover .vcard-play{opacity:1}
+.play-circle{
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#92400e,#d97706);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 28px rgba(217,119,6,.5);
+  transform:scale(.9);transition:transform .25s var(--spring);
+}
+.vcard:hover .play-circle{transform:scale(1)}
+.play-circle svg{width:18px;height:18px;color:#fff;margin-left:3px}
 
-    header { transition: all 0.25s ease; }
-    header.scrolled { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; backdrop-filter: blur(30px); background-color: rgba(255,255,255,0.86); box-shadow: 0 4px 20px rgba(168,85,247,0.12); }
+/* Duration badge */
+.vcard-dur{position:absolute;bottom:8px;right:8px;padding:2px 8px;border-radius:5px;background:rgba(16,15,14,.85);font-family:var(--mono);font-size:10px;color:#fff;letter-spacing:.04em;backdrop-filter:blur(6px)}
 
-    .animate-fade-in-down { animation: fadeInDown 1s ease-out both; }
-    @keyframes fadeInDown { 0%{opacity:0;transform:translateY(-18px)}100%{opacity:1;transform:translateY(0)} }
+.vcard-body{padding:16px 18px}
+.vcard-title{font-family:var(--serif);font-size:16px;font-weight:400;line-height:1.4;color:var(--tx2);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vcard-meta{display:flex;align-items:center;justify-content:space-between}
+.vcard-date{font-family:var(--mono);font-size:10px;color:var(--tx4);letter-spacing:.04em}
+.vcard-yt{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;color:var(--tx4);transition:color .2s}
+.vcard-yt svg{width:12px;height:12px}
+.vcard:hover .vcard-yt{color:var(--amber)}
 
-    .nav-link { position: relative; opacity: 0; animation: fadeInUp 0.6s ease forwards; }
-    @keyframes fadeInUp { 0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)} }
-    .nav-link::after { content: ""; position:absolute; left:0; bottom:-4px; width:100%; height:2px; background: linear-gradient(90deg,#a855f7,#ec4899); transform:scaleX(0); transform-origin:left; transition:transform .28s ease; box-shadow:0 0 8px rgba(236,72,153,0.45); }
-    .nav-link:hover::after { transform:scaleX(1); }
+/* Skeleton */
+.vcard-skel{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden}
+.skel-thumb{aspect-ratio:16/9;background:var(--sur2);animation:skel-pulse 1.5s ease-in-out infinite}
+.skel-body{padding:16px 18px}
+.skel-line{height:12px;border-radius:6px;background:var(--sur2);animation:skel-pulse 1.5s ease-in-out infinite;margin-bottom:10px}
+.skel-line.short{width:60%}
+@keyframes skel-pulse{0%,100%{opacity:.6}50%{opacity:1}}
 
-    /* Premium white video card style (B) */
-    .video-card { background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(16,24,40,0.08); border: 1px solid rgba(15,23,42,0.04); transition: transform .22s ease, box-shadow .22s ease; }
-    .video-card:hover { transform: translateY(-6px); box-shadow: 0 22px 48px rgba(16,24,40,0.12); }
-    .video-meta { padding: 14px; }
-    .video-title { font-weight: 600; color: #0f172a; display: -webkit-box; -webkit-line-clamp:2; -webkit-box-orient: vertical; overflow:hidden; }
-    .video-thumb { display:block; width:100%; height:100%; object-fit:cover; }
+/* ═══════════ LOAD MORE ═══════════ */
+.load-more-wrap{max-width:1200px;margin:28px auto;padding:0 36px;text-align:center}
+.load-more-btn{
+  display:none;align-items:center;gap:9px;
+  padding:12px 32px;border-radius:12px;
+  background:var(--sur);border:1px solid var(--bdr);
+  color:var(--tx3);font-size:14px;font-weight:500;
+  transition:all .22s;
+}
+.load-more-btn:hover{border-color:var(--bdr2);color:var(--amber);background:var(--sur2);transform:translateY(-1px)}
+.load-more-btn svg{width:15px;height:15px}
+.empty-state{text-align:center;padding:60px 20px}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-family:var(--serif);font-size:24px;color:var(--tx);margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--tx4)}
 
-    /* Modal */
-    .modal { display:none; }
-    .modal.active { display:flex; }
+/* ═══════════ VIDEO MODAL ═══════════ */
+.modal{
+  display:none;position:fixed;inset:0;z-index:999;
+  align-items:center;justify-content:center;
+  background:rgba(10,9,8,.92);
+  backdrop-filter:blur(16px);
+  padding:24px;
+  animation:fade-in .25s var(--ease);
+}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.modal.open{display:flex}
+.modal-inner{
+  position:relative;width:100%;max-width:880px;
+  background:var(--bg2);border:1px solid var(--bdr2);
+  border-radius:16px;overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.9);
+  animation:fade-up .3s var(--spring);
+}
+.modal-inner::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);background-size:200% 100%;animation:hero-line 4s linear infinite}
+.modal-close{
+  position:absolute;top:14px;right:14px;z-index:2;
+  width:34px;height:34px;border-radius:8px;
+  background:rgba(16,15,14,.7);border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.8);transition:all .18s;
+  backdrop-filter:blur(8px);
+}
+.modal-close:hover{background:rgba(220,38,38,.2);border-color:rgba(220,38,38,.3);color:#fff}
+.modal-close svg{width:16px;height:16px}
+.modal-frame{width:100%;aspect-ratio:16/9;display:block;border:none}
+.modal-info{padding:16px 20px}
+.modal-title{font-family:var(--serif);font-size:18px;color:var(--tx);line-height:1.4}
+.modal-actions{display:flex;align-items:center;gap:10px;margin-top:12px}
+.modal-yt-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 18px;border-radius:9px;
+  background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.25);
+  color:var(--amber);font-size:13px;font-weight:500;transition:all .2s;
+}
+.modal-yt-btn:hover{background:rgba(217,119,6,.18);border-color:rgba(217,119,6,.5)}
+.modal-yt-btn svg{width:13px;height:13px}
 
-    /* Utilities kept from homepage to ensure parity */
-    .lux-card { background: rgba(255,255,255,0.25); border:1px solid rgba(255,255,255,0.4); backdrop-filter: blur(14px); }
+/* ═══════════ FOOTER ═══════════ */
+.footer{position:relative;z-index:2;border-top:1px solid var(--bdr);background:var(--sur);padding:48px 36px 32px}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.footer-gem{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center}
+.footer-gem svg{width:15px;height:15px}
+.footer-name{font-family:var(--serif);font-size:17px;color:var(--tx)}
+.footer-name em{color:var(--amber);font-style:italic}
+.footer-tag{font-size:13px;color:var(--tx4);line-height:1.65;max-width:240px}
+.footer-col-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+.footer-links{display:flex;flex-direction:column;gap:8px}
+.footer-link{font-size:13px;color:var(--tx3);transition:color .18s}
+.footer-link:hover{color:var(--amber)}
+.footer-bottom{max-width:1200px;margin:32px auto 0;padding-top:20px;border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.footer-copy{font-family:var(--mono);font-size:11px;color:var(--tx4)}
+.footer-love{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--tx4)}
+.footer-love em{color:var(--amber)}
 
-    /* responsive tweaks */
-    @media (max-width:640px){ .nav-link{ font-size:14px } }
-  </style>
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:900px){
+  .video-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-links{display:none}
+  .footer-inner{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .video-grid{grid-template-columns:1fr}
+  .page-hero,.toolbar,.video-section,.load-more-wrap,.footer{padding-left:20px;padding-right:20px}
+  .nav-inner{padding:0 20px}
+  .footer-bottom{flex-direction:column;gap:8px}
+}
+</style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-purple-100 via-purple-200 to-purple-300 text-gray-800">
-  <div id="tsparticles"></div>
+<body>
 
-  <!-- HEADER (same structure as homepage) -->
-  <header id="mainHeader" class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/30 backdrop-blur-md border-b border-purple-200 shadow-md">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center animate-fade-in-down">
-      <h1 class="text-3xl font-extrabold bg-gradient-to-r from-purple-400 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">Books Coffee Dreams</h1>
-
-      <nav class="flex gap-4 font-semibold text-purple-900">
-        <a href="index.html" class="nav-link" style="animation-delay:0.1s">Home</a>
-        <a href="content.html" class="nav-link " style="animation-delay:0.2s">Content</a>
-        <a href="courses.html" class="nav-link" style="animation-delay:0.3s">Courses</a>
-        <a href="blogs.html" class="nav-link" style="animation-delay:0.4s">Blogs</a>
-        <a href="community.html" class="nav-link" style="animation-delay:0.5s">Community</a>
-        <a href="staff-application.html" class="nav-link" style="animation-delay:0.6s">Apply</a>
-      </nav>
-
-      <div class="flex items-center gap-3">
-        <img id="headerPhoto" class="hidden w-10 h-10 rounded-full border-2 border-purple-500 shadow cursor-pointer" onclick="window.location.href='profile.html'" alt="profile">
-        <button id="loginBtn" onclick="window.location.href='login.html'" class="hidden bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-4 py-2 rounded-full">Login</button>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">
+        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
       </div>
+      <span class="nav-site-name">Books <em>&amp;</em> Dreams</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link active" href="content.html">Content</a>
+      <a class="nav-link" href="courses.html">Courses</a>
+      <a class="nav-link" href="blogs.html">Blogs</a>
+      <a class="nav-link" href="community.html">Community</a>
+      <a class="nav-link" href="staff-application.html">Apply</a>
     </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="pt-48 pb-28 text-center px-6" data-aos="fade-up">
-    <h2 class="text-5xl font-extrabold purple-gradient mb-4">📺 Explore Our YouTube Content</h2>
-    <p class="text-lg text-gray-700 max-w-2xl mx-auto mb-6">Dive into curated study videos, productivity tips, and cinematic talks — all wrapped in a premium layout.</p>
-
-    <div class="max-w-3xl mx-auto flex gap-3 items-center justify-center">
-      <input id="searchBar" type="text" placeholder="🔍 Search videos across all uploads..." class="w-full px-4 py-3 border-2 border-purple-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition" />
-    </div>
-  </section>
-
-  <!-- VIDEO GRID -->
-  <main class="max-w-7xl mx-auto px-6 pb-20">
-    <div id="videoGrid" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3" data-aos="fade-up"></div>
-    <p id="loadingText" class="text-center text-gray-500 mt-10">⏳ Loading videos...</p>
-    <div class="text-center"><button id="loadMoreBtn" class="mt-8 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700 transition" style="display:none">⬇️ Load More</button></div>
-  </main>
-
-  <!-- VIDEO MODAL -->
-  <div id="videoModal" class="modal fixed inset-0 bg-black/70 backdrop-blur-sm items-center justify-center z-50">
-    <div class="bg-black rounded-xl overflow-hidden w-[92%] max-w-4xl relative">
-      <button id="closeModal" class="absolute top-2 right-2 text-white text-3xl font-bold">&times;</button>
-      <iframe id="videoFrame" class="w-full aspect-video" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div class="nav-right">
+      <button class="mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+        <span class="icon-moon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span id="modeLabel">Light</span>
+      </button>
+      <div class="nav-user" id="navUser" onclick="location.href='profile.html'">
+        <img class="nav-user-av" id="navAvatar" src="" alt="avatar"/>
+        <span class="nav-user-name" id="navName">Account</span>
+      </div>
+      <a class="nav-login" id="navLogin" href="login.html">Sign In</a>
     </div>
   </div>
+</nav>
 
-  <!-- FOOTER (same look) -->
-  <footer class="mt-10 text-center text-white bg-gradient-to-r from-purple-700 to-fuchsia-700 py-10 shadow-inner relative">
-    <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-fuchsia-500 opacity-20 blur-2xl animate-pulse-slow"></div>
-    <p class="relative z-10 font-semibold text-lg">Made with ❤️ by <span class="font-extrabold">Books Coffee and Dreams</span></p>
-    <p class="relative z-10 text-sm mt-2">© 2025 All rights reserved</p>
-  </footer>
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-eyebrow">YouTube Content</div>
+  <h1 class="page-h1">Watch. Learn. <em>Grow.</em></h1>
+  <p class="page-sub">Curated study videos, productivity deep-dives, and thoughtful conversations — all in one place.</p>
+</div>
 
-  <!-- FIREBASE AUTH (match homepage) -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+<!-- SEARCH + FILTER -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-inp" id="searchInp" type="text" placeholder="Search videos…" autocomplete="off"/>
+  </div>
+  <div class="filter-count" id="filterCount">Loading…</div>
+</div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-  authDomain: "bcd-discord.firebaseapp.com",
-  projectId: "bcd-discord",
-  storageBucket: "bcd-discord.firebasestorage.app",
-  messagingSenderId: "278895155371",
-  appId: "1:278895155371:web:177a468f5fa3f0abfe3fee",
-  measurementId: "G-6Q46Z9ZF0D"
-};
+<!-- VIDEO GRID -->
+<div class="video-section reveal">
+  <div class="video-grid" id="videoGrid">
+    <!-- Skeletons -->
+    <div class="vcard-skel"><div class="skel-thumb"></div><div class="skel-body"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="vcard-skel"><div class="skel-thumb"></div><div class="skel-body"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="vcard-skel"><div class="skel-thumb"></div><div class="skel-body"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="vcard-skel"><div class="skel-thumb"></div><div class="skel-body"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="vcard-skel"><div class="skel-thumb"></div><div class="skel-body"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+    <div class="vcard-skel"><div class="skel-thumb"></div><div class="skel-body"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
+  </div>
+</div>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+<!-- LOAD MORE -->
+<div class="load-more-wrap">
+  <button class="load-more-btn" id="loadMoreBtn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    Load more videos
+  </button>
+</div>
 
-const headerPhoto = document.getElementById('headerPhoto');
-const loginBtn = document.getElementById('loginBtn');
+<!-- VIDEO MODAL -->
+<div class="modal" id="videoModal">
+  <div class="modal-inner">
+    <button class="modal-close" id="closeModal">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <iframe class="modal-frame" id="videoFrame" src="" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+    <div class="modal-info">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-actions">
+        <a class="modal-yt-btn" id="modalYtLink" href="#" target="_blank">
+          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-2.74 12.62 12.62 0 0 0-8.45.05 4.82 4.82 0 0 1-3.76 2.7C3 8 3 12 3 12s0 4 .61 5.31a4.83 4.83 0 0 0 3.77 2.74c2.74.37 8.45.37 8.45.37s5.71 0 8.45-.37a4.82 4.82 0 0 0 3.77-2.74C28 16 28 12 28 12s0-4-.41-5.31z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
+          Open on YouTube
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    headerPhoto.src = user.photoURL || '/default-avatar.png';
-    headerPhoto.classList.remove('hidden');
-    loginBtn.classList.add('hidden');
-  } else {
-    headerPhoto.classList.add('hidden');
-    loginBtn.classList.remove('hidden');
-  }
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">
+        <div class="footer-gem"><svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <span class="footer-name">Books <em>&amp;</em> Dreams</span>
+      </div>
+      <div class="footer-tag">A warm, intelligent community for readers, learners, and dreamers.</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigate</div>
+      <div class="footer-links">
+        <a class="footer-link" href="index.html">Home</a>
+        <a class="footer-link" href="content.html">Content</a>
+        <a class="footer-link" href="courses.html">Courses</a>
+        <a class="footer-link" href="blogs.html">Blogs</a>
+        <a class="footer-link" href="community.html">Community</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Account</div>
+      <div class="footer-links">
+        <a class="footer-link" href="profile.html">Profile</a>
+        <a class="footer-link" href="settings.html">Settings</a>
+        <a class="footer-link" href="login.html">Sign In</a>
+        <a class="footer-link" href="staff-application.html">Apply as Staff</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Books Coffee and Dreams — All rights reserved</div>
+    <div class="footer-love">Made with <em>love</em> for curious minds</div>
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script>
+// Mode toggle
+const H = document.documentElement;
+const saved = localStorage.getItem('bcd-settings-mode') || 'dark';
+H.setAttribute('data-mode', saved);
+function updateMode() { document.getElementById('modeLabel').textContent = H.getAttribute('data-mode') === 'dark' ? 'Light' : 'Dark'; }
+updateMode();
+document.getElementById('modeToggle').addEventListener('click', () => {
+  const next = H.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
+  H.setAttribute('data-mode', next);
+  localStorage.setItem('bcd-settings-mode', next);
+  updateMode();
+});
+
+// Scroll reveal
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target)} }), {threshold:.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+
+<script>
+// Firebase auth
+firebase.initializeApp({
+  apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain:"bcd-discord.firebaseapp.com",
+  projectId:"bcd-discord",
+  storageBucket:"bcd-discord.appspot.com",
+  messagingSenderId:"278895155371",
+  appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"
+});
+const auth = firebase.auth();
+const DEF_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+auth.onAuthStateChanged(user => {
+  const nu = document.getElementById('navUser');
+  const nl = document.getElementById('navLogin');
+  if(user){
+    nu.style.display='flex'; nl.style.display='none';
+    const av=document.getElementById('navAvatar');
+    av.src=user.photoURL||DEF_AV; av.onerror=()=>av.src=DEF_AV;
+    document.getElementById('navName').textContent=user.displayName||user.email?.split('@')[0]||'Account';
+  } else { nu.style.display='none'; nl.style.display='flex'; }
 });
 </script>
 
-<!-- YOUTUBE API SCRIPT (kept logic, improved rendering + card style B) -->
-  <script type="module">
-    const API_KEY = "AIzaSyBWCFpqDQp9Zoru4s8UgScW9lii_2dr6gU";
-    const UPLOADS_PLAYLIST_ID = "UUJZ83gzcryT0GJs6O8KrhGA";
-    const MAX_RESULTS = 50;
+<script>
+// YouTube API
+const API_KEY = "AIzaSyBWCFpqDQp9Zoru4s8UgScW9lii_2dr6gU";
+const PLAYLIST_ID = "UUJZ83gzcryT0GJs6O8KrhGA";
+const BATCH = 9;
 
-    const videoGrid = document.getElementById('videoGrid');
-    const loadingText = document.getElementById('loadingText');
-    const videoModal = document.getElementById('videoModal');
-    const videoFrame = document.getElementById('videoFrame');
-    const closeModal = document.getElementById('closeModal');
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    const searchBar = document.getElementById('searchBar');
+let allVideos = [];
+let visibleCount = 0;
+let searching = false;
 
-    let allVideos = [];
-    let visibleVideos = [];
-    const INITIAL_BATCH = 9;
-    let currentIndex = 0;
+const grid = document.getElementById('videoGrid');
+const filterCount = document.getElementById('filterCount');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const searchInp = document.getElementById('searchInp');
+const modal = document.getElementById('videoModal');
+const frame = document.getElementById('videoFrame');
+const modalTitle = document.getElementById('modalTitle');
+const modalYtLink = document.getElementById('modalYtLink');
 
-    async function fetchAllVideos() {
-      try {
-        let nextPageToken = '';
-        allVideos = [];
-        loadingText.style.display = 'block';
-        loadingText.textContent = '⏳ Loading videos...';
+function formatDate(str) {
+  if(!str) return '';
+  return new Date(str).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
 
-        do {
-          const url = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=' + MAX_RESULTS + '&playlistId=' + UPLOADS_PLAYLIST_ID + '&key=' + API_KEY + (nextPageToken ? '&pageToken=' + nextPageToken : '');
-          const res = await fetch(url);
-          const data = await res.json();
+function makeCard(item) {
+  const vid = item.snippet?.resourceId?.videoId || '';
+  const title = item.snippet?.title || 'Untitled';
+  const thumb = item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || '';
+  const date = formatDate(item.snippet?.publishedAt);
 
-          if (data.error) { loadingText.style.display = 'none'; videoGrid.innerHTML = '<p class="text-red-500">⚠️ API Error: ' + (data.error.message || 'Unknown') + '</p>'; return; }
+  const card = document.createElement('div');
+  card.className = 'vcard';
+  card.innerHTML = `
+    <div class="vcard-thumb">
+      <img src="${thumb}" alt="${title.replace(/"/g,'')}" loading="lazy"/>
+      <div class="vcard-play">
+        <div class="play-circle">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="vcard-body">
+      <div class="vcard-title">${title}</div>
+      <div class="vcard-meta">
+        <span class="vcard-date">${date}</span>
+        <span class="vcard-yt">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-2.74 12.62 12.62 0 0 0-8.45.05 4.82 4.82 0 0 1-3.76 2.7C3 8 3 12 3 12s0 4 .61 5.31a4.83 4.83 0 0 0 3.77 2.74c2.74.37 8.45.37 8.45.37s5.71 0 8.45-.37a4.82 4.82 0 0 0 3.77-2.74C28 16 28 12 28 12s0-4-.41-5.31z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+          YouTube
+        </span>
+      </div>
+    </div>`;
+  card.addEventListener('click', () => openModal(vid, title));
+  return card;
+}
 
-          if (data.items && data.items.length) allVideos = allVideos.concat(data.items);
-          nextPageToken = data.nextPageToken || '';
-        } while (nextPageToken);
+function renderBatch(videos, from, to) {
+  const frag = document.createDocumentFragment();
+  for(let i = from; i < Math.min(to, videos.length); i++) {
+    frag.appendChild(makeCard(videos[i]));
+  }
+  grid.appendChild(frag);
+}
 
-        loadingText.style.display = 'none';
-        currentIndex = 0; visibleVideos = [];
-        loadNextBatch();
-      } catch (err) {
-        console.error('Fetch failed:', err);
-        loadingText.textContent = '❌ Error loading videos.';
-      }
-    }
-
-    function createCard(item) {
-      const videoId = (item.snippet && item.snippet.resourceId) ? item.snippet.resourceId.videoId : '';
-      const title = (item.snippet && item.snippet.title) ? item.snippet.title : 'Untitled';
-      const thumb = (item.snippet && item.snippet.thumbnails && item.snippet.thumbnails.high) ? item.snippet.thumbnails.high.url : '';
-
-      const outer = document.createElement('div');
-      outer.className = 'video-card cursor-pointer';
-
-      const thumbWrap = document.createElement('div');
-      thumbWrap.className = 'w-full aspect-video overflow-hidden bg-gray-100';
-      const img = document.createElement('img');
-      img.className = 'video-thumb'; img.loading = 'lazy'; img.src = thumb; img.alt = title;
-      thumbWrap.appendChild(img);
-
-      const meta = document.createElement('div');
-      meta.className = 'video-meta';
-      const h3 = document.createElement('h3');
-      h3.className = 'video-title'; h3.textContent = title;
-      meta.appendChild(h3);
-
-      outer.appendChild(thumbWrap);
-      outer.appendChild(meta);
-
-      outer.addEventListener('click', () => {
-        videoModal.classList.add('active');
-        videoFrame.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
-      });
-
-      return outer;
-    }
-
-    function renderVideos(videos) {
-      videoGrid.innerHTML = '';
-      if (!videos || videos.length === 0) {
-        videoGrid.innerHTML = '<p class="text-center col-span-3 text-gray-500">No videos found.</p>';
-        return;
-      }
-      const fragment = document.createDocumentFragment();
-      videos.forEach(item => fragment.appendChild(createCard(item)));
-      videoGrid.appendChild(fragment);
-    }
-
-    function loadNextBatch() {
-      const batch = allVideos.slice(currentIndex, currentIndex + INITIAL_BATCH);
-      visibleVideos = visibleVideos.concat(batch);
-      renderVideos(visibleVideos);
-      currentIndex += INITIAL_BATCH;
-      loadMoreBtn.style.display = (currentIndex < allVideos.length) ? 'inline-block' : 'none';
-    }
-
-    searchBar.addEventListener('input', function () {
-  const q = searchBar.value.trim().toLowerCase();
-
-  if (q === '') {
-    // Reset to visible videos
-    visibleVideos = allVideos.slice(0, currentIndex);
-    renderVideos(visibleVideos);
-
-    // Show "Load More" again if needed
-    loadMoreBtn.style.display = (currentIndex < allVideos.length)
-      ? 'inline-block'
-      : 'none';
-
+function renderVideos(videos) {
+  grid.innerHTML = '';
+  if(!videos.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📭</div><div class="empty-title">No videos found</div><div class="empty-sub">Try a different search term</div></div>`;
+    loadMoreBtn.style.display = 'none';
     return;
   }
+  visibleCount = Math.min(BATCH, videos.length);
+  renderBatch(videos, 0, visibleCount);
+  loadMoreBtn.style.display = visibleCount < videos.length ? 'inline-flex' : 'none';
+  filterCount.textContent = `${videos.length} video${videos.length!==1?'s':''}`;
+}
 
-  // Filter videos
-  const filtered = allVideos.filter(v =>
-    v.snippet &&
-    v.snippet.title &&
-    v.snippet.title.toLowerCase().includes(q)
-  );
+function openModal(videoId, title) {
+  frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  modalTitle.textContent = title;
+  modalYtLink.href = `https://www.youtube.com/watch?v=${videoId}`;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  modal.classList.remove('open');
+  frame.src = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('closeModal').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 
-  // Show filtered videos
-  renderVideos(filtered);
-
-  // Hide Load More button when searching
-  loadMoreBtn.style.display = 'none';
+loadMoreBtn.addEventListener('click', () => {
+  const src = searching ? allVideos.filter(v => v.snippet?.title?.toLowerCase().includes(searchInp.value.trim().toLowerCase())) : allVideos;
+  const next = Math.min(visibleCount + BATCH, src.length);
+  renderBatch(src, visibleCount, next);
+  visibleCount = next;
+  loadMoreBtn.style.display = visibleCount < src.length ? 'inline-flex' : 'none';
 });
 
+searchInp.addEventListener('input', () => {
+  const q = searchInp.value.trim().toLowerCase();
+  if(!q) { searching = false; renderVideos(allVideos); return; }
+  searching = true;
+  const filtered = allVideos.filter(v => v.snippet?.title?.toLowerCase().includes(q));
+  renderVideos(filtered);
+});
 
-    loadMoreBtn.addEventListener('click', loadNextBatch);
-
-    closeModal.addEventListener('click', () => { videoModal.classList.remove('active'); videoFrame.src = ''; });
-    videoModal.addEventListener('click', (e) => { if (e.target === videoModal) { videoModal.classList.remove('active'); videoFrame.src = ''; } });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && videoModal.classList.contains('active')) { videoModal.classList.remove('active'); videoFrame.src = ''; } });
-
-    // Start fetching
-    fetchAllVideos();
-  </script>
-
-  <!-- AOS + PARTICLES -->
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script>AOS.init({ duration: 1000, once: true });</script>
-  <script>
-    tsParticles.load("tsparticles", {
-      fullScreen: { enable: false },
-      particles: { number: { value: 70 }, color: { value: "#a855f7" }, links: { enable: true, distance: 130, color: "#c084fc", opacity: 0.26 }, move: { enable: true, speed: 0.7 }, opacity: { value: 0.3 }, size: { value: 3 } },
-      interactivity: { events: { onHover: { enable: true, mode: "repulse" } }, modes: { repulse: { distance: 80 } } },
-      detectRetina: true
-    });
-
-    // Header scroll effect
-    window.addEventListener('scroll', () => { const header = document.getElementById('mainHeader'); header.classList.toggle('scrolled', window.scrollY > 50); });
-
-    // Small animation delay for nav-links to appear in sequence
-    document.querySelectorAll('.nav-link').forEach((el, i) => el.style.animationDelay = (0.05 * (i+1)) + 's');
-  </script>
+async function fetchAll() {
+  try {
+    let token = '', items = [];
+    filterCount.textContent = 'Loading…';
+    do {
+      const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${API_KEY}${token?'&pageToken='+token:''}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if(data.error){ grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load videos</div><div class="empty-sub">${data.error.message||'API error'}</div></div>`;filterCount.textContent='Error';return; }
+      if(data.items) items = items.concat(data.items);
+      token = data.nextPageToken || '';
+    } while(token);
+    allVideos = items;
+    renderVideos(allVideos);
+    // trigger reveal
+    document.querySelector('.video-section').classList.add('in');
+  } catch(e) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><div class="empty-title">Network error</div><div class="empty-sub">Please check your connection and try again.</div></div>`;
+    filterCount.textContent = 'Error';
+  }
+}
+fetchAll();
+</script>
 </body>
 </html>
