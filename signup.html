@@ -1,255 +1,688 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
-  <link href="/logo.png" rel="icon">
-  <link href="/logo.png" rel="apple-touch-icon">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .input-rounded {
-      border-radius: 12px;
-    }
-    .step { display: none; }
-    .step.active { display: block; animation: fadeInUp 0.6s ease-in-out; }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .blur-glow {
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle at center, rgba(168,85,247,0.4), transparent);
-      filter: blur(80px);
-      z-index: -1;
-    }
-    .loading-button::after {
-      content: '';
-      margin-left: 10px;
-      border: 2px solid transparent;
-      border-top: 2px solid #fff;
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      display: inline-block;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Account · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 20px 60px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#fff;--sur2:#fdf9f4;--sur3:#f5f0e8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 20px 60px rgba(120,83,32,.14);
+  --scr:rgba(217,119,6,.2);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .35s,color .35s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+input{font-family:var(--sans)}
+
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");background-size:60px 60px}
+
+.glow-1{position:fixed;top:-15%;left:-10%;width:55vw;height:55vh;border-radius:50%;background:radial-gradient(circle,rgba(217,119,6,.12),transparent 65%);pointer-events:none;z-index:0;animation:g1 18s ease-in-out infinite alternate}
+.glow-2{position:fixed;bottom:-15%;right:-10%;width:45vw;height:45vh;border-radius:50%;background:radial-gradient(circle,rgba(217,119,6,.07),transparent 65%);pointer-events:none;z-index:0;animation:g1 24s ease-in-out infinite alternate-reverse}
+@keyframes g1{0%{transform:translate(0,0)}100%{transform:translate(5vw,5vh)}}
+@keyframes hero-line{0%{background-position:0%}100%{background-position:200%}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes step-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes confetti-fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ── LAYOUT ── */
+.layout{position:relative;z-index:2;flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+
+/* ── LEFT PANEL ── */
+.left-panel{display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;background:var(--bg2);border-right:1px solid var(--bdr);position:relative;overflow:hidden}
+.left-panel::after{content:'★';position:absolute;bottom:-40px;right:-20px;font-size:280px;color:rgba(217,119,6,.04);line-height:1;pointer-events:none;user-select:none}
+
+.left-logo{display:flex;align-items:center;gap:12px;margin-bottom:56px}
+.logo-gem{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite}
+.logo-gem svg{width:18px;height:18px}
+.logo-name{font-family:var(--serif);font-size:18px;color:var(--tx)}
+.logo-name em{color:var(--amber);font-style:italic}
+
+.left-headline{font-family:var(--serif);font-size:clamp(34px,4vw,54px);font-weight:400;line-height:1.05;letter-spacing:-.03em;color:var(--tx);margin-bottom:18px}
+.left-headline em{color:var(--amber);font-style:italic;display:block}
+.left-sub{font-size:15px;color:var(--tx3);line-height:1.75;max-width:360px;margin-bottom:36px}
+
+/* Perks list */
+.perks{display:flex;flex-direction:column;gap:14px;margin-bottom:40px}
+.perk{display:flex;align-items:flex-start;gap:12px}
+.perk-icon{width:34px;height:34px;border-radius:9px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.18);display:flex;align-items:center;justify-content:center;color:var(--amber);flex-shrink:0}
+.perk-icon svg{width:16px;height:16px}
+.perk-title{font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:2px}
+.perk-desc{font-size:12px;color:var(--tx4)}
+
+/* Welcome bonus card */
+.bonus-card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.bonus-card::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);background-size:200% 100%;animation:hero-line 4s linear infinite;position:absolute;top:0;left:0;right:0}
+.bonus-inner{display:flex;align-items:center;gap:14px;margin-top:4px}
+.bonus-xp{font-family:var(--serif);font-size:40px;font-weight:400;color:var(--amber2);letter-spacing:-.03em;line-height:1}
+.bonus-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+.bonus-desc{font-size:13px;color:var(--tx3);line-height:1.5}
+
+/* ── RIGHT PANEL ── */
+.right-panel{display:flex;align-items:center;justify-content:center;padding:40px 48px;position:relative}
+
+/* Theme btn */
+.theme-btn{position:fixed;top:24px;right:28px;z-index:100;display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s}
+.theme-btn:hover{border-color:var(--bdr2);color:var(--amber)}
+.theme-btn svg{width:13px;height:13px}
+.t-sun,.t-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .t-sun{display:none}[data-mode="dark"] .t-moon{display:block}
+[data-mode="light"] .t-sun{display:block}[data-mode="light"] .t-moon{display:none}
+
+/* Form wrap */
+.form-wrap{width:100%;max-width:400px;animation:fade-up .6s var(--spring) .1s both}
+.form-heading{font-family:var(--serif);font-size:30px;font-weight:400;letter-spacing:-.02em;color:var(--tx);margin-bottom:6px}
+.form-heading em{font-style:italic;color:var(--amber)}
+.form-sub{font-size:14px;color:var(--tx3);margin-bottom:28px;line-height:1.6}
+
+/* Tabs */
+.auth-tabs{display:flex;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:4px;gap:3px;margin-bottom:28px}
+.auth-tab{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:600;color:var(--tx4);transition:all .2s;text-align:center}
+.auth-tab.active{background:var(--sur);color:var(--tx);box-shadow:var(--sh)}
+
+/* Progress dots */
+.step-dots{display:flex;align-items:center;gap:6px;margin-bottom:24px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--sur3);border:1px solid var(--bdr);transition:all .3s var(--spring)}
+.step-dot.active{background:var(--amber);border-color:var(--amber);width:24px;border-radius:99px}
+.step-dot.done{background:var(--amber);border-color:var(--amber);opacity:.5}
+
+/* Step panels */
+.step-panel{display:none}
+.step-panel.active{display:block;animation:step-in .3s var(--spring) both}
+
+/* Fields */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+.inp-wrap{position:relative}
+.inp-wrap svg.field-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--tx4);pointer-events:none}
+.inp{width:100%;padding:11px 14px 11px 40px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;color:var(--tx);font-size:14px;outline:none;transition:all .22s}
+.inp::placeholder{color:var(--tx4)}
+.inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(217,119,6,.08)}
+.inp.error{border-color:rgba(220,38,38,.5);box-shadow:0 0 0 3px rgba(220,38,38,.07)}
+.inp.valid{border-color:rgba(22,163,74,.4)}
+.inp.no-icon{padding-left:14px}
+.eye-btn{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--tx4);transition:color .18s;padding:2px}
+.eye-btn:hover{color:var(--amber)}
+.eye-btn svg{width:15px;height:15px}
+.field-err{font-size:11px;color:var(--red);font-family:var(--mono);display:none;align-items:center;gap:4px;margin-top:2px}
+.field-err svg{width:11px;height:11px;flex-shrink:0}
+
+/* Password strength */
+.strength-bar{height:3px;background:var(--sur3);border-radius:99px;overflow:hidden;margin-top:8px}
+.strength-fill{height:100%;border-radius:99px;width:0%;transition:width .4s var(--ease),background .4s}
+.strength-label{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:5px;transition:color .3s}
+
+/* Confirm match */
+.match-hint{font-family:var(--mono);font-size:10px;margin-top:5px;display:flex;align-items:center;gap:4px;transition:color .2s}
+.match-hint.match{color:var(--green)}
+.match-hint.mismatch{color:var(--red)}
+.match-hint svg{width:11px;height:11px}
+
+/* Terms */
+.terms-wrap{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;margin-bottom:18px}
+.terms-check{width:16px;height:16px;border-radius:4px;border:1px solid var(--bdr2);background:var(--bg2);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.terms-check.checked{background:var(--amber);border-color:var(--amber)}
+.terms-check svg{width:10px;height:10px;color:#fff;opacity:0;transition:opacity .18s}
+.terms-check.checked svg{opacity:1}
+.terms-text{font-size:12px;color:var(--tx4);line-height:1.55}
+.terms-text a{color:var(--amber)}
+
+/* Buttons */
+.btn-primary{width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:14px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px}
+.btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%);opacity:0;transition:.2s}
+.btn-primary:hover::after{opacity:1}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary svg{width:15px;height:15px}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn-primary.loading .spinner{display:block}
+.btn-primary.loading .btn-text,.btn-primary.loading svg{display:none}
+
+.btn-back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--tx4);margin-bottom:16px;transition:color .18s}
+.btn-back-link:hover{color:var(--amber)}
+.btn-back-link svg{width:13px;height:13px}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.div-line{flex:1;height:1px;background:var(--bdr)}
+.div-text{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx4)}
+
+/* Google btn */
+.btn-google{width:100%;padding:12px;border-radius:11px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx2);font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.btn-google:hover{border-color:var(--bdr2);background:var(--sur3);transform:translateY(-1px)}
+.btn-google img{width:18px;height:18px}
+
+/* Form footer */
+.form-footer{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px;font-size:13px;color:var(--tx4)}
+.form-footer a{color:var(--amber);transition:opacity .18s}
+.form-footer a:hover{opacity:.75}
+.form-footer-dot{width:3px;height:3px;border-radius:50%;background:var(--tx4)}
+
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:500;color:var(--tx);box-shadow:var(--sh2);z-index:999;opacity:0;transition:all .3s var(--spring);display:flex;align-items:center;gap:9px;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error .toast-icon{color:var(--red)}
+.toast.success .toast-icon{color:var(--green)}
+.toast-icon svg{width:15px;height:15px}
+
+/* Confetti canvas */
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:9999;display:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:780px){
+  .layout{grid-template-columns:1fr}
+  .left-panel{display:none}
+  .right-panel{padding:32px 24px;align-items:flex-start;padding-top:80px}
+  .form-wrap{max-width:100%}
+  .theme-btn{top:16px;right:16px}
+}
+</style>
 </head>
-<body class="bg-gradient-to-br from-white via-purple-100 to-indigo-100 min-h-screen flex items-center justify-center text-gray-800 p-4 relative overflow-hidden">
-  <div class="blur-glow top-10 left-10"></div>
-  <div class="blur-glow bottom-10 right-10"></div>
+<body>
 
-  <div class="w-full max-w-md bg-white shadow-xl rounded-xl p-8 fade-in mt-12 relative overflow-hidden">
-    <h2 class="text-2xl font-semibold text-center mb-6">Sign up</h2>
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+<canvas id="confettiCanvas"></canvas>
 
-    <form id="signup-form" class="space-y-6">
-      <div class="step active" id="step-1">
-        <div class="flex items-center gap-2 mb-2">
-          <img src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/98e609fc509ca98568daf03f2cded09a30948213/assets/images/back-arrow-navigation.svg" class="hidden w-4 h-4 cursor-pointer" id="back-1" />
-          <label for="name" class="text-sm font-medium text-gray-700">Work name</label>
-        </div>
-        <input type="text" id="name" required class="w-full px-4 py-3 mt-1 border border-gray-300 input-rounded focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm" />
-        <button type="button" id="next-1" class="mt-6 w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-3 input-rounded font-semibold hover:scale-105 transition">Next</button>
-      </div>
-      <div class="step" id="step-2">
-        <div class="flex items-center gap-2 mb-2">
-          <img src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/98e609fc509ca98568daf03f2cded09a30948213/assets/images/back-arrow-navigation.svg" class="w-4 h-4 cursor-pointer" id="back-2" />
-          <label for="email" class="text-sm font-medium text-gray-700">Email</label>
-        </div>
-        <input type="email" id="email" required class="w-full px-4 py-3 mt-1 border border-gray-300 input-rounded focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm" />
-        <button type="button" id="next-2" class="mt-6 w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-3 input-rounded font-semibold hover:scale-105 transition">Next</button>
-      </div>
-      <div class="step" id="step-3">
-        <div class="flex items-center gap-2 mb-2">
-          <img src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/98e609fc509ca98568daf03f2cded09a30948213/assets/images/back-arrow-navigation.svg" class="w-4 h-4 cursor-pointer" id="back-3" />
-          <label for="password" class="text-sm font-medium text-gray-700">Password</label>
-        </div>
-        <input type="password" id="password" required class="w-full px-4 py-3 mt-1 border border-gray-300 input-rounded focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm" />
-        <div id="strength-text" class="text-sm text-purple-600 mt-1"></div>
-        <button type="submit" id="submit-btn" class="mt-6 w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-3 input-rounded font-semibold hover:scale-105 transition">Continue</button>
-      </div>
-    </form>
+<!-- Theme btn -->
+<button class="theme-btn" id="themeBtn">
+  <span class="t-sun"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+  <span class="t-moon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+  <span id="modeLabel">Light</span>
+</button>
 
-    <div class="my-6 flex items-center text-sm text-gray-500 font-bold">
-      <div class="flex-grow h-px bg-gray-300"></div>
-      <span class="mx-3">OR</span>
-      <div class="flex-grow h-px bg-gray-300"></div>
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div>
+      <div class="left-logo">
+        <div class="logo-gem">
+          <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <span class="logo-name">Books <em>&amp;</em> Dreams</span>
+      </div>
+
+      <div class="left-headline">
+        Start your<br><em>reading journey</em><br>today.
+      </div>
+      <div class="left-sub">Join thousands of readers, dreamers and learners in the warmest community on the internet.</div>
+
+      <div class="perks">
+        <div class="perk">
+          <div class="perk-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div><div class="perk-title">100 XP Welcome Bonus</div><div class="perk-desc">Start earning right away — level up as you engage</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div><div class="perk-title">Active Community</div><div class="perk-desc">Books, blogs, courses, and real conversations</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div><div class="perk-title">Free Courses & Blogs</div><div class="perk-desc">Premium learning content, always free to explore</div></div>
+        </div>
+      </div>
     </div>
 
-    <button id="google-signup" class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 py-3 rounded-lg shadow-sm hover:bg-gray-50 transition">
-      <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" />
-      <span class="text-sm font-medium">Sign up with Google</span>
-    </button>
-
-    <p class="mt-6 text-center text-sm text-gray-500">
-      Already have an account?
-      <a href="login.html" class="text-purple-600 font-medium hover:underline">Log in</a>
-    </p>
+    <div class="bonus-card">
+      <div class="bonus-inner">
+        <div>
+          <div class="bonus-label">Welcome Gift</div>
+          <div class="bonus-xp">+100 XP</div>
+        </div>
+        <div class="bonus-desc">Every new member gets 100 XP the moment they join. Your learning journey starts immediately.</div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-      authDomain: "bcd-discord.firebaseapp.com",
-      projectId: "bcd-discord",
-      storageBucket: "bcd-discord.appspot.com",
-      messagingSenderId: "278895155371",
-      appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
-    };
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-wrap">
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const defaultPhoto = "https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png";
+      <div class="form-heading">Create <em>account.</em></div>
+      <div class="form-sub">It's free, it's warm, and it takes 30 seconds.</div>
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        window.location.href = "index.html";
-      }
-    });
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <div class="auth-tab" id="tabSignIn" onclick="location.href='login.html'" style="cursor:pointer">Sign In</div>
+        <div class="auth-tab active" id="tabSignUp">Create Account</div>
+      </div>
 
-    const step1 = document.getElementById("step-1");
-    const step2 = document.getElementById("step-2");
-    const step3 = document.getElementById("step-3");
+      <!-- Step dots -->
+      <div class="step-dots">
+        <div class="step-dot active" id="dot-0"></div>
+        <div class="step-dot" id="dot-1"></div>
+        <div class="step-dot" id="dot-2"></div>
+      </div>
 
-    document.getElementById("next-1").addEventListener("click", () => {
-  const name = document.getElementById("name").value.trim();
-  if (!name) {
-    Swal.fire("Name required", "Please enter your name before continuing.", "warning");
-    return;
-  }
-  step1.classList.remove("active");
-  step2.classList.add("active");
+      <!-- STEP 1: Name -->
+      <div class="step-panel active" id="step-0">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:16px">Step 1 of 3 — Your Name</div>
+
+        <div class="field">
+          <label class="field-label">Display Name</label>
+          <div class="inp-wrap">
+            <svg class="field-ico" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input class="inp" id="nameInp" type="text" placeholder="What should we call you?" autocomplete="name"/>
+          </div>
+          <div class="field-err" id="nameErr"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Please enter your name</div>
+        </div>
+
+        <button class="btn-primary" id="next0Btn">
+          <span class="btn-text">Continue</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="spinner"></div>
+        </button>
+
+        <div class="divider"><div class="div-line"></div><span class="div-text">or</span><div class="div-line"></div></div>
+        <button class="btn-google" id="googleBtn">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"/>
+          Sign up with Google
+        </button>
+
+        <div class="form-footer">
+          <span>Already have an account?</span>
+          <a href="login.html">Sign in</a>
+          <div class="form-footer-dot"></div>
+          <a href="index.html">Back to home</a>
+        </div>
+      </div>
+
+      <!-- STEP 2: Email -->
+      <div class="step-panel" id="step-1">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:16px">Step 2 of 3 — Your Email</div>
+
+        <button class="btn-back-link" id="back1Btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+
+        <div class="field">
+          <label class="field-label">Email Address</label>
+          <div class="inp-wrap">
+            <svg class="field-ico" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input class="inp" id="emailInp" type="email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <div class="field-err" id="emailErr"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="emailErrMsg">Enter a valid email</span></div>
+        </div>
+
+        <button class="btn-primary" id="next1Btn">
+          <span class="btn-text">Continue</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="spinner"></div>
+        </button>
+      </div>
+
+      <!-- STEP 3: Password -->
+      <div class="step-panel" id="step-2">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:16px">Step 3 of 3 — Set Password</div>
+
+        <button class="btn-back-link" id="back2Btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+
+        <div class="field">
+          <label class="field-label">Password</label>
+          <div class="inp-wrap">
+            <input class="inp no-icon" id="passInp" type="password" placeholder="Min 8 characters" autocomplete="new-password"/>
+            <button class="eye-btn" id="eyeBtn1" type="button" tabindex="-1">
+              <svg id="eye1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-label" id="strengthLabel">Enter a password</div>
+          <div class="field-err" id="passErr"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="passErrMsg">Minimum 8 characters</span></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Confirm Password</label>
+          <div class="inp-wrap">
+            <input class="inp no-icon" id="confirmInp" type="password" placeholder="Repeat your password" autocomplete="new-password"/>
+            <button class="eye-btn" id="eyeBtn2" type="button" tabindex="-1">
+              <svg id="eye2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="match-hint" id="matchHint"></div>
+          <div class="field-err" id="confirmErr"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Passwords do not match</div>
+        </div>
+
+        <!-- Terms -->
+        <div class="terms-wrap">
+          <div class="terms-check" id="termsCheck"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data will be stored securely.</div>
+        </div>
+
+        <button class="btn-primary" id="submitBtn">
+          <span class="btn-text">Create My Account</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <div class="spinner"></div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// Theme
+const H=document.documentElement;
+const sv=localStorage.getItem('bcd-settings-mode')||'dark';
+H.setAttribute('data-mode',sv);
+function updateMode(){document.getElementById('modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+updateMode();
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode',n);localStorage.setItem('bcd-settings-mode',n);updateMode();
 });
-    document.getElementById("next-2").addEventListener("click", () => {
-  const email = document.getElementById("email").value.trim();
-  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
 
-  if (!email) {
-    Swal.fire("Email required", "Please enter your email.", "warning");
-    return;
+// Toast
+let toastTimer;
+function showToast(msg,type='error'){
+  const t=document.getElementById('toast');
+  const icon=t.querySelector('.toast-icon svg');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast '+type;
+  icon.innerHTML=type==='success'
+    ?'<polyline points="20 6 9 17 4 12"/>'
+    :'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// Step navigation
+let currentStep=0;
+function goStep(next){
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  document.getElementById(`dot-${currentStep}`).classList.remove('active');
+  document.getElementById(`dot-${currentStep}`).classList.add('done');
+  currentStep=next;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  document.getElementById(`dot-${currentStep}`).classList.add('active');
+  document.getElementById(`dot-${currentStep}`).classList.remove('done');
+}
+function goBack(to){
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  document.getElementById(`dot-${currentStep}`).classList.remove('active');
+  document.getElementById(`dot-${currentStep}`).classList.remove('done');
+  // Reactivate previous done dot
+  for(let i=to+1;i<3;i++){ document.getElementById(`dot-${i}`).classList.remove('done','active'); }
+  currentStep=to;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  document.getElementById(`dot-${currentStep}`).classList.add('active');
+}
+
+// Step 1 → 2
+document.getElementById('next0Btn').addEventListener('click',()=>{
+  const name=document.getElementById('nameInp').value.trim();
+  if(!name){
+    document.getElementById('nameInp').classList.add('error');
+    document.getElementById('nameErr').style.display='flex'; return;
+  }
+  document.getElementById('nameErr').style.display='none';
+  document.getElementById('nameInp').classList.remove('error');
+  goStep(1);
+  setTimeout(()=>document.getElementById('emailInp').focus(),300);
+});
+document.getElementById('nameInp').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('next0Btn').click()});
+document.getElementById('nameInp').addEventListener('input',()=>{document.getElementById('nameInp').classList.remove('error');document.getElementById('nameErr').style.display='none'});
+
+// Step 2 → 3
+document.getElementById('next1Btn').addEventListener('click',async()=>{
+  const email=document.getElementById('emailInp').value.trim();
+  const errEl=document.getElementById('emailErr');
+  const errMsg=document.getElementById('emailErrMsg');
+  if(!email||!/\S+@\S+\.\S+/.test(email)){
+    document.getElementById('emailInp').classList.add('error');
+    errMsg.textContent='Enter a valid email address';
+    errEl.style.display='flex'; return;
+  }
+  errEl.style.display='none';
+  document.getElementById('emailInp').classList.remove('error');
+
+  // Check if email already exists (attempt signIn trick via fetchSignInMethodsForEmail)
+  try{
+    const btn=document.getElementById('next1Btn');
+    btn.disabled=true; btn.classList.add('loading');
+    const methods=await firebase.auth().fetchSignInMethodsForEmail(email);
+    btn.disabled=false; btn.classList.remove('loading');
+    if(methods.length>0){
+      document.getElementById('emailInp').classList.add('error');
+      errMsg.textContent='An account with this email already exists';
+      errEl.style.display='flex'; return;
+    }
+  }catch(e){
+    document.getElementById('next1Btn').disabled=false;
+    document.getElementById('next1Btn').classList.remove('loading');
   }
 
-  if (!emailRegex.test(email)) {
-    Swal.fire("Invalid Email", "Please enter a valid email address.", "warning");
-    return;
-  }
+  goStep(2);
+  setTimeout(()=>document.getElementById('passInp').focus(),300);
+});
+document.getElementById('emailInp').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('next1Btn').click()});
+document.getElementById('emailInp').addEventListener('input',()=>{document.getElementById('emailInp').classList.remove('error');document.getElementById('emailErr').style.display='none'});
 
-  step2.classList.remove("active");
-  step3.classList.add("active");
+// Back buttons
+document.getElementById('back1Btn').addEventListener('click',()=>goBack(0));
+document.getElementById('back2Btn').addEventListener('click',()=>goBack(1));
+
+// Password strength
+document.getElementById('passInp').addEventListener('input',()=>{
+  const v=document.getElementById('passInp').value;
+  const fill=document.getElementById('strengthFill');
+  const lbl=document.getElementById('strengthLabel');
+  if(!v){fill.style.width='0%';lbl.textContent='Enter a password';lbl.style.color='';return}
+  let s=0;
+  if(v.length>=8)s++;if(v.length>=12)s++;
+  if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+  const levels=[
+    {pct:'20%',bg:'#ef4444',txt:'Too short'},
+    {pct:'35%',bg:'#f59e0b',txt:'Weak'},
+    {pct:'55%',bg:'#f59e0b',txt:'Fair'},
+    {pct:'75%',bg:'#22c55e',txt:'Good'},
+    {pct:'100%',bg:'#16a34a',txt:'Strong ✓'},
+  ];
+  const l=levels[Math.min(s,4)];
+  fill.style.width=l.pct;fill.style.background=l.bg;
+  lbl.textContent=l.txt;lbl.style.color=l.bg;
+  // Recheck confirm
+  checkMatch();
 });
 
-    document.getElementById("back-2").addEventListener("click", () => {
-      step2.classList.remove("active");
-      step1.classList.add("active");
-    });
-    document.getElementById("back-3").addEventListener("click", () => {
-      step3.classList.remove("active");
-      step2.classList.add("active");
-    });
+// Confirm match
+function checkMatch(){
+  const p=document.getElementById('passInp').value;
+  const c=document.getElementById('confirmInp').value;
+  const hint=document.getElementById('matchHint');
+  if(!c){hint.innerHTML='';hint.className='match-hint';return}
+  if(p===c){
+    hint.className='match-hint match';
+    hint.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Passwords match';
+  } else {
+    hint.className='match-hint mismatch';
+    hint.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Passwords do not match';
+  }
+}
+document.getElementById('confirmInp').addEventListener('input',checkMatch);
 
-    const passwordInput = document.getElementById("password");
-    const strengthText = document.getElementById("strength-text");
+// Eye toggles
+function makeEye(btnId, inpId, iconId){
+  document.getElementById(btnId).addEventListener('click',()=>{
+    const inp=document.getElementById(inpId);
+    const isPass=inp.type==='password';
+    inp.type=isPass?'text':'password';
+    document.getElementById(iconId).innerHTML=isPass
+      ?'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      :'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  });
+}
+makeEye('eyeBtn1','passInp','eye1');
+makeEye('eyeBtn2','confirmInp','eye2');
 
-    passwordInput.addEventListener("input", () => {
-      const val = passwordInput.value;
-      let strength = 0;
-      if (val.length >= 8) strength++;
-      if (/[A-Z]/.test(val)) strength++;
-      if (/[0-9]/.test(val)) strength++;
-      if (/[^A-Za-z0-9]/.test(val)) strength++;
+// Terms checkbox
+let termsChecked=false;
+document.getElementById('termsCheck').addEventListener('click',()=>{
+  termsChecked=!termsChecked;
+  document.getElementById('termsCheck').classList.toggle('checked',termsChecked);
+});
 
-      strengthText.textContent =
-        val.length === 0 ? "" :
-        strength <= 1 ? "Weak password 🔴" :
-        strength === 2 ? "Moderate password 🟠" :
-        "Strong password 🟢";
-    });
+// Confetti
+function runConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;canvas.style.display='block';
+  const pieces=[];const cols=['#d97706','#f59e0b','#fbbf24','#fff','#92400e','#22c55e'];
+  for(let i=0;i<130;i++) pieces.push({x:Math.random()*canvas.width,y:-40,w:5+Math.random()*10,h:7+Math.random()*10,vx:-3+Math.random()*6,vy:2+Math.random()*5,r:Math.random()*360,c:cols[Math.floor(Math.random()*cols.length)]});
+  let t=0;
+  const raf=()=>{t++;ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.r+=3;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r*Math.PI/180);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});
+  if(t<220)requestAnimationFrame(raf);else{canvas.style.display='none';ctx.clearRect(0,0,canvas.width,canvas.height);}};
+  raf();
+}
+</script>
 
-    document.getElementById("signup-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const submitBtn = document.getElementById("submit-btn");
-      submitBtn.disabled = true;
-      submitBtn.classList.add("loading-button");
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain:"bcd-discord.firebaseapp.com",
+  projectId:"bcd-discord",
+  storageBucket:"bcd-discord.appspot.com",
+  messagingSenderId:"278895155371",
+  appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"
+});
+const auth=firebase.auth();
+const db=firebase.firestore();
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
 
-      try {
-        const cred = await auth.createUserWithEmailAndPassword(email, password);
-        await cred.user.updateProfile({ displayName: name, photoURL: defaultPhoto });
+// Already logged in
+auth.onAuthStateChanged(user=>{if(user) location.href='index.html'});
 
-        await db.collection("users").doc(cred.user.uid).set({
-  uid: cred.user.uid,
-  name,
-  email,
-  photoURL: defaultPhoto,
-  xp: 100,
-  badges: [],
-  streak: 0,
-  role: "user",
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-}, { merge: true });
+function firebaseErrMsg(code){
+  const map={
+    'auth/email-already-in-use':'An account with this email already exists.',
+    'auth/invalid-email':'Please enter a valid email address.',
+    'auth/weak-password':'Password is too weak. Use at least 8 characters.',
+    'auth/network-request-failed':'Network error. Check your connection.',
+    'auth/operation-not-allowed':'Email sign-up is not enabled.',
+  };
+  return map[code]||'Something went wrong. Please try again.';
+}
 
-        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+// Submit
+document.getElementById('submitBtn').addEventListener('click',async()=>{
+  const pass=document.getElementById('passInp').value;
+  const confirm=document.getElementById('confirmInp').value;
+  const passErr=document.getElementById('passErr');
+  const confirmErr=document.getElementById('confirmErr');
 
-        Swal.fire({
-          icon: 'success',
-          title: '🎉 Welcome to BCD!',
-          text: 'You earned 100 XP as a welcome reward!',
-          confirmButtonColor: '#a855f7'
-        });
+  // Validate password
+  if(pass.length<8){
+    document.getElementById('passInp').classList.add('error');
+    document.getElementById('passErrMsg').textContent='Minimum 8 characters required';
+    passErr.style.display='flex'; return;
+  }
+  passErr.style.display='none';
 
-        setTimeout(() => window.location.href = "index.html", 2000);
-      } catch (err) {
-        Swal.fire("Error", err.message, "error");
-        submitBtn.disabled = false;
-        submitBtn.classList.remove("loading-button");
-      }
-    });
+  if(pass!==confirm){
+    document.getElementById('confirmInp').classList.add('error');
+    confirmErr.style.display='flex'; return;
+  }
+  confirmErr.style.display='none';
 
-    document.getElementById("google-signup").addEventListener("click", () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(result => {
-          const user = result.user;
-          return db.collection("users").doc(user.uid).set({
-  uid: user.uid,
-  name: user.displayName,
-  email: user.email,
-  photoURL: user.photoURL || defaultPhoto,
-  xp: 100,
-  badges: [],
-  streak: 0,
-  role: "user",   // ⭐ CORRECT POSITION
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-}, { merge: true });
-        })
-        .then(() => {
-          confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-          Swal.fire("Success!", "Signed in with Google!", "success");
-          setTimeout(() => window.location.href = "index.html", 1500);
-        })
-        .catch(error => {
-          Swal.fire("Error", error.message, "error");
-        });
-    });
-  </script>
+  if(!termsChecked){
+    showToast('Please agree to the Terms of Service to continue.');
+    document.getElementById('termsCheck').style.boxShadow='0 0 0 3px rgba(220,38,38,.2)';
+    setTimeout(()=>document.getElementById('termsCheck').style.boxShadow='',2000);
+    return;
+  }
+
+  const name=document.getElementById('nameInp').value.trim();
+  const email=document.getElementById('emailInp').value.trim();
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.classList.add('loading');
+
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(email,pass);
+    await cred.user.updateProfile({displayName:name,photoURL:DEF_AV});
+    await db.collection('users').doc(cred.user.uid).set({
+      uid:cred.user.uid,
+      name,email,
+      photoURL:DEF_AV,
+      xp:100,badges:[],streak:0,role:'user',
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+
+    runConfetti();
+    showToast('🎉 Welcome to BCD! You earned 100 XP!','success');
+    setTimeout(()=>location.href='index.html',2000);
+  }catch(e){
+    showToast(firebaseErrMsg(e.code));
+    btn.disabled=false; btn.classList.remove('loading');
+  }
+});
+
+// Google signup
+document.getElementById('googleBtn').addEventListener('click',async()=>{
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    const result=await auth.signInWithPopup(provider);
+    const user=result.user;
+    const snap=await db.collection('users').doc(user.uid).get();
+    const isNew=!snap.exists;
+    await db.collection('users').doc(user.uid).set({
+      uid:user.uid,
+      name:user.displayName||'User',
+      email:user.email||'',
+      photoURL:user.photoURL||DEF_AV,
+      xp:isNew?100:snap.data().xp||0,
+      badges:isNew?[]:snap.data().badges||[],
+      streak:0,role:'user',
+      createdAt:isNew?firebase.firestore.FieldValue.serverTimestamp():snap.data().createdAt
+    },{merge:true});
+    if(isNew) runConfetti();
+    showToast(isNew?'🎉 Welcome to BCD! You earned 100 XP!':'Welcome back!','success');
+    setTimeout(()=>location.href='index.html',1500);
+  }catch(e){
+    if(e.code!=='auth/popup-closed-by-user') showToast(firebaseErrMsg(e.code));
+  }
+});
+</script>
 </body>
 </html>
