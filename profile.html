@@ -1,191 +1,754 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Profile | Books Coffee and Dreams</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Profile · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS — identical to settings.html
+═══════════════════════════════════════ */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --stone:#78716c;--red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --inp:#181614;--inp-bdr:rgba(217,119,6,.18);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --inp:#fdf9f4;--inp-bdr:rgba(120,83,32,.15);
+  --scr:rgba(217,119,6,.2);
+}
 
-  <!-- Fonts + Tailwind -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+/* ═══════════════════════════════════════
+   BASE
+═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s;font-size:15px;line-height:1.6}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+a{text-decoration:none;color:inherit}
+.hidden{display:none!important}
 
-  <!-- SweetAlert -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+/* same grid texture as settings */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
+  background-size:60px 60px;
+}
+body::after{
+  content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh;
+  background:radial-gradient(ellipse,rgba(217,119,6,.06) 0%,transparent 65%);
+  z-index:0;pointer-events:none;
+  animation:warm-drift 22s ease-in-out infinite alternate;
+}
+@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(-8vw,6vh)}}
+.page{position:relative;z-index:2}
 
-  <link href="/logo.png" rel="icon">
-  <link href="/logo.png" rel="apple-touch-icon">
+/* ═══════════════════════════════════════
+   TOPBAR — same as settings.html
+═══════════════════════════════════════ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;height:64px;
+  display:flex;align-items:center;
+  background:rgba(16,15,14,.88);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--bdr);transition:background .35s,border-color .35s;
+}
+[data-mode="light"] .topbar{background:rgba(250,247,242,.92)}
+.topbar-inner{max-width:1100px;margin:0 auto;padding:0 36px;width:100%;display:flex;align-items:center;gap:18px}
+.tb-back{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;color:var(--tx3);border:1px solid var(--bdr);background:var(--sur2);transition:all .2s;flex-shrink:0}
+.tb-back:hover{color:var(--amber);border-color:var(--bdr2);transform:translateX(-2px)}
+.tb-back svg{width:16px;height:16px}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(217,119,6,.4);animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+.tb-logo svg{width:16px;height:16px}
+.tb-site-name{font-family:var(--serif);font-size:17px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
+.tb-site-name em{color:var(--amber);font-style:italic}
+.tb-divider{width:1px;height:20px;background:var(--bdr);margin:0 4px;flex-shrink:0}
+.tb-page-title{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.mode-toggle{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s;white-space:nowrap}
+.mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-toggle svg{width:14px;height:14px}
+.icon-sun,.icon-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
+[data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
+.tb-settings-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;border:1px solid var(--bdr);background:var(--sur2);color:var(--tx3);transition:all .2s}
+.tb-settings-link:hover{color:var(--amber);border-color:var(--bdr2);transform:rotate(45deg)}
+.tb-settings-link svg{width:15px;height:15px}
 
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .blur-glow {
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle at center, rgba(168,85,247,0.40), transparent);
-      filter: blur(80px);
-      z-index: -1;
-    }
-    .card {
-      background: #ffffff;
-      border-radius: 1rem;
-      box-shadow: 0 10px 35px rgba(128, 90, 213, 0.15);
-      border: 1px solid rgba(0,0,0,0.05);
-      animation: fadeInUp .6s ease;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .gradient-title {
-      background: linear-gradient(to right, #a855f7, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .role-badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: capitalize;
-      display: inline-block;
-    }
-    .role-admin { background: linear-gradient(to right,#f97316,#a855f7); color:white; }
-    .role-staff { background: linear-gradient(to right,#7c3aed,#a855f7); color:white; }
-    .role-user { background: #e9d5ff; color:#5b21b6; }
-    .badge-chip {
-      background: #f3e8ff;
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #6b21a8;
-      display: inline-block;
-    }
-  </style>
+/* ═══════════════════════════════════════
+   HERO — CINEMATIC BANNER
+═══════════════════════════════════════ */
+.hero{position:relative;margin-top:64px;overflow:hidden}
+.banner-wrap{position:relative;height:300px;overflow:hidden}
+.banner-inner{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,#1a0900 0%,#3d1a00 25%,#92400e 55%,#6b2d00 80%,#100f0e 100%);
+  background-size:300% 300%;
+  animation:banner-flow 12s ease infinite;
+}
+@keyframes banner-flow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.banner-img-layer{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.3;display:none}
+/* Animated top-line on banner */
+.banner-wrap::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;z-index:3;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);
+  background-size:200% 100%;animation:hero-line 4s linear infinite;
+}
+@keyframes hero-line{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+/* Fade bottom */
+.banner-wrap::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:140px;z-index:2;
+  background:linear-gradient(to bottom,transparent,var(--bg));
+}
+/* Decorative big text in banner */
+.banner-deco{
+  position:absolute;bottom:-10px;right:40px;z-index:1;
+  font-family:var(--serif);font-size:clamp(80px,14vw,180px);
+  font-weight:400;font-style:italic;
+  color:rgba(217,119,6,.06);
+  line-height:1;letter-spacing:-.03em;
+  pointer-events:none;user-select:none;
+  white-space:nowrap;
+}
+/* Mesh light spots */
+.banner-glow1{position:absolute;top:-60px;left:-60px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(217,119,6,.18),transparent 65%);z-index:1}
+.banner-glow2{position:absolute;bottom:-80px;right:10%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.1),transparent 65%);z-index:1}
+
+/* Identity row — overlaps banner */
+.identity{
+  position:relative;z-index:3;
+  max-width:1100px;margin:0 auto;padding:0 36px;
+  margin-top:-80px;
+}
+.identity-card{
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:20px;overflow:hidden;
+  box-shadow:var(--sh2);
+  animation:fade-up .6s var(--spring) both;
+}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.identity-card::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);background-size:200% 100%;animation:hero-line 4s linear infinite}
+
+.identity-body{display:grid;grid-template-columns:1fr auto;align-items:center;padding:28px 32px;gap:24px}
+.identity-left{display:flex;align-items:center;gap:22px}
+
+/* Avatar */
+.av-frame{position:relative;flex-shrink:0}
+.av-img{width:88px;height:88px;border-radius:50%;object-fit:cover;border:4px solid var(--sur);box-shadow:0 0 0 3px var(--amber2),var(--sh2);display:block;background:var(--sur3);transition:transform .25s var(--spring)}
+.av-img:hover{transform:scale(1.05)}
+.av-status{position:absolute;bottom:4px;right:4px;width:16px;height:16px;border-radius:50%;background:var(--green);border:2.5px solid var(--sur);box-shadow:0 0 8px rgba(22,163,74,.6);transition:background .3s}
+
+/* Name area */
+.id-info{}
+.id-name{font-family:var(--serif);font-size:clamp(22px,3.5vw,34px);font-weight:400;letter-spacing:-.02em;color:var(--tx);line-height:1.1;margin-bottom:4px}
+.id-name em{font-style:italic;color:var(--amber)}
+.id-handle{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.06em;margin-bottom:12px}
+.id-pills{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.id-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:99px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--bdr);color:var(--tx3);background:var(--sur2)}
+.id-pill.role{background:rgba(217,119,6,.1);border-color:rgba(217,119,6,.3);color:var(--amber)}
+.id-pill.role.admin{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.25);color:var(--red)}
+.id-pill.role.staff{background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.25);color:var(--green)}
+.id-pill-dot{width:5px;height:5px;border-radius:50%}
+
+/* Action buttons — right side */
+.identity-actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;flex-shrink:0}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:11px;background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:13px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3);position:relative;overflow:hidden}
+.btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%);opacity:0;transition:.2s}
+.btn-primary:hover::after{opacity:1}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+.btn-primary svg{width:14px;height:14px}
+.btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:11px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;transition:all .2s}
+.btn-ghost:hover{border-color:var(--bdr2);color:var(--tx);background:var(--sur3)}
+.btn-ghost svg{width:13px;height:13px}
+.btn-danger{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:11px;background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.18);color:var(--red);font-size:12px;font-weight:500;transition:all .2s}
+.btn-danger:hover{background:rgba(220,38,38,.14);border-color:rgba(220,38,38,.4)}
+.btn-danger svg{width:12px;height:12px}
+
+/* ═══════════════════════════════════════
+   STATS ROW
+═══════════════════════════════════════ */
+.stats-row{
+  max-width:1100px;margin:16px auto 0;padding:0 36px;
+  animation:fade-up .6s var(--spring) .08s both;
+}
+.stats-inner{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;box-shadow:var(--sh);
+}
+.stat{padding:20px 22px;border-right:1px solid var(--bdr);position:relative;overflow:hidden;transition:background .18s;cursor:default}
+.stat:last-child{border-right:none}
+.stat:hover{background:var(--sur2)}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);transform:scaleX(0);transition:transform .35s var(--spring)}
+.stat:hover::after{transform:scaleX(1)}
+.stat-n{font-family:var(--serif);font-size:36px;font-weight:400;letter-spacing:-.03em;line-height:1;color:var(--amber2);margin-bottom:5px}
+.stat-l{font-family:var(--mono);font-size:10px;color:var(--tx4);text-transform:uppercase;letter-spacing:.16em}
+
+/* ═══════════════════════════════════════
+   XP BAR CARD
+═══════════════════════════════════════ */
+.xp-section{
+  max-width:1100px;margin:14px auto 0;padding:0 36px;
+  animation:fade-up .6s var(--spring) .14s both;
+}
+.xp-card{
+  background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:22px 28px;box-shadow:var(--sh);
+  display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;
+  position:relative;overflow:hidden;
+}
+.xp-card::before{content:'';display:block;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent)}
+.xp-card::after{content:attr(data-level);position:absolute;right:28px;top:50%;transform:translateY(-50%);font-family:var(--serif);font-size:80px;font-style:italic;color:rgba(217,119,6,.05);line-height:1;pointer-events:none}
+.xp-info{}
+.xp-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.xp-title{font-family:var(--serif);font-size:18px;color:var(--tx);margin-bottom:14px}
+.xp-track{height:7px;background:var(--sur3);border-radius:99px;overflow:hidden}
+.xp-fill{height:100%;border-radius:99px;width:0%;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);transition:width 1s var(--spring);position:relative;overflow:hidden}
+.xp-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:xp-s 2s ease-in-out infinite}
+@keyframes xp-s{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.xp-sub{font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:8px}
+.xp-big-num{text-align:right}
+.xp-big{font-family:var(--serif);font-size:56px;font-weight:400;letter-spacing:-.04em;line-height:1;color:var(--amber);font-style:italic}
+.xp-big-label{font-family:var(--mono);font-size:10px;color:var(--tx4);letter-spacing:.16em;text-transform:uppercase;text-align:right;margin-top:3px}
+
+/* ═══════════════════════════════════════
+   SECTION BLOCKS — same style as settings
+═══════════════════════════════════════ */
+.content{
+  max-width:1100px;margin:18px auto 80px;padding:0 36px;
+  display:grid;grid-template-columns:1fr 310px;gap:16px;
+}
+.col-main{display:flex;flex-direction:column;gap:16px}
+.col-side{display:flex;flex-direction:column;gap:16px}
+
+/* Block card — exact settings.html style */
+.block{
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:16px;overflow:hidden;box-shadow:var(--sh);
+  transition:border-color .2s;
+  position:relative;
+  animation:fade-up .6s var(--spring) both;
+}
+.block:hover{border-color:var(--bdr2)}
+.block::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent);opacity:.7}
+.block-header{display:flex;align-items:center;gap:14px;padding:18px 24px;border-bottom:1px solid var(--bdr);background:var(--sur2)}
+.block-header-icon{width:36px;height:36px;border-radius:9px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.18);display:flex;align-items:center;justify-content:center;color:var(--amber);flex-shrink:0}
+.block-header-icon svg{width:17px;height:17px}
+.block-title{font-family:var(--serif);font-size:18px;color:var(--tx);letter-spacing:-.01em}
+.block-desc{font-size:12px;color:var(--tx4);font-family:var(--mono);margin-top:2px}
+.block-header-right{margin-left:auto}
+.block-link{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--tx4);display:flex;align-items:center;gap:4px;transition:color .2s}
+.block-link:hover{color:var(--amber)}
+.block-link svg{width:11px;height:11px}
+.block-body{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+
+/* Bio */
+.bio-text{font-family:var(--serif);font-size:18px;font-style:italic;line-height:1.7;color:var(--tx2);padding-left:16px;border-left:2px solid var(--amber);margin-bottom:2px}
+.bio-chips{display:flex;flex-wrap:wrap;gap:8px}
+.bio-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);font-family:var(--mono);font-size:11px;color:var(--tx3)}
+.bio-chip svg{width:11px;height:11px;color:var(--amber)}
+.bio-chip a{color:var(--amber);transition:opacity .2s}
+.bio-chip a:hover{opacity:.7}
+
+/* Reading */
+.reading-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(217,119,6,.05);border:1px solid rgba(217,119,6,.14);border-radius:12px;transition:all .2s}
+.reading-row:hover{background:rgba(217,119,6,.09);transform:translateX(3px)}
+.reading-spine{width:44px;height:60px;border-radius:5px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;box-shadow:3px 4px 12px rgba(0,0,0,.35);flex-shrink:0}
+.reading-spine svg{width:20px;height:20px;color:#fff}
+.reading-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+.reading-title{font-family:var(--serif);font-size:16px;color:var(--tx2)}
+
+/* Post list */
+.post-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--bdr);transition:padding-left .2s var(--spring)}
+.post-item:hover{padding-left:6px}
+.post-item:first-child{padding-top:0}
+.post-item:last-child{border-bottom:none;padding-bottom:0}
+.post-idx{font-family:var(--mono);font-size:11px;color:var(--tx4);min-width:22px;padding-top:2px;flex-shrink:0}
+.post-cat{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:4px;color:var(--tx4)}
+.post-cat-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+.post-cat.discussion{color:#818cf8}
+.post-cat.review{color:var(--green)}
+.post-cat.question{color:var(--amber)}
+.post-cat.general{color:var(--amber2)}
+.post-text{font-family:var(--serif);font-size:15px;line-height:1.5;color:var(--tx2);margin-bottom:5px}
+.post-time{font-family:var(--mono);font-size:10px;color:var(--tx4)}
+.post-empty{font-family:var(--mono);font-size:12px;color:var(--tx4);font-style:italic}
+
+/* Badge list */
+.badge-list{display:flex;flex-direction:column;gap:2px}
+.badge-row{display:flex;align-items:center;gap:12px;padding:9px 11px;border-radius:9px;transition:background .16s}
+.badge-row:hover{background:var(--sur2)}
+.badge-em{font-size:20px;flex-shrink:0;width:24px;text-align:center}
+.badge-name{font-size:13px;font-weight:500;color:var(--tx2)}
+.badge-none{font-family:var(--mono);font-size:12px;color:var(--tx4);font-style:italic}
+
+/* Social */
+.soc-list{display:flex;flex-direction:column}
+.soc-item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--bdr);transition:padding-left .2s}
+.soc-item:last-child{border-bottom:none}
+.soc-item:hover{padding-left:4px}
+.soc-ico{width:32px;height:32px;border-radius:8px;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--tx3);transition:all .18s}
+.soc-item:hover .soc-ico{border-color:var(--bdr2);color:var(--amber)}
+.soc-ico svg{width:14px;height:14px}
+.soc-handle{font-size:13px;font-weight:500;color:var(--tx2)}
+.soc-name{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:1px}
+
+/* Info rows */
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:13px}
+.info-row:last-child{border-bottom:none;padding-bottom:0}
+.info-key{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--tx4)}
+.info-val{font-weight:500;color:var(--tx2)}
+
+/* Animation delays for blocks */
+.block:nth-child(1){animation-delay:.08s}
+.block:nth-child(2){animation-delay:.12s}
+.block:nth-child(3){animation-delay:.16s}
+.col-side .block:nth-child(1){animation-delay:.1s}
+.col-side .block:nth-child(2){animation-delay:.14s}
+.col-side .block:nth-child(3){animation-delay:.18s}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:780px){
+  .content{grid-template-columns:1fr;padding:0 16px}
+  .stats-inner{grid-template-columns:1fr 1fr}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--bdr)}
+  .xp-card{grid-template-columns:1fr;gap:16px}
+  .xp-big-num{text-align:left}
+  .xp-big{font-size:44px}
+  .identity-body{grid-template-columns:1fr;gap:18px}
+  .identity-actions{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+  .banner-wrap{height:200px}
+  .stats-row,.xp-section{padding:0 16px}
+  .identity{padding:0 16px}
+  .topbar-inner{padding:0 20px}
+}
+@media(max-width:500px){
+  .identity-left{flex-direction:column;align-items:flex-start;gap:14px}
+  .id-name{font-size:26px}
+  .banner-deco{display:none}
+  .stats-inner{grid-template-columns:1fr 1fr}
+  .stat-n{font-size:28px}
+}
+</style>
 </head>
+<body>
+<div class="page">
 
-<body class="bg-gradient-to-br from-white via-purple-100 to-indigo-100 min-h-screen flex items-center justify-center p-6 relative overflow-y-auto text-gray-800">
-
-  <!-- Glow Blobs -->
-  <div class="blur-glow top-10 left-10"></div>
-  <div class="blur-glow bottom-10 right-10"></div>
-
-  <!-- Profile Card -->
-  <div class="card max-w-md w-full p-8 text-center space-y-6 my-12 relative">
-
-    <!-- Back Arrow -->
-    <button onclick="history.back()"
-      class="absolute top-4 left-4 hover:scale-110 transition">
-      <img src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/main/assets/images/back-arrow-navigation.svg"
-          class="w-5 h-5" />
-    </button>
-
-    <!-- Settings Button -->
-    <a href="settings.html" class="absolute top-4 right-4 hover:scale-110 transition">
-      <img src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/main/assets/images/settings_icon.png" class="w-6 h-6" />
+<!-- ═══ TOPBAR ═══ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="tb-back" href="index.html">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
-
-    <!-- Profile Picture -->
-    <img id="userPhoto"
-      class="mx-auto w-32 h-32 rounded-full border-4 border-purple-400 shadow-lg object-cover mb-4 transition hover:scale-105"
-      src="">
-
-    <!-- User Name -->
-    <h1 id="userName" class="text-3xl font-bold gradient-title">Loading...</h1>
-
-    <!-- Email -->
-    <p id="userEmail" class="text-gray-600 text-sm">Loading...</p>
-
-    <!-- Role -->
-    <div id="userRole" class="mt-2"></div>
-
-    <!-- XP -->
-    <div class="mt-4">
-      <p class="font-semibold text-lg">XP: <span id="userXP">0</span></p>
+    <a class="tb-brand" href="index.html">
+      <div class="tb-logo">
+        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <span class="tb-site-name">Books <em>&amp;</em> Dreams</span>
+    </a>
+    <div class="tb-divider"></div>
+    <span class="tb-page-title">My Profile</span>
+    <div class="tb-right">
+      <button class="mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+        <span class="icon-moon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span id="modeLabel">Light</span>
+      </button>
+      <a class="tb-settings-link" href="settings.html" title="Settings">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </a>
     </div>
+  </div>
+</div>
 
-    <!-- Badges Section -->
-    <div class="mt-4">
-      <h3 class="font-bold text-purple-700 mb-2">Your Badges</h3>
-      <div id="badgeContainer" class="flex flex-wrap gap-2 justify-center text-sm"></div>
-    </div>
-
-    <!-- Logout Button -->
-    <button id="logoutBtn"
-      class="w-full mt-6 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold py-3 rounded-xl hover:scale-105 transition">
-      Logout
-    </button>
-
+<!-- ═══ HERO BANNER ═══ -->
+<div class="hero">
+  <div class="banner-wrap">
+    <div class="banner-inner" id="bannerInner"></div>
+    <div class="banner-img-layer" id="bannerImgLayer"></div>
+    <div class="banner-glow1"></div>
+    <div class="banner-glow2"></div>
+    <div class="banner-deco" id="bannerDeco">Reader</div>
   </div>
 
-  <!-- Firebase Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- Identity card overlapping banner -->
+  <div class="identity">
+    <div class="identity-card">
+      <div class="identity-body">
+        <div class="identity-left">
+          <div class="av-frame">
+            <img class="av-img" id="avatar" src="" alt="avatar"/>
+            <div class="av-status" id="avStatus"></div>
+          </div>
+          <div class="id-info">
+            <div class="id-name" id="idName">Loading…</div>
+            <div class="id-handle" id="idHandle">—</div>
+            <div class="id-pills" id="idPills">
+              <span class="id-pill role" id="rolePill">Member</span>
+            </div>
+          </div>
+        </div>
+        <div class="identity-actions">
+          <a href="settings.html" class="btn-primary">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Profile
+          </a>
+          <a href="community.html" class="btn-ghost">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Community
+          </a>
+          <button class="btn-danger" id="logoutBtn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-      authDomain: "bcd-discord.firebaseapp.com",
-      projectId: "bcd-discord",
-      storageBucket: "bcd-discord.appspot.com",
-      messagingSenderId: "278895155371",
-      appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
-    };
+<!-- ═══ STATS ═══ -->
+<div class="stats-row">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-n" id="sXP">0</div><div class="stat-l">XP Earned</div></div>
+    <div class="stat"><div class="stat-n" id="sPosts">—</div><div class="stat-l">Posts</div></div>
+    <div class="stat"><div class="stat-n" id="sLevel">1</div><div class="stat-l">Level</div></div>
+    <div class="stat"><div class="stat-n" id="sBadges">0</div><div class="stat-l">Badges</div></div>
+  </div>
+</div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+<!-- ═══ XP ═══ -->
+<div class="xp-section">
+  <div class="xp-card" id="xpCard" data-level="Lv 1">
+    <div class="xp-info">
+      <div class="xp-eyebrow" id="xpEyebrow">Level 1</div>
+      <div class="xp-title">Progress to next level</div>
+      <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+      <div class="xp-sub" id="xpSub">0 / 500 XP · 500 XP remaining</div>
+    </div>
+    <div class="xp-big-num">
+      <div class="xp-big" id="xpBig">0</div>
+      <div class="xp-big-label">Total XP</div>
+    </div>
+  </div>
+</div>
 
-    // Load user data
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+<!-- ═══ CONTENT ═══ -->
+<div class="content">
+  <div class="col-main">
 
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
-      const data = snap.exists() ? snap.data() : {};
+    <!-- Bio -->
+    <div class="block" id="bioBlock" style="display:none">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="block-title">About Me</div><div class="block-desc">Bio & personal details</div></div>
+      </div>
+      <div class="block-body">
+        <div class="bio-text" id="bioText"></div>
+        <div class="bio-chips" id="bioChips"></div>
+      </div>
+    </div>
 
-      // Photo priority
-      const finalPhoto =
-        (data.photoURL && data.photoURL.trim() !== "") ? data.photoURL :
-        (data.profileURL && data.profileURL.trim() !== "") ? data.profileURL :
-        "https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/main/assets/images/account_logo_default.png";
+    <!-- Reading -->
+    <div class="block" id="readingBlock" style="display:none">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <div><div class="block-title">Currently Reading</div><div class="block-desc">Your active book</div></div>
+      </div>
+      <div class="block-body">
+        <div class="reading-row">
+          <div class="reading-spine"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div><div class="reading-lbl">Now Reading</div><div class="reading-title" id="readingTitle">—</div></div>
+        </div>
+      </div>
+    </div>
 
-      document.getElementById("userPhoto").src = finalPhoto;
-      document.getElementById("userName").textContent = data.name || user.displayName || "Anonymous";
-      document.getElementById("userEmail").textContent = data.email || user.email || "No email";
+    <!-- Posts -->
+    <div class="block">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div><div class="block-title">Recent Posts</div><div class="block-desc">Latest community activity</div></div>
+        <div class="block-header-right"><a href="community.html" class="block-link">View all<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a></div>
+      </div>
+      <div class="block-body" style="gap:0;padding:4px 24px 20px">
+        <div id="postList"><div class="post-empty">Loading posts…</div></div>
+      </div>
+    </div>
+  </div>
 
-      // Role Badge
-      const role = data.role || "user";
-      let roleClass = role === "admin" ? "role-admin"
-                    : role === "staff" ? "role-staff"
-                    : "role-user";
-      document.getElementById("userRole").innerHTML =
-        `<span class="role-badge ${roleClass}">${role}</span>`;
+  <div class="col-side">
 
-      // XP
-      document.getElementById("userXP").textContent = data.xp ?? 0;
+    <!-- Badges -->
+    <div class="block">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        <div><div class="block-title">Badges</div><div class="block-desc">Earned achievements</div></div>
+      </div>
+      <div class="block-body">
+        <div class="badge-list" id="badgeList"><div class="badge-none">No badges yet.</div></div>
+      </div>
+    </div>
 
-      // Badges
-      const badgeBox = document.getElementById("badgeContainer");
-      badgeBox.innerHTML = "";
-      if (Array.isArray(data.badges) && data.badges.length > 0) {
-        data.badges.forEach(b => {
-          badgeBox.innerHTML += `<span class="badge-chip">${b}</span>`;
-        });
-      } else {
-        badgeBox.innerHTML = `<p class="text-gray-500 text-sm">No badges yet.</p>`;
-      }
+    <!-- Social -->
+    <div class="block" id="socialBlock" style="display:none">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+        <div><div class="block-title">Social Links</div><div class="block-desc">Find me online</div></div>
+      </div>
+      <div class="block-body" style="padding:8px 24px 16px">
+        <div class="soc-list" id="socList"></div>
+      </div>
+    </div>
+
+    <!-- Member info -->
+    <div class="block">
+      <div class="block-header">
+        <div class="block-header-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div><div class="block-title">Member Info</div><div class="block-desc">Account details</div></div>
+      </div>
+      <div class="block-body" style="padding:8px 24px 16px;gap:0">
+        <div class="info-row"><span class="info-key">Joined</span><span class="info-val" id="joinDate">—</span></div>
+        <div class="info-row"><span class="info-key">Last active</span><span class="info-val" id="lastActive">—</span></div>
+        <div class="info-row"><span class="info-key">Status</span><span class="info-val" id="memberStatus" style="color:var(--green)">● Online</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<script>
+// Mode toggle — same logic as settings.html
+const H = document.documentElement;
+const saved = localStorage.getItem('bcd-settings-mode') || 'dark';
+H.setAttribute('data-mode', saved);
+function updateModeUI() {
+  document.getElementById('modeLabel').textContent = H.getAttribute('data-mode') === 'dark' ? 'Light' : 'Dark';
+}
+updateModeUI();
+document.getElementById('modeToggle').addEventListener('click', () => {
+  const next = H.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
+  H.setAttribute('data-mode', next);
+  localStorage.setItem('bcd-settings-mode', next);
+  updateModeUI();
+});
+</script>
+
+<script>
+const FC = {
+  apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain: "bcd-discord.firebaseapp.com",
+  projectId: "bcd-discord",
+  storageBucket: "bcd-discord.appspot.com",
+  messagingSenderId: "278895155371",
+  appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
+};
+firebase.initializeApp(FC);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const DEFAULT_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+
+function timeAgo(ms) {
+  const s = Math.floor((Date.now() - ms) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+auth.onAuthStateChanged(async user => {
+  if (!user) return location.href = 'login.html';
+
+  // Avatar
+  const av = document.getElementById('avatar');
+  av.src = user.photoURL || DEFAULT_AV;
+  av.onerror = () => av.src = DEFAULT_AV;
+
+  // Timestamps
+  if (user.metadata?.creationTime)
+    document.getElementById('joinDate').textContent =
+      new Date(user.metadata.creationTime).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  if (user.metadata?.lastSignInTime)
+    document.getElementById('lastActive').textContent =
+      timeAgo(new Date(user.metadata.lastSignInTime).getTime());
+
+  // Firestore
+  const snap = await db.collection('users').doc(user.uid).get();
+  const d = snap.exists ? snap.data() : {};
+
+  // Name
+  const name = d.name || user.displayName || 'Reader';
+  const words = name.trim().split(/\s+/);
+  // Italic last name in Instrument Serif style
+  document.getElementById('idName').innerHTML =
+    words.length > 1
+      ? `${words[0]} <em>${words.slice(1).join(' ')}</em>`
+      : `<em>${words[0]}</em>`;
+  document.getElementById('idHandle').textContent = user.email || '';
+  document.getElementById('bannerDeco').textContent = name;
+
+  // Role
+  const role = d.role || 'user';
+  const rp = document.getElementById('rolePill');
+  rp.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+  rp.className = 'id-pill role ' + role;
+
+  // Status
+  const SC = { online: 'var(--green)', idle: 'var(--amber)', dnd: 'var(--red)', invisible: 'var(--tx4)' };
+  const SL = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', invisible: 'Offline' };
+  const st = d.status?.availability || 'online';
+  document.getElementById('avStatus').style.background = SC[st].startsWith('var') ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : SC[st];
+  const stColors = { online: '#16a34a', idle: '#d97706', dnd: '#dc2626', invisible: '#78716c' };
+  document.getElementById('avStatus').style.background = stColors[st] || stColors.online;
+  document.getElementById('memberStatus').style.color = stColors[st] || stColors.online;
+  document.getElementById('memberStatus').textContent = `● ${SL[st]}`;
+
+  // Status message pill
+  if (d.status?.message) {
+    const sp = document.createElement('span');
+    sp.className = 'id-pill';
+    sp.innerHTML = `<span class="id-pill-dot" style="background:${stColors[st]}"></span>${d.status.message}`;
+    document.getElementById('idPills').appendChild(sp);
+  }
+
+  // Banner
+  if (d.banner?.type === 'image' && d.banner.value) {
+    const l = document.getElementById('bannerImgLayer');
+    l.style.backgroundImage = `url(${d.banner.value})`;
+    l.style.display = 'block';
+  } else if (d.banner?.type === 'gradient' && d.banner.value) {
+    document.getElementById('bannerInner').style.background = d.banner.value;
+    document.getElementById('bannerInner').style.animation = 'none';
+  }
+
+  // XP
+  const xp = d.xp || 0;
+  const level = Math.floor(xp / 500) + 1;
+  const prog = xp % 500;
+  document.getElementById('sXP').textContent = xp;
+  document.getElementById('sLevel').textContent = level;
+  document.getElementById('xpBig').textContent = xp;
+  document.getElementById('xpEyebrow').textContent = `Level ${level}`;
+  document.getElementById('xpSub').textContent = `${prog} / 500 XP · ${500 - prog} XP remaining`;
+  document.getElementById('xpCard').setAttribute('data-level', `Lv ${level}`);
+  setTimeout(() => {
+    document.getElementById('xpFill').style.width = Math.min(100, Math.round(prog / 500 * 100)) + '%';
+  }, 400);
+
+  // Bio
+  if (d.bio) {
+    document.getElementById('bioBlock').style.display = 'block';
+    document.getElementById('bioText').textContent = d.bio;
+    const bc = document.getElementById('bioChips');
+    if (d.location)
+      bc.innerHTML += `<span class="bio-chip"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${d.location}</span>`;
+    if (d.website)
+      bc.innerHTML += `<span class="bio-chip"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><a href="${d.website}" target="_blank">${d.website.replace(/^https?:\/\//, '')}</a></span>`;
+  }
+
+  // Reading
+  if (d.currentlyReading) {
+    document.getElementById('readingBlock').style.display = 'block';
+    document.getElementById('readingTitle').textContent = d.currentlyReading;
+  }
+
+  // Badges
+  const bl = document.getElementById('badgeList');
+  const EM = { 'Reader':'📚','Reviewer':'⭐','Helper':'🤝','Early Bird':'🐦','Bookworm':'🐛','Explorer':'🗺️','Contributor':'✍️' };
+  if (Array.isArray(d.badges) && d.badges.length) {
+    bl.innerHTML = '';
+    d.badges.forEach(b => {
+      const el = document.createElement('div');
+      el.className = 'badge-row';
+      el.innerHTML = `<span class="badge-em">${EM[b]||'🏅'}</span><span class="badge-name">${b}</span>`;
+      bl.appendChild(el);
     });
+    document.getElementById('sBadges').textContent = d.badges.length;
+  }
 
-    // Logout
-    document.getElementById("logoutBtn").onclick = () => {
-      signOut(auth).then(() => window.location.href = "login.html");
-    };
-  </script>
+  // Social
+  if (d.social && Object.values(d.social).some(v => v)) {
+    document.getElementById('socialBlock').style.display = 'block';
+    const sl = document.getElementById('socList');
+    const SOCS = [
+      { k:'twitter',   l:'Twitter / X',  f:true,  u:'https://x.com/',          i:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>' },
+      { k:'instagram',  l:'Instagram',    f:false, u:'https://instagram.com/',   i:'<rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>' },
+      { k:'goodreads',  l:'Goodreads',    f:true,  u:'https://goodreads.com/',   i:'<path d="M11.43 23.995c-3.608-.208-6.274-2.077-6.448-5.078.695.007 1.375-.013 2.07-.006.224 1.342 1.065 2.43 2.683 3.026 1.583.496 3.737.46 5.082-.174 1.351-.636 2.145-1.822 2.503-3.577.212-1.042.236-1.734.231-2.92l-.005-1.631h-.059c-1.245 2.564-3.315 3.659-5.567 3.637-4.966-.044-7.754-4.006-7.817-8.152C4.043 5.003 7.04.982 12.015 1.04c2.153.023 4.042 1.024 5.269 3.026h.05l.006-2.82H19.5V18.6c0 2.898-1.177 4.248-2.966 5.047-1.6.715-3.44.795-5.104.348z"/>' },
+      { k:'linkedin',   l:'LinkedIn',     f:false, u:'https://linkedin.com/in/', i:'<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>' },
+      { k:'github',     l:'GitHub',       f:false, u:'https://github.com/',      i:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>' },
+    ];
+    SOCS.forEach(s => {
+      if (!d.social[s.k]) return;
+      const a = document.createElement('a');
+      a.href = s.u + d.social[s.k]; a.target = '_blank'; a.className = 'soc-item';
+      a.innerHTML = `<div class="soc-ico"><svg width="14" height="14" fill="${s.f?'currentColor':'none'}" stroke="${s.f?'none':'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${s.i}</svg></div><div><div class="soc-handle">${d.social[s.k]}</div><div class="soc-name">${s.l}</div></div>`;
+      sl.appendChild(a);
+    });
+  }
 
+  // Posts
+  try {
+    const ps = await db.collection('communityPosts')
+      .where('uid','==', user.uid)
+      .orderBy('createdAt','desc')
+      .limit(5)
+      .get();
+    document.getElementById('sPosts').textContent = ps.size;
+    const pl = document.getElementById('postList');
+    if (ps.empty) { pl.innerHTML = '<div class="post-empty">No posts yet.</div>'; return; }
+    pl.innerHTML = '';
+    let i = 1;
+    ps.forEach(pd => {
+      const p = pd.data();
+      const cat = p.category || 'general';
+      const t = p.createdAt ? timeAgo(new Date(p.createdAt.seconds * 1000).getTime()) : '';
+      const el = document.createElement('div');
+      el.className = 'post-item';
+      el.innerHTML = `
+        <span class="post-idx">0${i++}</span>
+        <div>
+          <div class="post-cat ${cat}"><span class="post-cat-dot"></span>${cat}</div>
+          <div class="post-text">${(p.content||'').slice(0,160)}${(p.content||'').length>160?'…':''}</div>
+          <div class="post-time">${t}</div>
+        </div>`;
+      pl.appendChild(el);
+    });
+  } catch(e) {
+    document.getElementById('postList').innerHTML = '<div class="post-empty">Could not load posts.</div>';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (!confirm('Sign out?')) return;
+  await auth.signOut();
+  location.href = 'login.html';
+});
+</script>
 </body>
 </html>
