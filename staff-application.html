@@ -1,34 +1,1008 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BCD - Discord Staff Application</title>
-  <link rel="stylesheet" href="staff-application.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="/logo.png" rel="icon">
-  <link href="/logo.png" rel="apple-touch-icon">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Staff Application · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+/* ═══════════ TOKENS ═══════════ */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --scr:rgba(217,119,6,.2);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+textarea,input,select{font-family:var(--sans)}
+
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");background-size:60px 60px}
+body::after{content:'';position:fixed;bottom:-20%;left:-10%;width:60vw;height:60vh;background:radial-gradient(ellipse,rgba(217,119,6,.06) 0%,transparent 65%);z-index:0;pointer-events:none;animation:warm-drift 22s ease-in-out infinite alternate}
+@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(6vw,-5vh)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes hero-line{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+@keyframes step-in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes step-out{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-24px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════ NAV ═══════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;background:rgba(16,15,14,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);transition:background .35s}
+[data-mode="light"] .nav{background:rgba(250,247,242,.92)}
+.nav-inner{max-width:1000px;margin:0 auto;padding:0 36px;width:100%;display:flex;align-items:center;gap:14px}
+.nav-back{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;transition:all .2s}
+.nav-back:hover{color:var(--amber);border-color:var(--bdr2);transform:translateX(-2px)}
+.nav-back svg{width:15px;height:15px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+.nav-logo svg{width:14px;height:14px}
+.nav-site-name{font-family:var(--serif);font-size:16px;color:var(--tx)}
+.nav-site-name em{color:var(--amber);font-style:italic}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.mode-toggle{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s}
+.mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-toggle svg{width:14px;height:14px}
+.icon-sun,.icon-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
+[data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
+
+/* ═══════════ PAGE LAYOUT ═══════════ */
+.page{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:96px 36px 80px;display:grid;grid-template-columns:300px 1fr;gap:40px;align-items:start}
+
+/* ═══════════ LEFT SIDEBAR ═══════════ */
+.sidebar{position:sticky;top:96px}
+.sidebar-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+.sidebar-eyebrow::before{content:'';display:block;width:18px;height:1px;background:var(--amber)}
+.sidebar-title{font-family:var(--serif);font-size:clamp(26px,3.5vw,38px);font-weight:400;letter-spacing:-.02em;line-height:1.1;color:var(--tx);margin-bottom:12px}
+.sidebar-title em{font-style:italic;color:var(--amber)}
+.sidebar-desc{font-size:14px;color:var(--tx3);line-height:1.72;margin-bottom:28px}
+
+/* Step tracker */
+.step-tracker{display:flex;flex-direction:column;gap:0}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;position:relative}
+.step-item:not(:last-child)::after{content:'';position:absolute;left:13px;top:38px;width:2px;height:calc(100% - 16px);background:var(--bdr)}
+.step-item.done::after{background:var(--amber)}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s var(--spring);background:var(--bg);z-index:1}
+.step-item.active .step-dot{border-color:var(--amber);background:rgba(217,119,6,.1);box-shadow:0 0 0 4px rgba(217,119,6,.1)}
+.step-item.done .step-dot{border-color:var(--amber);background:var(--amber)}
+.step-dot-inner{font-family:var(--mono);font-size:10px;color:var(--tx4)}
+.step-item.active .step-dot-inner{color:var(--amber)}
+.step-item.done .step-dot-inner{color:#fff}
+.step-dot svg{width:12px;height:12px;color:#fff}
+.step-text{}
+.step-name{font-size:13px;font-weight:600;color:var(--tx3);transition:color .2s}
+.step-item.active .step-name{color:var(--tx)}
+.step-item.done .step-name{color:var(--amber)}
+.step-sub{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:2px}
+
+/* Draft saved indicator */
+.draft-badge{display:inline-flex;align-items:center;gap:5px;margin-top:20px;padding:5px 12px;border-radius:8px;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.06em;opacity:0;transition:opacity .3s}
+.draft-badge.show{opacity:1}
+.draft-badge svg{width:11px;height:11px}
+
+/* Requirements */
+.reqs{margin-top:24px;display:flex;flex-direction:column;gap:8px}
+.req-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx4)}
+.req-item svg{width:13px;height:13px;color:var(--amber);flex-shrink:0}
+
+/* ═══════════ FORM CARD ═══════════ */
+.form-card{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;overflow:hidden;box-shadow:var(--sh2)}
+.form-card::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);background-size:200% 100%;animation:hero-line 4s linear infinite}
+
+/* Progress bar inside card */
+.form-progress{padding:0 28px;margin:0}
+.form-progress-bar{height:3px;background:var(--sur3);margin:0 -28px}
+.form-progress-fill{height:100%;background:linear-gradient(90deg,#92400e,var(--amber),var(--amber3));transition:width .5s var(--spring)}
+
+/* Step panels */
+.step-panels{padding:28px}
+.step-panel{display:none;animation:step-in .35s var(--spring) both}
+.step-panel.active{display:block}
+
+/* Step header */
+.step-header{margin-bottom:24px}
+.step-header-num{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.step-header-title{font-family:var(--serif);font-size:22px;color:var(--tx);letter-spacing:-.01em;margin-bottom:4px}
+.step-header-desc{font-size:13px;color:var(--tx4)}
+
+/* Form fields */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.field-label{font-size:12px;font-weight:600;color:var(--tx3);letter-spacing:.04em;text-transform:uppercase;font-family:var(--mono);display:flex;align-items:center;justify-content:space-between}
+.char-count{font-size:11px;color:var(--tx4);font-weight:400;text-transform:none;letter-spacing:0;transition:color .2s}
+.char-count.warn{color:var(--amber)}
+.char-count.over{color:var(--red)}
+.field-hint{font-size:11px;color:var(--tx4);font-family:var(--mono)}
+
+.inp{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;color:var(--tx);font-size:14px;outline:none;width:100%;transition:all .22s}
+.inp::placeholder{color:var(--tx4)}
+.inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(217,119,6,.08)}
+.inp.error{border-color:rgba(220,38,38,.5);box-shadow:0 0 0 3px rgba(220,38,38,.07)}
+.inp.valid{border-color:rgba(22,163,74,.4)}
+textarea.inp{resize:vertical;min-height:100px;line-height:1.65}
+
+.field-error{font-size:11px;color:var(--red);font-family:var(--mono);margin-top:2px;display:flex;align-items:center;gap:4px}
+.field-error svg{width:11px;height:11px;flex-shrink:0}
+
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* Role cards */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.role-card{background:var(--sur2);border:2px solid var(--bdr);border-radius:12px;padding:14px;cursor:pointer;transition:all .22s;position:relative}
+.role-card:hover{border-color:var(--bdr2);background:var(--sur3)}
+.role-card.selected{border-color:var(--amber);background:rgba(217,119,6,.07)}
+.role-card input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+.role-icon{font-size:22px;margin-bottom:8px}
+.role-name{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:3px}
+.role-desc{font-size:11px;color:var(--tx4);line-height:1.5}
+.role-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.role-card.selected .role-check{border-color:var(--amber);background:var(--amber)}
+.role-check svg{width:10px;height:10px;color:#fff;opacity:0;transition:opacity .2s}
+.role-card.selected .role-check svg{opacity:1}
+
+/* Availability checkboxes */
+.avail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.avail-chip{position:relative;text-align:center}
+.avail-chip input{position:absolute;opacity:0;pointer-events:none}
+.avail-label{display:block;padding:8px 4px;border-radius:8px;border:1px solid var(--bdr);background:var(--sur2);font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx4);cursor:pointer;transition:all .2s;text-align:center}
+.avail-chip input:checked+.avail-label{border-color:var(--amber);background:rgba(217,119,6,.1);color:var(--amber)}
+
+/* Hours slider */
+.slider-wrap{padding:4px 0}
+.slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;background:var(--sur3);outline:none;cursor:pointer}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#92400e,var(--amber));box-shadow:0 2px 8px rgba(217,119,6,.4);cursor:pointer;border:2px solid var(--sur)}
+.slider-val{font-family:var(--mono);font-size:14px;color:var(--amber);font-weight:600;margin-top:8px;text-align:center}
+
+/* Rating stars */
+.stars-wrap{display:flex;gap:8px;margin-top:4px}
+.star-btn{font-size:24px;cursor:pointer;transition:transform .15s var(--spring);opacity:.3;line-height:1}
+.star-btn:hover,.star-btn.active{opacity:1;transform:scale(1.2)}
+
+/* Skills tags */
+.skills-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.skill-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);font-size:12px;color:var(--tx3);cursor:pointer;transition:all .18s;user-select:none}
+.skill-tag:hover{border-color:var(--bdr2);color:var(--tx)}
+.skill-tag.selected{background:rgba(217,119,6,.1);border-color:rgba(217,119,6,.3);color:var(--amber)}
+.skill-tag svg{width:10px;height:10px}
+
+/* Review section */
+.review-grid{display:flex;flex-direction:column;gap:12px}
+.review-item{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px}
+.review-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.review-val{font-size:14px;color:var(--tx2);line-height:1.55}
+.review-val.italic{font-family:var(--serif);font-style:italic;font-size:15px}
+.review-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.review-tag{padding:2px 8px;border-radius:99px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);font-family:var(--mono);font-size:10px;color:var(--amber)}
+
+/* Nav buttons */
+.form-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 28px 24px;border-top:1px solid var(--bdr)}
+.btn-back{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;transition:all .2s}
+.btn-back:hover{border-color:var(--bdr2);color:var(--tx)}
+.btn-back svg{width:14px;height:14px}
+.btn-next{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:10px;background:linear-gradient(135deg,#92400e,var(--amber));color:#fff;font-size:14px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3);position:relative;overflow:hidden}
+.btn-next::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%);opacity:0;transition:.2s}
+.btn-next:hover::after{opacity:1}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+.btn-next:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-next svg{width:14px;height:14px}
+.btn-submit{background:linear-gradient(135deg,#16a34a,#22c55e);box-shadow:0 4px 16px rgba(22,163,74,.3)}
+.btn-submit:hover{box-shadow:0 8px 28px rgba(22,163,74,.5)}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn-next.loading .spinner{display:block}
+.btn-next.loading svg{display:none}
+.btn-next.loading span{display:none}
+
+/* Success screen */
+.success-screen{display:none;padding:48px 28px;text-align:center}
+.success-screen.show{display:block;animation:fade-up .5s var(--spring) both}
+.success-icon{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:0 0 0 12px rgba(22,163,74,.1)}
+.success-icon svg{width:32px;height:32px;color:#fff}
+.success-title{font-family:var(--serif);font-size:30px;color:var(--tx);margin-bottom:12px;letter-spacing:-.02em}
+.success-desc{font-size:14px;color:var(--tx3);line-height:1.72;max-width:400px;margin:0 auto 28px}
+.success-id{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:9px;background:var(--sur2);border:1px solid var(--bdr);font-family:var(--mono);font-size:12px;color:var(--tx4);margin-bottom:28px}
+.success-id span{color:var(--amber)}
+.btn-home{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:10px;background:linear-gradient(135deg,#92400e,var(--amber));color:#fff;font-size:14px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3)}
+.btn-home:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+
+/* Already applied banner */
+.already-applied{display:none;padding:20px 28px;background:rgba(217,119,6,.06);border-bottom:1px solid var(--bdr)}
+.already-applied.show{display:flex;align-items:center;gap:12px}
+.already-applied svg{width:18px;height:18px;color:var(--amber);flex-shrink:0}
+.already-applied-text{font-size:13px;color:var(--tx3)}
+.already-applied-text strong{color:var(--amber)}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:780px){
+  .page{grid-template-columns:1fr;gap:28px;padding:84px 20px 60px}
+  .sidebar{position:static}
+  .step-tracker{flex-direction:row;overflow-x:auto;gap:8px}
+  .step-item::after{display:none}
+  .avail-grid{grid-template-columns:repeat(4,1fr)}
+  .role-grid{grid-template-columns:1fr 1fr}
+  .nav-inner{padding:0 20px}
+}
+@media(max-width:480px){
+  .row-2{grid-template-columns:1fr}
+  .role-grid{grid-template-columns:1fr 1fr}
+  .avail-grid{grid-template-columns:repeat(2,1fr)}
+  .step-panels{padding:20px}
+  .form-nav{padding:16px 20px 20px}
+}
+</style>
 </head>
 <body>
-  <div class="bg">
-    <div class="form-card">
-      <h2>💜 Be a part of BCD</h2>
-      <p>We’re looking for amazing staff! Apply now using the form below.</p>
-      <form id="staffForm">
-        <input type="text" name="username" placeholder="Your Name" required />
-        <input type="text" name="discordTag" placeholder="Discord Tag (e.g. User#1234)" required />
-        <input type="number" name="age" placeholder="Age" required />
-        <textarea name="experience" placeholder="Your experience in moderation, Discord, etc." required></textarea>
-        <textarea name="reason" placeholder="Why do you want to be staff?" required></textarea>
-        <button type="submit">🚀 Submit Application</button>
-      </form>
-      <p id="successMsg"></p>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-back" href="index.html">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Home
+    </a>
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <span class="nav-site-name">Books <em>&amp;</em> Dreams</span>
+    </div>
+    <div class="nav-right">
+      <button class="mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+        <span class="icon-moon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span id="modeLabel">Light</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-eyebrow">Join the Team</div>
+    <div class="sidebar-title">Apply to be <em>staff.</em></div>
+    <div class="sidebar-desc">We're looking for passionate, dedicated people to help build the BCD community. Every application is read carefully.</div>
+
+    <div class="step-tracker" id="stepTracker">
+      <div class="step-item active" data-step="0">
+        <div class="step-dot"><span class="step-dot-inner">1</span></div>
+        <div class="step-text"><div class="step-name">About You</div><div class="step-sub">Personal info</div></div>
+      </div>
+      <div class="step-item" data-step="1">
+        <div class="step-dot"><span class="step-dot-inner">2</span></div>
+        <div class="step-text"><div class="step-name">Role & Skills</div><div class="step-sub">What you bring</div></div>
+      </div>
+      <div class="step-item" data-step="2">
+        <div class="step-dot"><span class="step-dot-inner">3</span></div>
+        <div class="step-text"><div class="step-name">Experience</div><div class="step-sub">Your background</div></div>
+      </div>
+      <div class="step-item" data-step="3">
+        <div class="step-dot"><span class="step-dot-inner">4</span></div>
+        <div class="step-text"><div class="step-name">Availability</div><div class="step-sub">Time commitment</div></div>
+      </div>
+      <div class="step-item" data-step="4">
+        <div class="step-dot"><span class="step-dot-inner">5</span></div>
+        <div class="step-text"><div class="step-name">Review</div><div class="step-sub">Submit</div></div>
+      </div>
+    </div>
+
+    <div class="draft-badge" id="draftBadge">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Draft saved
+    </div>
+
+    <div class="reqs">
+      <div class="req-item"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Must be 14 or older</div>
+      <div class="req-item"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Active BCD community member</div>
+      <div class="req-item"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Min. 5 hrs/week availability</div>
+      <div class="req-item"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Good English communication</div>
     </div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="staff-application-firebase.js"></script>
+  <!-- FORM CARD -->
+  <div class="form-card">
+
+    <!-- Already applied banner -->
+    <div class="already-applied" id="alreadyApplied">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="already-applied-text">You have already submitted an application. <strong>We'll be in touch soon!</strong></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="form-progress">
+      <div class="form-progress-bar"><div class="form-progress-fill" id="progressFill" style="width:20%"></div></div>
+    </div>
+
+    <!-- STEP 1: About You -->
+    <div class="step-panel active" id="step-0">
+      <div class="step-panels">
+        <div class="step-header">
+          <div class="step-header-num">Step 1 of 5</div>
+          <div class="step-header-title">Tell us about yourself</div>
+          <div class="step-header-desc">Basic information so we know who you are.</div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label class="field-label">Full Name *</label>
+            <input class="inp" id="f-name" type="text" placeholder="Your name" autocomplete="name"/>
+            <div class="field-error" id="e-name" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Required</div>
+          </div>
+          <div class="field">
+            <label class="field-label">Age *</label>
+            <input class="inp" id="f-age" type="number" placeholder="Your age" min="14" max="99"/>
+            <div class="field-error" id="e-age" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Must be 14 or older</div>
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label class="field-label">Discord Username *</label>
+            <input class="inp" id="f-discord" type="text" placeholder="username or User#1234"/>
+            <div class="field-error" id="e-discord" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Required</div>
+          </div>
+          <div class="field">
+            <label class="field-label">Email *</label>
+            <input class="inp" id="f-email" type="email" placeholder="your@email.com" autocomplete="email"/>
+            <div class="field-error" id="e-email" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Valid email required</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Country / Timezone *</label>
+          <input class="inp" id="f-country" type="text" placeholder="e.g. India (IST), UK (GMT)"/>
+          <div class="field-error" id="e-country" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Required</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">How long have you been in the BCD community? *</label>
+          <select class="inp" id="f-tenure">
+            <option value="">Select…</option>
+            <option value="Less than 1 month">Less than 1 month</option>
+            <option value="1–3 months">1–3 months</option>
+            <option value="3–6 months">3–6 months</option>
+            <option value="6–12 months">6–12 months</option>
+            <option value="1+ years">1+ years</option>
+          </select>
+          <div class="field-error" id="e-tenure" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Required</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Role & Skills -->
+    <div class="step-panel" id="step-1">
+      <div class="step-panels">
+        <div class="step-header">
+          <div class="step-header-num">Step 2 of 5</div>
+          <div class="step-header-title">Role &amp; Skills</div>
+          <div class="step-header-desc">What position are you applying for and what do you bring?</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Preferred Role * <span style="color:var(--tx4);font-weight:400;text-transform:none;letter-spacing:0">Select one</span></label>
+          <div class="role-grid" id="roleGrid">
+            <label class="role-card" data-role="Moderator">
+              <input type="radio" name="role" value="Moderator"/>
+              <div class="role-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="role-icon">🛡️</div>
+              <div class="role-name">Moderator</div>
+              <div class="role-desc">Keep conversations safe and healthy</div>
+            </label>
+            <label class="role-card" data-role="Content Creator">
+              <input type="radio" name="role" value="Content Creator"/>
+              <div class="role-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="role-icon">✍️</div>
+              <div class="role-name">Content Creator</div>
+              <div class="role-desc">Write blogs, create engaging content</div>
+            </label>
+            <label class="role-card" data-role="Community Manager">
+              <input type="radio" name="role" value="Community Manager"/>
+              <div class="role-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="role-icon">🤝</div>
+              <div class="role-name">Community Manager</div>
+              <div class="role-desc">Organise events, welcome members</div>
+            </label>
+            <label class="role-card" data-role="Designer">
+              <input type="radio" name="role" value="Designer"/>
+              <div class="role-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="role-icon">🎨</div>
+              <div class="role-name">Designer</div>
+              <div class="role-desc">Graphics, banners, visual identity</div>
+            </label>
+            <label class="role-card" data-role="Developer">
+              <input type="radio" name="role" value="Developer"/>
+              <div class="role-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="role-icon">💻</div>
+              <div class="role-name">Developer</div>
+              <div class="role-desc">Build tools, bots, and features</div>
+            </label>
+            <label class="role-card" data-role="Other">
+              <input type="radio" name="role" value="Other"/>
+              <div class="role-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="role-icon">✨</div>
+              <div class="role-name">Other</div>
+              <div class="role-desc">Something else entirely</div>
+            </label>
+          </div>
+          <div class="field-error" id="e-role" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Please select a role</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Skills &amp; Strengths <span style="color:var(--tx4);font-weight:400;text-transform:none;letter-spacing:0">Select all that apply</span></label>
+          <div class="skills-wrap" id="skillsWrap">
+            <div class="skill-tag" data-skill="Communication">💬 Communication</div>
+            <div class="skill-tag" data-skill="Writing">✍️ Writing</div>
+            <div class="skill-tag" data-skill="Conflict Resolution">⚖️ Conflict Resolution</div>
+            <div class="skill-tag" data-skill="Design">🎨 Design</div>
+            <div class="skill-tag" data-skill="Coding">💻 Coding</div>
+            <div class="skill-tag" data-skill="Social Media">📱 Social Media</div>
+            <div class="skill-tag" data-skill="Teaching">📚 Teaching</div>
+            <div class="skill-tag" data-skill="Event Planning">🗓️ Event Planning</div>
+            <div class="skill-tag" data-skill="Video Editing">🎬 Video Editing</div>
+            <div class="skill-tag" data-skill="Leadership">👑 Leadership</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Rate your English proficiency *</label>
+          <div class="stars-wrap" id="englishStars">
+            <span class="star-btn" data-val="1">⭐</span>
+            <span class="star-btn" data-val="2">⭐</span>
+            <span class="star-btn" data-val="3">⭐</span>
+            <span class="star-btn" data-val="4">⭐</span>
+            <span class="star-btn" data-val="5">⭐</span>
+          </div>
+          <div class="field-hint" id="engHint" style="margin-top:6px">Click to rate (1 = Basic, 5 = Native)</div>
+          <div class="field-error" id="e-english" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Please rate your proficiency</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Experience -->
+    <div class="step-panel" id="step-2">
+      <div class="step-panels">
+        <div class="step-header">
+          <div class="step-header-num">Step 3 of 5</div>
+          <div class="step-header-title">Your experience</div>
+          <div class="step-header-desc">Tell us about your background and why you want to join.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="f-experience">
+            Moderation / Community Experience *
+            <span class="char-count" id="cc-experience">0 / 500</span>
+          </label>
+          <textarea class="inp" id="f-experience" rows="4" placeholder="Have you moderated other servers, Discord communities, or online spaces? Tell us about it." maxlength="500"></textarea>
+          <div class="field-error" id="e-experience" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum 50 characters required</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="f-reason">
+            Why do you want to be staff? *
+            <span class="char-count" id="cc-reason">0 / 600</span>
+          </label>
+          <textarea class="inp" id="f-reason" rows="4" placeholder="What motivates you? What would you bring to the BCD team?" maxlength="600"></textarea>
+          <div class="field-error" id="e-reason" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum 80 characters required</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="f-scenario">
+            Scenario Question *
+            <span class="char-count" id="cc-scenario">0 / 400</span>
+          </label>
+          <div class="field-hint" style="margin-bottom:8px">A member is repeatedly being rude to others in a channel despite warnings. What do you do?</div>
+          <textarea class="inp" id="f-scenario" rows="3" placeholder="Describe how you'd handle this situation step by step…" maxlength="400"></textarea>
+          <div class="field-error" id="e-scenario" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum 50 characters required</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Portfolio / Social Links <span style="color:var(--tx4);font-weight:400;text-transform:none;letter-spacing:0">Optional</span></label>
+          <input class="inp" id="f-portfolio" type="url" placeholder="https://your-portfolio.com, GitHub, etc."/>
+          <div class="field-hint">Share any relevant links — portfolio, GitHub, writing samples, etc.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Availability -->
+    <div class="step-panel" id="step-3">
+      <div class="step-panels">
+        <div class="step-header">
+          <div class="step-header-num">Step 4 of 5</div>
+          <div class="step-header-title">Availability</div>
+          <div class="step-header-desc">Let us know when you're free and how much time you can commit.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Hours per week you can commit *</label>
+          <div class="slider-wrap">
+            <input class="slider" type="range" id="f-hours" min="1" max="40" value="10"/>
+            <div class="slider-val" id="hoursVal">10 hours/week</div>
+          </div>
+          <div class="field-error" id="e-hours" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum 5 hours required</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Days available * <span style="color:var(--tx4);font-weight:400;text-transform:none;letter-spacing:0">Select all that apply</span></label>
+          <div class="avail-grid">
+            <div class="avail-chip"><input type="checkbox" id="d-mon" value="Monday"/><label class="avail-label" for="d-mon">Mon</label></div>
+            <div class="avail-chip"><input type="checkbox" id="d-tue" value="Tuesday"/><label class="avail-label" for="d-tue">Tue</label></div>
+            <div class="avail-chip"><input type="checkbox" id="d-wed" value="Wednesday"/><label class="avail-label" for="d-wed">Wed</label></div>
+            <div class="avail-chip"><input type="checkbox" id="d-thu" value="Thursday"/><label class="avail-label" for="d-thu">Thu</label></div>
+            <div class="avail-chip"><input type="checkbox" id="d-fri" value="Friday"/><label class="avail-label" for="d-fri">Fri</label></div>
+            <div class="avail-chip"><input type="checkbox" id="d-sat" value="Saturday"/><label class="avail-label" for="d-sat">Sat</label></div>
+            <div class="avail-chip"><input type="checkbox" id="d-sun" value="Sunday"/><label class="avail-label" for="d-sun">Sun</label></div>
+          </div>
+          <div class="field-error" id="e-days" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Please select at least one day</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Preferred time of day *</label>
+          <select class="inp" id="f-timeofday">
+            <option value="">Select…</option>
+            <option value="Morning (6am–12pm)">Morning (6am–12pm)</option>
+            <option value="Afternoon (12pm–6pm)">Afternoon (12pm–6pm)</option>
+            <option value="Evening (6pm–12am)">Evening (6pm–12am)</option>
+            <option value="Night (12am–6am)">Night (12am–6am)</option>
+            <option value="Flexible">Flexible / Any time</option>
+          </select>
+          <div class="field-error" id="e-timeofday" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Required</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Are you currently on any other moderation teams?</label>
+          <select class="inp" id="f-otherteams">
+            <option value="No">No, only BCD</option>
+            <option value="Yes, 1 other">Yes, 1 other server</option>
+            <option value="Yes, 2-3 others">Yes, 2–3 other servers</option>
+            <option value="Yes, 4+ others">Yes, 4+ other servers</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="f-additional">Anything else you want to share? <span style="color:var(--tx4);font-weight:400;text-transform:none;letter-spacing:0">Optional</span></label>
+          <textarea class="inp" id="f-additional" rows="2" placeholder="Any other information that might help your application…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Review -->
+    <div class="step-panel" id="step-4">
+      <div class="step-panels">
+        <div class="step-header">
+          <div class="step-header-num">Step 5 of 5</div>
+          <div class="step-header-title">Review &amp; Submit</div>
+          <div class="step-header-desc">Check your application before submitting. You cannot edit after submission.</div>
+        </div>
+        <div class="review-grid" id="reviewGrid"></div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title">Application Submitted!</div>
+      <div class="success-desc">Thank you for applying to the BCD staff team. We review all applications carefully and will get back to you within 7–14 days via Discord or email.</div>
+      <div class="success-id">Application ID: <span id="appId">—</span></div>
+      <a href="index.html" class="btn-home">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Back to Home
+      </a>
+    </div>
+
+    <!-- NAV BUTTONS -->
+    <div class="form-nav" id="formNav">
+      <button class="btn-back" id="btnBack" style="visibility:hidden">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button class="btn-next" id="btnNext">
+        <span>Continue</span>
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        <div class="spinner"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mode toggle
+const H=document.documentElement;
+const sv=localStorage.getItem('bcd-settings-mode')||'dark';
+H.setAttribute('data-mode',sv);
+function updateMode(){document.getElementById('modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+updateMode();
+document.getElementById('modeToggle').addEventListener('click',()=>{
+  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode',n);localStorage.setItem('bcd-settings-mode',n);updateMode();
+});
+
+// Firebase
+firebase.initializeApp({
+  apiKey:"AIzaSyCJQOWy3dDMguqn7jTAgSO7YyOCuuywO2Y",
+  authDomain:"bcd-discord-staff-application.firebaseapp.com",
+  projectId:"bcd-discord-staff-application",
+  storageBucket:"bcd-discord-staff-application.firebasestorage.app",
+  messagingSenderId:"432620310583",
+  appId:"1:432620310583:web:b1ebba74c1e29638d6efb2"
+});
+
+// Also init main app for auth check
+firebase.initializeApp({
+  apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain:"bcd-discord.firebaseapp.com",
+  projectId:"bcd-discord",
+  storageBucket:"bcd-discord.appspot.com",
+  messagingSenderId:"278895155371",
+  appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"
+},'main');
+
+const db = firebase.app().firestore();
+const mainDb = firebase.app('main').firestore();
+const auth = firebase.app('main').auth();
+
+// ── STATE ──
+let currentStep = 0;
+const TOTAL_STEPS = 5;
+let selectedRole = '';
+let selectedSkills = [];
+let englishRating = 0;
+let draftTimer = null;
+
+// ── AUTOFILL FROM AUTH ──
+auth.onAuthStateChanged(async user => {
+  if(!user) return;
+  // Check already applied using email
+  try{
+    const snap = await db.collection('staffApplications').where('email','==',user.email).get();
+    if(!snap.empty){
+      document.getElementById('alreadyApplied').classList.add('show');
+    }
+  }catch(e){}
+  // Prefill name + email
+  if(user.displayName && !document.getElementById('f-name').value)
+    document.getElementById('f-name').value = user.displayName;
+  if(user.email && !document.getElementById('f-email').value)
+    document.getElementById('f-email').value = user.email;
+});
+
+// ── LOAD DRAFT ──
+function loadDraft(){
+  try{
+    const d = JSON.parse(localStorage.getItem('bcd-staff-draft')||'{}');
+    if(d.name) document.getElementById('f-name').value=d.name;
+    if(d.age) document.getElementById('f-age').value=d.age;
+    if(d.discord) document.getElementById('f-discord').value=d.discord;
+    if(d.email) document.getElementById('f-email').value=d.email;
+    if(d.country) document.getElementById('f-country').value=d.country;
+    if(d.tenure) document.getElementById('f-tenure').value=d.tenure;
+    if(d.role){ selectRole(d.role); }
+    if(d.skills){ d.skills.forEach(s=>toggleSkill(s)); }
+    if(d.english){ setEnglish(d.english); }
+    if(d.experience) document.getElementById('f-experience').value=d.experience;
+    if(d.reason) document.getElementById('f-reason').value=d.reason;
+    if(d.scenario) document.getElementById('f-scenario').value=d.scenario;
+    if(d.portfolio) document.getElementById('f-portfolio').value=d.portfolio;
+    if(d.hours){ document.getElementById('f-hours').value=d.hours; document.getElementById('hoursVal').textContent=d.hours+' hours/week'; }
+    if(d.days){ d.days.forEach(day=>{ const el=document.querySelector(`input[value="${day}"]`); if(el)el.checked=true; }); }
+    if(d.timeofday) document.getElementById('f-timeofday').value=d.timeofday;
+    if(d.otherteams) document.getElementById('f-otherteams').value=d.otherteams;
+    if(d.additional) document.getElementById('f-additional').value=d.additional;
+    updateCharCounts();
+  }catch(e){}
+}
+
+function saveDraft(){
+  try{
+    const days=Array.from(document.querySelectorAll('.avail-grid input:checked')).map(el=>el.value);
+    localStorage.setItem('bcd-staff-draft', JSON.stringify({
+      name:document.getElementById('f-name').value,
+      age:document.getElementById('f-age').value,
+      discord:document.getElementById('f-discord').value,
+      email:document.getElementById('f-email').value,
+      country:document.getElementById('f-country').value,
+      tenure:document.getElementById('f-tenure').value,
+      role:selectedRole,skills:selectedSkills,english:englishRating,
+      experience:document.getElementById('f-experience').value,
+      reason:document.getElementById('f-reason').value,
+      scenario:document.getElementById('f-scenario').value,
+      portfolio:document.getElementById('f-portfolio').value,
+      hours:document.getElementById('f-hours').value,days,
+      timeofday:document.getElementById('f-timeofday').value,
+      otherteams:document.getElementById('f-otherteams').value,
+      additional:document.getElementById('f-additional').value
+    }));
+    const badge=document.getElementById('draftBadge');
+    badge.classList.add('show');
+    setTimeout(()=>badge.classList.remove('show'),2500);
+  }catch(e){}
+}
+
+function scheduleDraft(){
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(saveDraft,1000);
+}
+
+document.querySelectorAll('.inp').forEach(el=>el.addEventListener('input',scheduleDraft));
+
+// ── ROLE SELECTION ──
+function selectRole(val){
+  selectedRole=val;
+  document.querySelectorAll('.role-card').forEach(c=>{
+    c.classList.toggle('selected',c.dataset.role===val);
+    const inp=c.querySelector('input');
+    if(inp) inp.checked=c.dataset.role===val;
+  });
+}
+document.querySelectorAll('.role-card').forEach(card=>{
+  card.addEventListener('click',()=>selectRole(card.dataset.role));
+});
+
+// ── SKILLS ──
+function toggleSkill(name){
+  const tag=document.querySelector(`.skill-tag[data-skill="${name}"]`);
+  if(!tag) return;
+  const i=selectedSkills.indexOf(name);
+  if(i>=0){ selectedSkills.splice(i,1); tag.classList.remove('selected'); }
+  else { selectedSkills.push(name); tag.classList.add('selected'); }
+}
+document.querySelectorAll('.skill-tag').forEach(tag=>{
+  tag.addEventListener('click',()=>toggleSkill(tag.dataset.skill));
+});
+
+// ── ENGLISH STARS ──
+function setEnglish(val){
+  englishRating=val;
+  const labels=['','Basic','Elementary','Conversational','Proficient','Native'];
+  document.querySelectorAll('.star-btn').forEach(s=>{
+    s.classList.toggle('active',parseInt(s.dataset.val)<=val);
+  });
+  document.getElementById('engHint').textContent=val?`${val}/5 — ${labels[val]}`:'Click to rate (1 = Basic, 5 = Native)';
+}
+document.querySelectorAll('.star-btn').forEach(s=>{
+  s.addEventListener('click',()=>{setEnglish(parseInt(s.dataset.val));scheduleDraft();});
+});
+
+// ── HOURS SLIDER ──
+document.getElementById('f-hours').addEventListener('input',function(){
+  document.getElementById('hoursVal').textContent=this.value+' hours/week';
+  scheduleDraft();
+});
+
+// ── CHAR COUNTS ──
+function updateCharCounts(){
+  const fields=[
+    {id:'f-experience',cc:'cc-experience',max:500},
+    {id:'f-reason',cc:'cc-reason',max:600},
+    {id:'f-scenario',cc:'cc-scenario',max:400}
+  ];
+  fields.forEach(({id,cc,max})=>{
+    const el=document.getElementById(id);
+    const ccEl=document.getElementById(cc);
+    if(!el||!ccEl) return;
+    const len=el.value.length;
+    ccEl.textContent=`${len} / ${max}`;
+    ccEl.className='char-count'+(len>max*0.9?' warn':'')+(len>=max?' over':'');
+  });
+}
+['f-experience','f-reason','f-scenario'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',updateCharCounts);
+});
+
+// ── VALIDATION ──
+function validateStep(step){
+  let ok=true;
+  function err(id,errId,show){
+    const el=document.getElementById(id);
+    const errEl=document.getElementById(errId);
+    if(show){ el?.classList.add('error'); if(errEl) errEl.style.display='flex'; ok=false; }
+    else { el?.classList.remove('error'); if(errEl) errEl.style.display='none'; }
+  }
+  if(step===0){
+    err('f-name','e-name',!document.getElementById('f-name').value.trim());
+    const age=parseInt(document.getElementById('f-age').value);
+    err('f-age','e-age',!age||age<14||age>99);
+    err('f-discord','e-discord',!document.getElementById('f-discord').value.trim());
+    const email=document.getElementById('f-email').value.trim();
+    err('f-email','e-email',!email||!/\S+@\S+\.\S+/.test(email));
+    err('f-country','e-country',!document.getElementById('f-country').value.trim());
+    err('f-tenure','e-tenure',!document.getElementById('f-tenure').value);
+  }
+  if(step===1){
+    const noRole=!selectedRole;
+    document.getElementById('roleGrid').style.outline=noRole?'2px solid rgba(220,38,38,.4)':'none';
+    document.getElementById('e-role').style.display=noRole?'flex':'none';
+    if(noRole) ok=false;
+    const noEng=!englishRating;
+    document.getElementById('e-english').style.display=noEng?'flex':'none';
+    if(noEng) ok=false;
+  }
+  if(step===2){
+    const exp=document.getElementById('f-experience').value.trim();
+    err('f-experience','e-experience',exp.length<50);
+    const reason=document.getElementById('f-reason').value.trim();
+    err('f-reason','e-reason',reason.length<80);
+    const scenario=document.getElementById('f-scenario').value.trim();
+    err('f-scenario','e-scenario',scenario.length<50);
+  }
+  if(step===3){
+    const hours=parseInt(document.getElementById('f-hours').value);
+    document.getElementById('e-hours').style.display=hours<5?'flex':'none';
+    if(hours<5) ok=false;
+    const days=Array.from(document.querySelectorAll('.avail-grid input:checked'));
+    document.getElementById('e-days').style.display=days.length===0?'flex':'none';
+    if(!days.length) ok=false;
+    err('f-timeofday','e-timeofday',!document.getElementById('f-timeofday').value);
+  }
+  return ok;
+}
+
+// ── REVIEW RENDER ──
+function renderReview(){
+  const days=Array.from(document.querySelectorAll('.avail-grid input:checked')).map(el=>el.value);
+  const items=[
+    {label:'Full Name',val:document.getElementById('f-name').value},
+    {label:'Age',val:document.getElementById('f-age').value},
+    {label:'Discord',val:document.getElementById('f-discord').value},
+    {label:'Email',val:document.getElementById('f-email').value},
+    {label:'Country / Timezone',val:document.getElementById('f-country').value},
+    {label:'Community Tenure',val:document.getElementById('f-tenure').value},
+    {label:'Applying For',val:selectedRole,bold:true},
+    {label:'Skills',val:selectedSkills,tags:true},
+    {label:'English Proficiency',val:['','⭐','⭐⭐','⭐⭐⭐','⭐⭐⭐⭐','⭐⭐⭐⭐⭐'][englishRating]||'—'},
+    {label:'Experience',val:document.getElementById('f-experience').value,italic:true},
+    {label:'Why Staff?',val:document.getElementById('f-reason').value,italic:true},
+    {label:'Scenario Answer',val:document.getElementById('f-scenario').value,italic:true},
+    {label:'Portfolio / Links',val:document.getElementById('f-portfolio').value||'—'},
+    {label:'Hours/Week',val:document.getElementById('f-hours').value+' hrs/week'},
+    {label:'Available Days',val:days,tags:true},
+    {label:'Preferred Time',val:document.getElementById('f-timeofday').value},
+    {label:'Other Teams',val:document.getElementById('f-otherteams').value},
+    {label:'Additional Notes',val:document.getElementById('f-additional').value||'—'},
+  ];
+  const grid=document.getElementById('reviewGrid');
+  grid.innerHTML='';
+  items.forEach(({label,val,italic,bold,tags})=>{
+    const div=document.createElement('div');div.className='review-item';
+    let content='';
+    if(tags&&Array.isArray(val)){
+      content=`<div class="review-tags">${val.map(t=>`<span class="review-tag">${t}</span>`).join('')}</div>`;
+    } else {
+      content=`<div class="review-val${italic?' italic':''}${bold?' ':{}}}">${val||'—'}</div>`;
+    }
+    div.innerHTML=`<div class="review-label">${label}</div>${content}`;
+    grid.appendChild(div);
+  });
+}
+
+// ── STEP NAVIGATION ──
+function goToStep(next){
+  const panels=document.querySelectorAll('.step-panel');
+  const items=document.querySelectorAll('.step-item');
+  panels[currentStep].classList.remove('active');
+  items[currentStep].classList.remove('active');
+  items[currentStep].classList.add('done');
+  currentStep=next;
+  panels[currentStep].classList.add('active');
+  items[currentStep].classList.add('active');
+  // Update progress bar
+  document.getElementById('progressFill').style.width=((currentStep+1)/TOTAL_STEPS*100)+'%';
+  // Update buttons
+  document.getElementById('btnBack').style.visibility=currentStep===0?'hidden':'visible';
+  const nextBtn=document.getElementById('btnNext');
+  if(currentStep===TOTAL_STEPS-1){
+    nextBtn.innerHTML='<span>Submit Application</span><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><div class="spinner"></div>';
+    nextBtn.className='btn-next btn-submit';
+  } else {
+    nextBtn.innerHTML='<span>Continue</span><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg><div class="spinner"></div>';
+    nextBtn.className='btn-next';
+  }
+  if(currentStep===TOTAL_STEPS-1) renderReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('btnNext').addEventListener('click',async()=>{
+  if(currentStep<TOTAL_STEPS-1){
+    if(!validateStep(currentStep)) return;
+    saveDraft();
+    goToStep(currentStep+1);
+  } else {
+    // SUBMIT
+    const btn=document.getElementById('btnNext');
+    btn.disabled=true; btn.classList.add('loading');
+    try{
+      const days=Array.from(document.querySelectorAll('.avail-grid input:checked')).map(el=>el.value);
+      const data={
+        name:document.getElementById('f-name').value.trim(),
+        age:parseInt(document.getElementById('f-age').value),
+        discordTag:document.getElementById('f-discord').value.trim(),
+        email:document.getElementById('f-email').value.trim(),
+        country:document.getElementById('f-country').value.trim(),
+        communityTenure:document.getElementById('f-tenure').value,
+        role:selectedRole,
+        skills:selectedSkills,
+        englishProficiency:englishRating,
+        experience:document.getElementById('f-experience').value.trim(),
+        reason:document.getElementById('f-reason').value.trim(),
+        scenario:document.getElementById('f-scenario').value.trim(),
+        portfolio:document.getElementById('f-portfolio').value.trim(),
+        hoursPerWeek:parseInt(document.getElementById('f-hours').value),
+        availableDays:days,
+        preferredTime:document.getElementById('f-timeofday').value,
+        otherTeams:document.getElementById('f-otherteams').value,
+        additionalNotes:document.getElementById('f-additional').value.trim(),
+        status:'pending',
+        submittedAt:firebase.firestore.FieldValue.serverTimestamp()
+      };
+      const ref=await db.collection('staffApplications').add(data);
+      // Clear draft
+      localStorage.removeItem('bcd-staff-draft');
+      // Show success
+      document.getElementById('appId').textContent=ref.id.slice(0,8).toUpperCase();
+      document.querySelectorAll('.step-panel').forEach(p=>p.style.display='none');
+      document.getElementById('formNav').style.display='none';
+      document.getElementById('progressFill').style.width='100%';
+      document.getElementById('successScreen').classList.add('show');
+      // Mark all steps done
+      document.querySelectorAll('.step-item').forEach(s=>{ s.classList.remove('active'); s.classList.add('done'); });
+    }catch(e){
+      console.error(e);
+      alert('Submission failed: '+(e.message||e)+'\nPlease try again.');
+      btn.disabled=false; btn.classList.remove('loading');
+    }
+  }
+});
+
+document.getElementById('btnBack').addEventListener('click',()=>{
+  if(currentStep===0) return;
+  const panels=document.querySelectorAll('.step-panel');
+  const items=document.querySelectorAll('.step-item');
+  panels[currentStep].classList.remove('active');
+  items[currentStep].classList.remove('active');
+  items[currentStep].classList.remove('done');
+  currentStep--;
+  panels[currentStep].classList.add('active');
+  items[currentStep].classList.add('active');
+  items[currentStep].classList.remove('done');
+  document.getElementById('progressFill').style.width=((currentStep+1)/TOTAL_STEPS*100)+'%';
+  document.getElementById('btnBack').style.visibility=currentStep===0?'hidden':'visible';
+  const nextBtn=document.getElementById('btnNext');
+  nextBtn.innerHTML='<span>Continue</span><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg><div class="spinner"></div>';
+  nextBtn.className='btn-next'; nextBtn.disabled=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+// ── INIT ──
+loadDraft();
+updateCharCounts();
+</script>
 </body>
 </html>
