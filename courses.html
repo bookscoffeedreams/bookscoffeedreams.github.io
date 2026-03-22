@@ -618,7 +618,9 @@ async function loadCourses(){
     const snap=await db.collection('courses').orderBy('createdAt','desc').get();
     allCourses=snap.docs.map(d=>{
       const data=d.data();
-      return{id:d.id,title:data.title||'Untitled',description:data.description||'',thumbnailURL:data.thumbnailURL||'',price:data.price??0,isPaid:!!data.isPaid,featured:!!data.featured,teachers:data.teachers||[],teacher:data.teacher||'',tags:data.tags||[],xp:data.xp??0,popularity:data.popularity??0,createdAt:data.createdAt?.(data.createdAt.toMillis?data.createdAt.toMillis():data.createdAt.seconds*1000)??0,duration:data.duration||''};
+      const cat=data.createdAt;
+      const createdAt=cat?(typeof cat.toMillis==='function'?cat.toMillis():cat.seconds?cat.seconds*1000:0):0;
+      return{id:d.id,title:data.title||'Untitled',description:data.description||'',thumbnailURL:data.thumbnailURL||'',price:data.price??0,isPaid:!!data.isPaid,featured:!!data.featured,teachers:data.teachers||[],teacher:data.teacher||'',tags:data.tags||[],xp:data.xp??0,popularity:data.popularity??0,createdAt,duration:data.duration||''};
     });
     const featured=allCourses.filter(c=>c.featured);
     buildHeroSwiper(featured);
