@@ -1,229 +1,695 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="UTF-8" />
-  <title>XP Leaderboard | BCD</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background: radial-gradient(circle at top left, #ede9fe, #e9d5ff);
-      font-family: 'Segoe UI', sans-serif;
-      color: #333;
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(200, 150, 255, 0.25);
-    }
-    .progress-bar {
-      height: 8px;
-      background: linear-gradient(to right, #9333ea, #c084fc);
-      border-radius: 9999px;
-      box-shadow: 0 0 6px rgba(147,51,234,0.6);
-    }
-    .badge {
-      font-size: 1.2rem;
-    }
-    .countup {
-      transition: all 0.4s ease-out;
-    }
-    /* Top 3 highlight */
-    .gold { border: 2px solid gold; box-shadow: 0 0 12px gold; }
-    .silver { border: 2px solid silver; box-shadow: 0 0 12px silver; }
-    .bronze { border: 2px solid peru; box-shadow: 0 0 12px peru; }
-    /* Leaderboard card */
-    .leader-card {
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-    .leader-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.12);
-    }
-    /* Scrollbar styling */
-    .scrollbar-thin::-webkit-scrollbar {
-      height: 6px;
-    }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: #a78bfa;
-      border-radius: 9999px;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Prarambh Leaderboard · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+/* ═══════════ TOKENS ═══════════ */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --gold:#fbbf24;--silver:#9ca3af;--bronze:#b45309;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --scr:rgba(217,119,6,.2);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+img{display:block;max-width:100%}
+input,select{font-family:var(--sans)}
+
+/* Grid texture */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
+  background-size:60px 60px}
+body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh;
+  background:radial-gradient(ellipse,rgba(217,119,6,.07) 0%,transparent 65%);
+  z-index:0;pointer-events:none;animation:warm-drift 22s ease-in-out infinite alternate}
+@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(-6vw,5vh)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes hero-line{0%{background-position:0% 0%}100%{background-position:200% 0%}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+@keyframes skel{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes card-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes shine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════ NAV ═══════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;
+  background:rgba(16,15,14,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);transition:background .35s}
+[data-mode="light"] .nav{background:rgba(250,247,242,.92)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 36px;width:100%;display:flex;align-items:center;gap:18px}
+.nav-back{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;
+  background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;transition:all .2s}
+.nav-back:hover{color:var(--amber);border-color:var(--bdr2);transform:translateX(-2px)}
+.nav-back svg{width:15px;height:15px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#92400e,#d97706);
+  display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+.nav-logo svg{width:16px;height:16px}
+.nav-site-name{font-family:var(--serif);font-size:17px;color:var(--tx);letter-spacing:-.01em}
+.nav-site-name em{color:var(--amber);font-style:italic}
+.nav-divider{width:1px;height:20px;background:var(--bdr);flex-shrink:0}
+.nav-page-title{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.14em;text-transform:uppercase}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-user{display:none;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:99px;
+  background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .2s}
+.nav-user:hover{border-color:var(--bdr2)}
+.nav-user-av{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--amber2)}
+.nav-user-name{font-size:13px;font-weight:600;color:var(--tx2);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-login{display:none;align-items:center;gap:7px;padding:8px 18px;border-radius:10px;
+  background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:13px;font-weight:600;
+  transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3)}
+.nav-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+.mode-toggle{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;
+  background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s}
+.mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-toggle svg{width:14px;height:14px}
+.icon-sun,.icon-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
+[data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
+
+/* ═══════════ PAGE HERO ═══════════ */
+.page{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:84px 36px 80px}
+
+.hero-section{
+  background:var(--sur);border:1px solid var(--bdr);border-radius:20px;
+  overflow:hidden;box-shadow:var(--sh2);margin-bottom:24px;
+  position:relative;animation:fade-up .6s var(--spring) .05s both;
+}
+.hero-section::before{content:'';display:block;height:3px;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e);
+  background-size:200% 100%;animation:hero-line 4s linear infinite}
+.hero-inner{padding:32px 36px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.hero-eyebrow::before{content:'';display:block;width:18px;height:1px;background:var(--amber)}
+.hero-title{font-family:var(--serif);font-size:clamp(28px,4vw,46px);font-weight:400;
+  letter-spacing:-.03em;line-height:1.05;color:var(--tx);margin-bottom:10px}
+.hero-title em{font-style:italic;color:var(--amber)}
+.hero-sub{font-size:14px;color:var(--tx3);line-height:1.7;max-width:500px}
+
+/* Podium mini stats */
+.podium-stats{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.podium-stat{display:flex;align-items:center;gap:10px;padding:10px 16px;
+  background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;min-width:160px}
+.podium-stat-icon{font-size:20px}
+.podium-stat-n{font-family:var(--serif);font-size:22px;color:var(--amber2);letter-spacing:-.02em;line-height:1}
+.podium-stat-l{font-family:var(--mono);font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.12em}
+
+/* ═══════════ TOP 3 PODIUM ═══════════ */
+.podium-section{margin-bottom:24px;animation:fade-up .6s var(--spring) .1s both}
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:end}
+
+.podium-card{
+  background:var(--sur);border:1px solid var(--bdr);
+  border-radius:16px;overflow:hidden;box-shadow:var(--sh);
+  text-align:center;position:relative;transition:all .25s;cursor:default;
+}
+.podium-card:hover{transform:translateY(-4px);box-shadow:var(--sh2)}
+
+/* Gold */
+.podium-card.rank-1{border-color:rgba(251,191,36,.4);order:2}
+.podium-card.rank-1::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#92400e,#fbbf24,#92400e);background-size:200%;animation:hero-line 3s linear infinite}
+.podium-card.rank-1 .podium-card-inner{background:rgba(251,191,36,.05)}
+/* Silver */
+.podium-card.rank-2{order:1}
+.podium-card.rank-2::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#6b7280,#d1d5db,#6b7280)}
+/* Bronze */
+.podium-card.rank-3{order:3}
+.podium-card.rank-3::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#92400e)}
+
+.podium-card-inner{padding:22px 16px 18px}
+.podium-medal{font-size:32px;margin-bottom:10px;display:block}
+.podium-av{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 10px;
+  border:3px solid var(--sur)}
+.podium-card.rank-1 .podium-av{border-color:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.25),var(--sh)}
+.podium-card.rank-2 .podium-av{border-color:#9ca3af;box-shadow:0 0 0 3px rgba(156,163,175,.2)}
+.podium-card.rank-3 .podium-av{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.2)}
+.podium-name{font-family:var(--serif);font-size:16px;color:var(--tx);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.podium-role{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tx4);margin-bottom:10px}
+.podium-xp{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--amber2);
+  letter-spacing:-.02em;line-height:1;margin-bottom:4px}
+.podium-level{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-bottom:12px}
+/* Progress bar */
+.podium-prog-wrap{background:var(--sur3);height:5px;border-radius:99px;overflow:hidden;margin:0 4px}
+.podium-prog{height:100%;border-radius:99px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);
+  width:0%;transition:width 1.2s var(--spring)}
+/* Prarambh badges */
+.podium-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:12px;min-height:20px}
+.p-badge{width:32px;height:32px;border-radius:7px;border:1px solid var(--bdr);object-fit:cover;
+  transition:transform .2s var(--spring)}
+.p-badge:hover{transform:scale(1.2)}
+
+/* Version chip */
+.version-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;
+  background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);
+  font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:.06em;margin-bottom:6px}
+
+/* ═══════════ TOOLBAR ═══════════ */
+.toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;
+  animation:fade-up .6s var(--spring) .14s both;
+}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;color:var(--tx4);pointer-events:none}
+.search-inp{width:100%;padding:10px 14px 10px 38px;background:var(--sur);border:1px solid var(--bdr);
+  border-radius:10px;color:var(--tx);font-size:13px;outline:none;transition:all .2s}
+.search-inp::placeholder{color:var(--tx4)}
+.search-inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(217,119,6,.08)}
+
+.select-wrap{position:relative}
+.select-wrap svg{position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:12px;height:12px;color:var(--tx4);pointer-events:none}
+.sel{appearance:none;padding:9px 32px 9px 13px;background:var(--sur);border:1px solid var(--bdr);
+  border-radius:10px;color:var(--tx3);font-size:13px;outline:none;cursor:pointer;transition:all .2s;min-width:130px}
+.sel:focus{border-color:var(--bdr2)}
+.sel option{background:var(--bg)}
+
+.toolbar-count{font-family:var(--mono);font-size:12px;color:var(--tx4);
+  padding:9px 14px;background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;white-space:nowrap}
+
+/* Real-time dot */
+.live-dot{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--tx4);
+  padding:8px 14px;background:var(--sur2);border:1px solid var(--bdr);border-radius:10px}
+.dot-pulse{width:7px;height:7px;border-radius:50%;background:var(--green);
+  animation:dot-p 2s ease-in-out infinite}
+@keyframes dot-p{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+/* ═══════════ LEADERBOARD LIST ═══════════ */
+.lb-section{animation:fade-up .6s var(--spring) .18s both}
+.lb-list{display:flex;flex-direction:column;gap:10px}
+
+.lb-card{
+  background:var(--sur);border:1px solid var(--bdr);border-radius:14px;
+  overflow:hidden;box-shadow:var(--sh);transition:all .22s var(--ease);
+  cursor:default;position:relative;
+  animation:card-in .35s var(--spring) both;
+}
+.lb-card:hover{border-color:var(--bdr2);transform:translateX(4px);box-shadow:var(--sh2)}
+.lb-card.is-me{border-color:rgba(217,119,6,.4);background:rgba(217,119,6,.03)}
+.lb-card.is-me::before{content:'You';position:absolute;top:10px;right:12px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--amber);padding:2px 7px;border-radius:99px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2)}
+
+.lb-card-inner{display:flex;align-items:center;gap:14px;padding:14px 18px}
+
+.lb-rank-col{min-width:36px;text-align:center;flex-shrink:0}
+.lb-rank-num{font-family:var(--mono);font-size:12px;color:var(--tx4);font-weight:600}
+.lb-rank-medal{font-size:20px;line-height:1}
+
+.lb-av{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:2px solid var(--bdr);background:var(--sur3)}
+.lb-card.rank-4 .lb-av,.lb-card.is-me .lb-av{border-color:rgba(217,119,6,.3)}
+
+.lb-info{flex:1;min-width:0}
+.lb-info-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.lb-name{font-size:14px;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.lb-role-pill{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 8px;border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx4)}
+.lb-version-chip{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:99px;
+  background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.18);color:var(--amber)}
+.lb-day-chip{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:99px;
+  background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);color:var(--green)}
+
+/* Level + progress */
+.lb-prog-row{display:flex;align-items:center;gap:10px}
+.lb-level-lbl{font-family:var(--mono);font-size:10px;color:var(--tx4);white-space:nowrap}
+.lb-prog-track{flex:1;height:4px;background:var(--sur3);border-radius:99px;overflow:hidden}
+.lb-prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);
+  width:0%;transition:width 1s var(--spring)}
+
+/* Right side */
+.lb-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.lb-xp{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--amber2);
+  letter-spacing:-.02em;line-height:1}
+.lb-xp-label{font-family:var(--mono);font-size:9px;color:var(--tx4);letter-spacing:.08em}
+.lb-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:140px}
+.lb-badge-img{width:26px;height:26px;border-radius:5px;border:1px solid var(--bdr);object-fit:cover;
+  transition:transform .2s var(--spring)}
+.lb-badge-img:hover{transform:scale(1.3);z-index:10}
+
+/* Skeleton */
+.skel-card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:14px 18px;
+  display:flex;align-items:center;gap:14px}
+.skel{background:var(--sur2);border-radius:6px;animation:skel 1.4s ease-in-out infinite}
+.skel-av{width:44px;height:44px;border-radius:50%;background:var(--sur2);animation:skel 1.4s ease-in-out infinite;flex-shrink:0}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--tx4)}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-family:var(--serif);font-size:22px;color:var(--tx);margin-bottom:8px}
+.empty-sub{font-size:14px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;padding:10px 18px;
+  font-size:13px;color:var(--tx);box-shadow:var(--sh2);z-index:999;
+  opacity:0;transition:all .3s var(--spring);pointer-events:none;white-space:nowrap;
+  display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Footer */
+.footer{position:relative;z-index:2;border-top:1px solid var(--bdr);background:var(--sur);
+  padding:28px 36px;margin-top:40px}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.footer-copy{font-family:var(--mono);font-size:11px;color:var(--tx4)}
+.footer-love{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--tx4)}
+.footer-love em{color:var(--amber)}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:800px){
+  .podium{grid-template-columns:1fr;max-width:320px;margin:0 auto}
+  .podium-card{order:unset!important}
+  .hero-inner{grid-template-columns:1fr}
+  .podium-stats{flex-direction:row;flex-wrap:wrap}
+  .lb-badges{max-width:80px}
+  .lb-name{max-width:140px}
+}
+@media(max-width:560px){
+  .page,.footer{padding-left:20px;padding-right:20px}
+  .nav-inner{padding:0 20px}
+  .toolbar{gap:8px}
+  .podium-stats{display:none}
+}
+</style>
 </head>
-<body class="min-h-screen p-4">
-  <div class="max-w-5xl mx-auto glass p-6 rounded-2xl shadow-xl">
-    <h1 class="text-4xl font-extrabold text-center mb-6 text-purple-700 tracking-wide">🏆 XP Leaderboard</h1>
+<body>
 
-    <!-- Filters -->
-    <div class="flex flex-col sm:flex-row gap-3 justify-between mb-6">
-      <input id="searchInput" type="text" placeholder="🔍 Search by name..."
-        class="flex-1 px-4 py-2 rounded-xl border border-purple-200 bg-white/70 text-sm shadow focus:ring-2 focus:ring-purple-400 outline-none" />
-      <select id="roleFilter"
-        class="px-4 py-2 rounded-xl border border-purple-200 bg-white/70 text-sm shadow focus:ring-2 focus:ring-purple-400 outline-none">
-        <option value="">All Roles</option>
-      </select>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-back" href="dashboard.html">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Dashboard
+    </a>
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <span class="nav-site-name">Books <em>&amp;</em> Dreams</span>
     </div>
+    <div class="nav-divider"></div>
+    <span class="nav-page-title">Prarambh Leaderboard</span>
+    <div class="nav-right">
+      <button class="mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+        <span class="icon-moon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span id="modeLabel">Light</span>
+      </button>
+      <div class="nav-user" id="navUser" onclick="location.href='profile.html'">
+        <img class="nav-user-av" id="navAvatar" src="" alt=""/>
+        <span class="nav-user-name" id="navName">Account</span>
+      </div>
+      <a class="nav-login" id="navLogin" href="login.html">Sign In</a>
+    </div>
+  </div>
+</nav>
 
-    <!-- Loading -->
-    <p id="loading" class="text-center text-purple-600 animate-pulse">⏳ Loading leaderboard...</p>
+<div class="page">
 
-    <!-- Leaderboard -->
-    <ul id="leaderboardList" class="space-y-4 hidden"></ul>
+  <!-- HERO -->
+  <div class="hero-section">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">Live Rankings</div>
+        <div class="hero-title">Prarambh <em>Leaderboard</em></div>
+        <div class="hero-sub">Real-time XP rankings for the BCD community. Earn XP by participating, studying, and contributing. Prarambh badges unlock at days 1, 5, 10, 15 and 21.</div>
+      </div>
+      <div class="podium-stats">
+        <div class="podium-stat">
+          <span class="podium-stat-icon">👥</span>
+          <div><div class="podium-stat-n" id="totalUsers">—</div><div class="podium-stat-l">Participants</div></div>
+        </div>
+        <div class="podium-stat">
+          <span class="podium-stat-icon">⭐</span>
+          <div><div class="podium-stat-n" id="totalXPStat">—</div><div class="podium-stat-l">Total XP Earned</div></div>
+        </div>
+        <div class="podium-stat">
+          <span class="podium-stat-icon">🔥</span>
+          <div><div class="podium-stat-n" id="maxDay">—</div><div class="podium-stat-l">Highest Day</div></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg shadow hidden"></div>
+  <!-- TOP 3 PODIUM -->
+  <div class="podium-section" id="podiumSection" style="display:none">
+    <div class="podium" id="podiumCards"></div>
+  </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-inp" id="searchInp" type="text" placeholder="Search by name…" autocomplete="off"/>
+    </div>
+    <div class="select-wrap">
+      <select class="sel" id="roleFilter">
+        <option value="">All Roles</option>
+      </select>
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="select-wrap">
+      <select class="sel" id="versionFilter">
+        <option value="">All Versions</option>
+      </select>
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="toolbar-count" id="toolbarCount">Loading…</div>
+    <div class="live-dot">
+      <span class="dot-pulse"></span>
+      Live
+    </div>
+  </div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-    authDomain: "bcd-discord.firebaseapp.com",
-    databaseURL: "https://bcd-discord-default-rtdb.firebaseio.com",
-    projectId: "bcd-discord",
-    storageBucket: "bcd-discord.appspot.com",
-    messagingSenderId: "278895155371",
-    appId: "1:278895155371:web:177a468f5fa3f0abfe3fee",
-    measurementId: "G-6Q46Z9ZF0D"
-  };
+  <!-- LEADERBOARD LIST (rank 4+) -->
+  <div class="lb-section">
+    <!-- Skeletons -->
+    <div class="lb-list" id="skeletonList">
+      <div class="skel-card"><div class="skel-av"></div><div style="flex:1;display:flex;flex-direction:column;gap:7px"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:8px;width:40%"></div></div><div class="skel" style="height:24px;width:72px;border-radius:6px"></div></div>
+      <div class="skel-card"><div class="skel-av"></div><div style="flex:1;display:flex;flex-direction:column;gap:7px"><div class="skel" style="height:12px;width:55%"></div><div class="skel" style="height:8px;width:35%"></div></div><div class="skel" style="height:24px;width:72px;border-radius:6px"></div></div>
+      <div class="skel-card"><div class="skel-av"></div><div style="flex:1;display:flex;flex-direction:column;gap:7px"><div class="skel" style="height:12px;width:65%"></div><div class="skel" style="height:8px;width:45%"></div></div><div class="skel" style="height:24px;width:72px;border-radius:6px"></div></div>
+    </div>
+    <div class="lb-list" id="lbList"></div>
+  </div>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <!-- Empty state -->
+  <div class="empty-state" id="emptyState" style="display:none">
+    <div class="empty-icon">🏆</div>
+    <div class="empty-title">No results found</div>
+    <div class="empty-sub">Try a different search or filter</div>
+  </div>
 
-  const listEl = document.getElementById("leaderboardList");
-  const searchInput = document.getElementById("searchInput");
-  const roleFilter = document.getElementById("roleFilter");
-  const loadingEl = document.getElementById("loading");
+</div><!-- .page -->
 
-  function calculateLevel(xp) {
-    if (xp <= 0) return { level: 0, progress: 0 };
-    const level = Math.floor(0.2 * Math.sqrt(xp));
-    const nextXP = Math.pow((level + 1) / 0.2, 2);
-    const currXP = Math.pow(level / 0.2, 2);
-    const progress = Math.floor(((xp - currXP) / (nextXP - currXP)) * 100);
-    return { level, progress: Math.min(100, Math.max(0, progress)) };
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-copy">© 2025 Books Coffee and Dreams — All rights reserved</div>
+    <div class="footer-love">Made with <em>love</em> for curious minds</div>
+  </div>
+</footer>
+
+<script>
+// Mode
+const H=document.documentElement;
+const sv=localStorage.getItem('bcd-settings-mode')||'dark';
+H.setAttribute('data-mode',sv);
+function updateMode(){document.getElementById('modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+updateMode();
+document.getElementById('modeToggle').addEventListener('click',()=>{
+  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode',n);localStorage.setItem('bcd-settings-mode',n);updateMode();
+});
+
+// Toast
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Prarambh badge URLs
+const BADGES=[
+  {day:1, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_1.png', label:'Day 1'},
+  {day:5, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_2.png', label:'Day 5'},
+  {day:10,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_3.png', label:'Day 10'},
+  {day:15,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_4.png', label:'Day 15'},
+  {day:21,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_5.png', label:'Day 21'},
+];
+function getBadges(day=0){ return BADGES.filter(b=>day>=b.day); }
+function badgeImgsSmall(day){
+  return getBadges(day).map(b=>`<img class="lb-badge-img" src="${b.url}" title="Prarambh ${b.label}" loading="lazy"/>`).join('');
+}
+function badgeImgsMedium(day){
+  return getBadges(day).map(b=>`<img class="p-badge" src="${b.url}" title="Prarambh ${b.label}" loading="lazy"/>`).join('');
+}
+
+// Level calculation — original square root formula from prarambh.html
+function calcLevel(xp){
+  if(xp<=0) return {level:0,progress:0,nextXP:25};
+  const level=Math.floor(0.2*Math.sqrt(xp));
+  const nextXP=Math.pow((level+1)/0.2,2);
+  const currXP=Math.pow(level/0.2,2);
+  const progress=Math.min(100,Math.max(0,Math.floor(((xp-currXP)/(nextXP-currXP))*100)));
+  return {level,progress,nextXP:Math.round(nextXP)};
+}
+
+// Animated XP count-up
+function countUp(el, to){
+  const duration=900, stepTime=16;
+  const steps=duration/stepTime;
+  const increment=to/steps;
+  let current=0;
+  const iv=setInterval(()=>{
+    current+=increment;
+    if(current>=to){ el.textContent=to.toLocaleString(); clearInterval(iv); }
+    else el.textContent=Math.floor(current).toLocaleString();
+  },stepTime);
+}
+</script>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain:"bcd-discord.firebaseapp.com",
+  projectId:"bcd-discord",
+  storageBucket:"bcd-discord.appspot.com",
+  messagingSenderId:"278895155371",
+  appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"
+});
+const auth=firebase.auth();
+const db=firebase.firestore();
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+
+let allUsers=[], currentUid=null;
+let searchQ='', roleQ='', versionQ='';
+
+// Auth
+auth.onAuthStateChanged(user=>{
+  const nu=document.getElementById('navUser'), nl=document.getElementById('navLogin');
+  if(user){
+    currentUid=user.uid;
+    nu.style.display='flex'; nl.style.display='none';
+    const av=document.getElementById('navAvatar');
+    av.src=user.photoURL||DEF_AV; av.onerror=()=>av.src=DEF_AV;
+    document.getElementById('navName').textContent=user.displayName||user.email?.split('@')[0]||'Account';
+  } else {
+    currentUid=null;
+    nu.style.display='none'; nl.style.display='flex';
   }
+});
 
-  function getRankBadge(index) {
-    const badge = {
-      0: "🥇",
-      1: "🥈",
-      2: "🥉"
-    }[index] || `<span class="text-purple-600 font-bold">#${index + 1}</span>`;
-    return `<span class="badge">${badge}</span>`;
-  }
+// Build podium card
+function makePodiumCard(u, rank){
+  const {level,progress}=calcLevel(u.totalXP||0);
+  const badges=getBadges(u.prarambhDay||0);
+  const medalMap={1:'🥇',2:'🥈',3:'🥉'};
+  const card=document.createElement('div');
+  card.className=`podium-card rank-${rank}`;
+  if(u.uid===currentUid) card.classList.add('is-me');
+  card.innerHTML=`
+    <div class="podium-card-inner">
+      <span class="podium-medal">${medalMap[rank]}</span>
+      <img class="podium-av" src="${u.avatar||DEF_AV}" alt="${u.username}" onerror="this.src='${DEF_AV}'"/>
+      <div class="podium-name">${u.username||'Unknown'}</div>
+      ${u.prarambhVersion?`<div class="version-chip">v${u.prarambhVersion}</div>`:''}
+      <div class="podium-role">${u.role||'Member'}</div>
+      <div class="podium-xp" data-xp="${u.totalXP||0}">0</div>
+      <div class="podium-level">Level ${level}</div>
+      <div class="podium-prog-wrap"><div class="podium-prog" data-pct="${progress}"></div></div>
+      ${badges.length?`<div class="podium-badges">${badgeImgsMedium(u.prarambhDay||0)}</div>`:'<div class="podium-badges"></div>'}
+    </div>`;
+  return card;
+}
 
-  function countUp(el, to) {
-    let start = 0;
-    const duration = 800;
-    const stepTime = 20;
-    const steps = duration / stepTime;
-    const increment = to / steps;
-    const interval = setInterval(() => {
-      start += increment;
-      if (start >= to) {
-        el.textContent = `${to.toLocaleString()} XP`;
-        clearInterval(interval);
-      } else {
-        el.textContent = `${Math.floor(start).toLocaleString()} XP`;
-      }
-    }, stepTime);
-  }
-
-  function getBadgesFromDay(day = 0) {
-    const urls = [];
-    if (day >= 1) urls.push("https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_1.png");
-    if (day >= 5) urls.push("https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_2.png");
-    if (day >= 10) urls.push("https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_3.png");
-    if (day >= 15) urls.push("https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_4.png");
-    if (day >= 21) urls.push("https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_5.png");
-    return urls;
-  }
-
-  function renderLeaderboard(users) {
-    const keyword = searchInput.value.toLowerCase();
-    const selectedRole = roleFilter.value;
-    const filtered = users.filter(u =>
-      (!selectedRole || u.role === selectedRole) &&
-      (!keyword || u.username.toLowerCase().includes(keyword))
-    );
-
-    listEl.innerHTML = "";
-
-    filtered.forEach((u, i) => {
-      const { level, progress } = calculateLevel(u.totalXP || 0);
-      const badges = getBadgesFromDay(u.prarambhDay || 0);
-      const li = document.createElement("li");
-      li.className = "leader-card bg-white/60 hover:bg-white/80 p-5 rounded-xl flex gap-4 items-center justify-between transition";
-
-      if (i === 0) li.classList.add("gold");
-      if (i === 1) li.classList.add("silver");
-      if (i === 2) li.classList.add("bronze");
-
-      li.innerHTML = `
-        <div class="flex items-center gap-3">
-          ${getRankBadge(i)}
-          <img src="${u.avatar}" class="w-12 h-12 rounded-full border-2 border-purple-400 shadow" />
-          <div>
-            <p class="font-semibold text-gray-800">${u.username}</p>
-            <p class="text-xs text-purple-600">${u.role || 'Member'}</p>
-          </div>
+// Build list card (rank 4+)
+function makeLbCard(u, rank, delay){
+  const {level,progress}=calcLevel(u.totalXP||0);
+  const isMe=u.uid===currentUid;
+  const card=document.createElement('div');
+  card.className=`lb-card rank-${rank}${isMe?' is-me':''}`;
+  card.style.animationDelay=delay+'ms';
+  card.innerHTML=`
+    <div class="lb-card-inner">
+      <div class="lb-rank-col">
+        <span class="lb-rank-num">${rank}</span>
+      </div>
+      <img class="lb-av" src="${u.avatar||DEF_AV}" alt="${u.username}" onerror="this.src='${DEF_AV}'"/>
+      <div class="lb-info">
+        <div class="lb-info-top">
+          <span class="lb-name">${u.username||'Unknown'}</span>
+          <span class="lb-role-pill">${u.role||'Member'}</span>
+          ${u.prarambhVersion?`<span class="lb-version-chip">v${u.prarambhVersion}</span>`:''}
+          ${u.prarambhDay?`<span class="lb-day-chip">Day ${u.prarambhDay}</span>`:''}
         </div>
-        <div class="text-right w-1/2">
-          <p class="text-sm text-purple-800 font-medium">Level ${level}</p>
-          <div class="w-full bg-purple-200 rounded-full mt-1">
-            <div class="progress-bar" style="width: ${progress}%;"></div>
-          </div>
-          <p class="text-xs text-purple-800 mt-1 countup" data-xp="${u.totalXP || 0}">0 XP</p>
-          <div class="flex gap-2 mt-2 flex-nowrap overflow-x-auto scrollbar-thin">
-            ${
-              badges.length
-                ? badges.map(url => `
-  <img 
-    src="${url}" 
-    class="w-12 h-12 rounded-lg border-2 border-purple-300 flex-shrink-0 shadow-md" 
-    title="${url.split('/').pop().replace('.png','').replaceAll('_',' ')}" 
-  />
-`).join('')
-
-                : "<span class='text-xs text-gray-500'>No badges</span>"
-            }
-          </div>
+        <div class="lb-prog-row">
+          <span class="lb-level-lbl">Lv ${level}</span>
+          <div class="lb-prog-track"><div class="lb-prog-fill" data-pct="${progress}%"></div></div>
         </div>
-      `;
-      listEl.appendChild(li);
-      countUp(li.querySelector(".countup"), u.totalXP || 0);
-    });
-  }
+      </div>
+      <div class="lb-right">
+        <div class="lb-xp" data-xp="${u.totalXP||0}">0</div>
+        <div class="lb-xp-label">XP</div>
+        ${getBadges(u.prarambhDay||0).length?`<div class="lb-badges">${badgeImgsSmall(u.prarambhDay||0)}</div>`:''}
+      </div>
+    </div>`;
+  return card;
+}
 
-  onSnapshot(collection(db, "users"), (snapshot) => {
-    const users = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.username && data.avatar && typeof data.totalXP === "number" && data.totalXP >= 0) {
-        users.push(data);
-      }
-    });
-
-    const skipped = snapshot.size - users.length;
-    if (skipped > 0) {
-      const toast = document.getElementById("toast");
-      toast.textContent = `⚠️ Skipped ${skipped} incomplete user${skipped > 1 ? "s" : ""}`;
-      toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
-    }
-
-    users.sort((a, b) => b.totalXP - a.totalXP);
-    loadingEl.classList.add("hidden");
-    listEl.classList.remove("hidden");
-    renderLeaderboard(users);
-
-    const roles = [...new Set(users.map(u => u.role).filter(Boolean))].sort();
-    roleFilter.innerHTML = '<option value="">All Roles</option>' +
-      roles.map(r => `<option value="${r}">${r}</option>`).join('');
+function getFiltered(){
+  return allUsers.filter(u=>{
+    const matchSearch=!searchQ||(u.username||'').toLowerCase().includes(searchQ);
+    const matchRole=!roleQ||u.role===roleQ;
+    const matchVersion=!versionQ||String(u.prarambhVersion||'')=== versionQ;
+    return matchSearch&&matchRole&&matchVersion;
   });
+}
+
+function renderAll(){
+  const filtered=getFiltered();
+  document.getElementById('toolbarCount').textContent=`${filtered.length} member${filtered.length!==1?'s':''}`;
+
+  // Podium (top 3 of filtered)
+  const podiumEl=document.getElementById('podiumCards');
+  podiumEl.innerHTML='';
+  const podiumSection=document.getElementById('podiumSection');
+  if(filtered.length>=1&&!searchQ&&!roleQ&&!versionQ){
+    podiumSection.style.display='block';
+    filtered.slice(0,3).forEach((u,i)=>{
+      const card=makePodiumCard(u,i+1);
+      podiumEl.appendChild(card);
+    });
+    // Animate progress and XP
+    setTimeout(()=>{
+      podiumEl.querySelectorAll('.podium-prog').forEach(el=>{
+        el.style.width=el.dataset.pct+'%';
+      });
+      podiumEl.querySelectorAll('.podium-xp').forEach(el=>{
+        countUp(el,parseInt(el.dataset.xp)||0);
+      });
+    },300);
+  } else {
+    podiumSection.style.display='none';
+  }
+
+  // List (rank 4+ normally, or all if searching/filtering)
+  const lbList=document.getElementById('lbList');
+  lbList.innerHTML='';
+  const emptyState=document.getElementById('emptyState');
+
+  if(!filtered.length){
+    emptyState.style.display='block';
+    return;
+  }
+  emptyState.style.display='none';
+
+  const startRank=(!searchQ&&!roleQ&&!versionQ)?3:0;
+  const listItems=filtered.slice(startRank);
+
+  listItems.forEach((u,i)=>{
+    const globalRank=filtered.indexOf(u)+1;
+    const card=makeLbCard(u,globalRank,i*30);
+    lbList.appendChild(card);
+  });
+
+  // Animate fills + count-ups
+  setTimeout(()=>{
+    lbList.querySelectorAll('.lb-prog-fill').forEach(el=>{el.style.width=el.dataset.pct});
+    lbList.querySelectorAll('.lb-xp').forEach(el=>{countUp(el,parseInt(el.dataset.xp)||0)});
+  },200);
+}
+
+// Real-time listener
+db.collection('users').onSnapshot(snapshot=>{
+  document.getElementById('skeletonList').style.display='none';
+
+  let skipped=0;
+  const users=[];
+  snapshot.forEach(doc=>{
+    const d=doc.data();
+    // Valid users must have username + avatar + totalXP
+    if(d.username && d.avatar && typeof d.totalXP==='number' && d.totalXP>=0){
+      users.push({uid:doc.id,...d});
+    } else { skipped++; }
+  });
+
+  // Sort by totalXP desc
+  users.sort((a,b)=>(b.totalXP||0)-(a.totalXP||0));
+  allUsers=users;
+
+  // Hero stats
+  document.getElementById('totalUsers').textContent=users.length;
+  const totalXPAll=users.reduce((s,u)=>s+(u.totalXP||0),0);
+  document.getElementById('totalXPStat').textContent=totalXPAll>999?Math.round(totalXPAll/1000)+'k':totalXPAll;
+  const maxDay=Math.max(0,...users.map(u=>u.prarambhDay||0));
+  document.getElementById('maxDay').textContent=maxDay?`Day ${maxDay}`:'—';
+
+  // Build role filter options
+  const roles=[...new Set(users.map(u=>u.role).filter(Boolean))].sort();
+  const rf=document.getElementById('roleFilter');
+  const curRole=rf.value;
+  rf.innerHTML='<option value="">All Roles</option>'+roles.map(r=>`<option value="${r}">${r}</option>`).join('');
+  if(curRole) rf.value=curRole;
+
+  // Build version filter
+  const versions=[...new Set(users.map(u=>u.prarambhVersion).filter(Boolean))].sort();
+  const vf=document.getElementById('versionFilter');
+  const curVer=vf.value;
+  vf.innerHTML='<option value="">All Versions</option>'+versions.map(v=>`<option value="${v}">v${v}</option>`).join('');
+  if(curVer) vf.value=curVer;
+
+  if(skipped>0) showToast(`⚠️ ${skipped} incomplete profile${skipped>1?'s':''} hidden`);
+
+  renderAll();
+});
+
+// Filter events
+document.getElementById('searchInp').addEventListener('input',function(){
+  searchQ=this.value.trim().toLowerCase();renderAll();
+});
+document.getElementById('roleFilter').addEventListener('change',function(){roleQ=this.value;renderAll()});
+document.getElementById('versionFilter').addEventListener('change',function(){versionQ=this.value;renderAll()});
 </script>
 </body>
 </html>
