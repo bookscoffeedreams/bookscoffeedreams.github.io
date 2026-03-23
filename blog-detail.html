@@ -1,155 +1,747 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Blog Detail | Books Coffee and Dreams</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body {
-      background: linear-gradient(to bottom right, #faf5ff, #ede9fe);
-      font-family: 'Segoe UI', sans-serif;
-    }
-    .tag {
-      background-color: #e9d5ff;
-      color: #6b21a8;
-      font-size: 0.75rem;
-      padding: 2px 6px;
-      border-radius: 9999px;
-      margin-right: 4px;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Blog · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+/* ═══════════ TOKENS ═══════════ */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --scr:rgba(217,119,6,.2);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;
+  overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+img{display:block;max-width:100%}
+
+/* Texture + glow */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
+  background-size:60px 60px}
+body::after{content:'';position:fixed;top:-20%;right:-10%;width:55vw;height:55vh;
+  background:radial-gradient(ellipse,rgba(217,119,6,.06) 0%,transparent 65%);
+  z-index:0;pointer-events:none;animation:warm-drift 22s ease-in-out infinite alternate}
+@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(-5vw,5vh)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes hero-line{0%{background-position:0%}100%{background-position:200%}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes heart-pop{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+/* ═══════════ NAV ═══════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;
+  background:rgba(16,15,14,.88);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--bdr);transition:background .35s}
+[data-mode="light"] .nav{background:rgba(250,247,242,.92)}
+.nav-inner{max-width:820px;margin:0 auto;padding:0 36px;width:100%;display:flex;align-items:center;gap:14px}
+.nav-back{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:9px;
+  background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);
+  font-size:13px;font-weight:500;transition:all .2s;flex-shrink:0}
+.nav-back:hover{color:var(--amber);border-color:var(--bdr2);transform:translateX(-2px)}
+.nav-back svg{width:15px;height:15px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#92400e,#d97706);
+  display:flex;align-items:center;justify-content:center;
+  animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+.nav-logo svg{width:14px;height:14px}
+.nav-site-name{font-family:var(--serif);font-size:16px;color:var(--tx)}
+.nav-site-name em{color:var(--amber);font-style:italic}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-user{display:none;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;
+  background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .2s}
+.nav-user:hover{border-color:var(--bdr2)}
+.nav-user-av{width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid var(--amber2)}
+.nav-user-name{font-size:12px;font-weight:600;color:var(--tx2);max-width:90px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-login{display:none;align-items:center;gap:6px;padding:7px 16px;border-radius:9px;
+  background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:12px;font-weight:600;transition:all .2s}
+.nav-login:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(217,119,6,.4)}
+.mode-toggle{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;
+  background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);
+  font-size:11px;font-family:var(--mono);transition:all .2s}
+.mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-toggle svg{width:13px;height:13px}
+.icon-sun,.icon-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
+[data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
+
+/* ═══════════ READING PROGRESS BAR ═══════════ */
+.read-progress{position:fixed;top:64px;left:0;right:0;height:3px;z-index:100;
+  background:var(--sur3)}
+.read-progress-fill{height:100%;width:0%;
+  background:linear-gradient(90deg,#92400e,var(--amber),var(--amber3));
+  transition:width .1s linear}
+
+/* ═══════════ PAGE ═══════════ */
+.page{position:relative;z-index:2;max-width:820px;margin:0 auto;
+  padding:84px 36px 80px}
+
+/* ═══════════ HERO IMAGE ═══════════ */
+.hero-img-wrap{
+  position:relative;border-radius:20px;overflow:hidden;
+  aspect-ratio:16/7;margin-bottom:32px;box-shadow:var(--sh2);
+  background:var(--sur3);
+  animation:fade-up .6s var(--spring) .05s both;
+}
+.hero-img{width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .5s var(--ease)}
+.hero-img-wrap:hover .hero-img{transform:scale(1.02)}
+.hero-img-overlay{position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 40%,rgba(16,15,14,.6))}
+.featured-badge{position:absolute;top:16px;left:16px;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:99px;
+  background:linear-gradient(135deg,#92400e,#d97706);
+  color:#fff;font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;box-shadow:0 4px 14px rgba(217,119,6,.4)}
+.featured-badge svg{width:11px;height:11px}
+
+/* ═══════════ ARTICLE HEADER ═══════════ */
+.article-header{margin-bottom:28px;animation:fade-up .6s var(--spring) .08s both}
+.article-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.article-tag{display:inline-flex;align-items:center;padding:3px 11px;border-radius:99px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);color:var(--amber)}
+.article-title{font-family:var(--serif);font-size:clamp(28px,5vw,46px);
+  font-weight:400;line-height:1.1;letter-spacing:-.03em;color:var(--tx);margin-bottom:14px}
+.article-title em{font-style:italic;color:var(--amber)}
+.article-desc{font-family:var(--serif);font-size:18px;font-style:italic;
+  color:var(--tx3);line-height:1.7;margin-bottom:22px;
+  padding-left:16px;border-left:2px solid var(--amber)}
+
+/* Author + meta row */
+.article-meta{display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:14px;padding:16px 0;
+  border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr)}
+.article-author{display:flex;align-items:center;gap:10px}
+.author-av{width:40px;height:40px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--sur);box-shadow:0 0 0 2px var(--amber2);
+  background:var(--sur3)}
+.author-name{font-size:14px;font-weight:600;color:var(--tx2)}
+.author-date{font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:2px}
+.article-stats{display:flex;align-items:center;gap:14px}
+.stat-pill{display:flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;color:var(--tx4)}
+.stat-pill svg{width:13px;height:13px}
+
+/* ═══════════ ARTICLE BODY ═══════════ */
+.article-body{
+  margin:32px 0;
+  font-family:var(--serif);font-size:19px;line-height:1.8;
+  color:var(--tx2);
+  animation:fade-up .6s var(--spring) .12s both;
+}
+/* Rich text typography */
+.article-body p{margin-bottom:1.4em}
+.article-body p:last-child{margin-bottom:0}
+.article-body h2{font-family:var(--serif);font-size:28px;font-weight:400;
+  letter-spacing:-.02em;color:var(--tx);margin:1.8em 0 .7em;
+  padding-bottom:.4em;border-bottom:1px solid var(--bdr)}
+.article-body h3{font-family:var(--serif);font-size:22px;font-weight:400;
+  color:var(--tx);margin:1.5em 0 .6em}
+.article-body strong{font-weight:700;color:var(--tx)}
+.article-body em{font-style:italic;color:var(--amber)}
+.article-body blockquote{margin:1.5em 0;padding:18px 24px;
+  border-left:3px solid var(--amber);background:rgba(217,119,6,.05);
+  border-radius:0 10px 10px 0;font-style:italic;color:var(--tx3)}
+.article-body ul,.article-body ol{margin:1em 0 1em 1.5em}
+.article-body li{margin-bottom:.4em}
+.article-body a{color:var(--amber);border-bottom:1px solid rgba(217,119,6,.3);
+  transition:border-color .2s}
+.article-body a:hover{border-color:var(--amber)}
+.article-body code{font-family:var(--mono);font-size:.85em;padding:2px 7px;
+  border-radius:5px;background:var(--sur3);border:1px solid var(--bdr);color:var(--amber2)}
+.article-body pre{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;
+  padding:18px;overflow-x:auto;margin:1.5em 0}
+.article-body pre code{background:none;border:none;padding:0;font-size:14px}
+.article-body img{border-radius:12px;margin:1.5em 0;box-shadow:var(--sh)}
+.article-body hr{border:none;border-top:1px solid var(--bdr);margin:2em 0}
+
+/* ═══════════ ACTIONS BAR ═══════════ */
+.actions-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:20px 24px;background:var(--sur);border:1px solid var(--bdr);
+  border-radius:14px;box-shadow:var(--sh);margin-bottom:32px;
+  animation:fade-up .6s var(--spring) .15s both;
+  position:relative;overflow:hidden;
+}
+.actions-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent)}
+.action-btn{display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:10px;background:var(--sur2);
+  border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;
+  transition:all .2s}
+.action-btn:hover{border-color:var(--bdr2);color:var(--tx);background:var(--sur3)}
+.action-btn svg{width:15px;height:15px}
+.action-btn.liked{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.25);
+  color:var(--red)}
+.action-btn.liked svg{animation:heart-pop .3s var(--spring)}
+.action-btn.share-success{background:rgba(22,163,74,.08);
+  border-color:rgba(22,163,74,.25);color:var(--green)}
+
+/* ═══════════ RELATED POSTS ═══════════ */
+.related-section{margin-top:48px;animation:fade-up .6s var(--spring) .18s both}
+.related-eyebrow{display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--amber);margin-bottom:18px}
+.related-eyebrow::before{content:'';display:block;width:18px;height:1px;background:var(--amber)}
+.related-title{font-family:var(--serif);font-size:26px;color:var(--tx);
+  letter-spacing:-.02em;margin-bottom:20px}
+.related-title em{font-style:italic;color:var(--amber)}
+.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.related-card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;
+  overflow:hidden;cursor:pointer;transition:all .22s;position:relative}
+.related-card::before{content:'';display:block;height:2px;
+  background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent);opacity:0;transition:opacity .22s}
+.related-card:hover{border-color:var(--bdr2);transform:translateY(-3px);box-shadow:var(--sh2)}
+.related-card:hover::before{opacity:.8}
+.related-img{aspect-ratio:16/9;overflow:hidden;background:var(--sur3)}
+.related-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s var(--ease)}
+.related-card:hover .related-img img{transform:scale(1.05)}
+.related-body{padding:14px 16px}
+.related-tags{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.related-tag{padding:2px 7px;border-radius:99px;font-family:var(--mono);font-size:9px;
+  background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.16);color:var(--amber)}
+.related-name{font-family:var(--serif);font-size:15px;color:var(--tx2);
+  line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.related-date{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:7px}
+
+/* Skeleton */
+.skel{background:var(--sur2);border-radius:6px;animation:sk 1.4s ease-in-out infinite}
+@keyframes sk{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Error state */
+.error-state{text-align:center;padding:80px 20px}
+.error-icon{font-size:48px;margin-bottom:16px}
+.error-title{font-family:var(--serif);font-size:26px;color:var(--tx);margin-bottom:10px}
+.error-sub{font-size:14px;color:var(--tx4);margin-bottom:24px}
+.error-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;
+  border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);
+  color:#fff;font-size:13px;font-weight:600;transition:all .2s}
+.error-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(217,119,6,.4)}
+
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;
+  padding:11px 18px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);
+  z-index:999;opacity:0;transition:all .3s var(--spring);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success .ti{color:var(--green)}.toast.error .ti{color:var(--red)}
+.ti svg{width:14px;height:14px}
+
+/* Footer */
+.footer{position:relative;z-index:2;border-top:1px solid var(--bdr);
+  background:var(--sur);padding:28px 36px}
+.footer-inner{max-width:820px;margin:0 auto;display:flex;
+  align-items:center;justify-content:space-between}
+.footer-copy{font-family:var(--mono);font-size:11px;color:var(--tx4)}
+.footer-love{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--tx4)}
+.footer-love em{color:var(--amber)}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:600px){
+  .page,.footer{padding-left:20px;padding-right:20px}
+  .nav-inner{padding:0 20px}
+  .related-grid{grid-template-columns:1fr}
+  .article-body{font-size:17px}
+  .article-title{font-size:clamp(24px,8vw,36px)}
+}
+</style>
 </head>
-<body class="overflow-x-hidden">
+<body>
 
-  <header class="flex items-center justify-between px-6 py-4 shadow-md backdrop-blur bg-white/70 fixed w-full z-50">
-    <h1 class="text-2xl font-bold text-purple-600">Books ☕ Dreams</h1>
-  </header>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-back" href="blogs.html">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Blogs
+    </a>
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <span class="nav-site-name">Books <em>&amp;</em> Dreams</span>
+    </div>
+    <div class="nav-right">
+      <button class="mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+        <span class="icon-moon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span id="modeLabel">Light</span>
+      </button>
+      <div class="nav-user" id="navUser" onclick="location.href='profile.html'">
+        <img class="nav-user-av" id="navAvatar" src="" alt=""/>
+        <span class="nav-user-name" id="navName">Account</span>
+      </div>
+      <a class="nav-login" id="navLogin" href="login.html">Sign In</a>
+    </div>
+  </div>
+</nav>
 
-  <main class="pt-28 px-6 md:px-16 max-w-3xl mx-auto">
-    <div id="blogContent" class="bg-white shadow-lg rounded-xl p-6 relative"></div>
-  </main>
+<!-- READING PROGRESS -->
+<div class="read-progress"><div class="read-progress-fill" id="readProgress"></div></div>
 
-  <footer class="mt-20 px-6 py-8 text-center text-gray-600 bg-purple-50">
-    © 2025 Books Coffee and Dreams. All rights reserved.
-  </footer>
+<!-- PAGE -->
+<div class="page" id="pageWrap">
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <!-- Loading skeleton -->
+  <div id="skeletonWrap">
+    <div class="skel" style="aspect-ratio:16/7;border-radius:20px;margin-bottom:32px"></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <div class="skel" style="height:22px;width:70px;border-radius:99px"></div>
+      <div class="skel" style="height:22px;width:56px;border-radius:99px"></div>
+    </div>
+    <div class="skel" style="height:40px;width:80%;border-radius:8px;margin-bottom:12px"></div>
+    <div class="skel" style="height:28px;width:60%;border-radius:8px;margin-bottom:24px"></div>
+    <div class="skel" style="height:1px;width:100%;margin-bottom:20px"></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="skel" style="height:18px;width:100%;border-radius:6px"></div>
+      <div class="skel" style="height:18px;width:95%;border-radius:6px"></div>
+      <div class="skel" style="height:18px;width:88%;border-radius:6px"></div>
+      <div class="skel" style="height:18px;width:92%;border-radius:6px"></div>
+    </div>
+  </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-      authDomain: "bcd-discord.firebaseapp.com",
-      databaseURL: "https://bcd-discord-default-rtdb.firebaseio.com",
-      projectId: "bcd-discord",
-      storageBucket: "bcd-discord.firebasestorage.app",
-      messagingSenderId: "278895155371",
-      appId: "1:278895155371:web:177a468f5fa3f0abfe3fee",
-      measurementId: "G-6Q46Z9ZF0D"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+  <!-- Article (hidden until loaded) -->
+  <div id="articleWrap" style="display:none">
 
-    const blogContent = document.getElementById("blogContent");
+    <!-- Hero image -->
+    <div class="hero-img-wrap" id="heroImgWrap">
+      <img class="hero-img" id="heroImg" src="" alt=""/>
+      <div class="hero-img-overlay"></div>
+      <div class="featured-badge" id="featuredBadge" style="display:none">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Featured
+      </div>
+    </div>
 
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
-    async function loadBlog() {
-      const blogId = getQueryParam("id");
-      if (!blogId) return blogContent.innerHTML = "<p class='text-center text-red-500'>Blog ID not provided.</p>";
-
-      const blogRef = db.collection("blogs").doc(blogId);
-      
-      try {
-        const doc = await blogRef.get();
-        if (!doc.exists) {
-          blogContent.innerHTML = "<p class='text-center text-red-500'>Blog not found.</p>";
-          return;
-        }
-
-        const blog = doc.data();
-
-        // Increment views
-        blogRef.update({ views: firebase.firestore.FieldValue.increment(1) });
-
-        // Fetch author image
-        let authorImage = 'https://api.dicebear.com/6.x/thumbs/svg?seed=' + encodeURIComponent(blog.author);
-        if (blog.authorId) {
-          try {
-            const userDoc = await db.collection("users").doc(blog.authorId).get();
-            if (userDoc.exists) authorImage = userDoc.data().photoURL || authorImage;
-          } catch {}
-        }
-
-        const date = blog.createdAt?.toDate().toLocaleDateString() || "Unknown";
-        const tagsHTML = (blog.tags || []).map(tag => `<span class="tag">${tag}</span>`).join("");
-        const featured = blog.isFeatured 
-          ? `<span class="text-xs font-bold bg-yellow-200 text-yellow-800 px-2 py-1 rounded absolute top-4 left-4">🌟 Featured</span>` 
-          : "";
-
-        blogContent.innerHTML = `
-          ${featured}
-          <h1 class="text-3xl font-bold text-purple-800 mb-2">${blog.title}</h1>
-          <p class="text-gray-600 mb-4">${blog.description}</p>
-          <div class="mb-4">${tagsHTML}</div>
-          <img src="${blog.imageUrl || 'https://via.placeholder.com/800x400'}" class="w-full h-64 object-cover rounded mb-4" />
-          <p class="text-gray-800 mb-6 whitespace-pre-line">${blog.content}</p>
-          <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-            <div class="flex items-center gap-2">
-              <img src="${authorImage}" class="w-8 h-8 rounded-full" />
-              <span>${blog.author}</span>
-            </div>
-            <span>${date}</span>
+    <!-- Header -->
+    <div class="article-header">
+      <div class="article-tags" id="articleTags"></div>
+      <h1 class="article-title" id="articleTitle">—</h1>
+      <div class="article-desc" id="articleDesc"></div>
+      <div class="article-meta">
+        <div class="article-author">
+          <img class="author-av" id="authorAv" src="" alt="Author" onerror="this.src='https://api.dicebear.com/6.x/thumbs/svg?seed=BCD'"/>
+          <div>
+            <div class="author-name" id="authorName">—</div>
+            <div class="author-date" id="authorDate">—</div>
           </div>
-          <div class="flex items-center gap-4">
-            <button onclick="likeBlog(event, '${blogId}')" class="flex items-center gap-1 text-gray-500 hover:text-pink-600">
-              ❤️ <span id="like-count-${blogId}">${blog.likes || 0}</span>
-            </button>
-            <span>👁️ ${blog.views || 0} Views</span>
-            <button onclick="shareBlog('${window.location.href}')" class="text-gray-500 hover:text-purple-600">📤 Share</button>
+        </div>
+        <div class="article-stats">
+          <div class="stat-pill">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="viewCount">0</span> views
           </div>
-        `;
+          <div class="stat-pill">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="likeCount">0</span> likes
+          </div>
+          <div class="stat-pill" id="readTimePill">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="readTime">— min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      } catch (err) {
-        console.error(err);
-        blogContent.innerHTML = "<p class='text-center text-red-500'>Error loading blog.</p>";
-      }
+    <!-- Body content -->
+    <div class="article-body" id="articleBody"></div>
+
+    <!-- Actions bar -->
+    <div class="actions-bar">
+      <button class="action-btn" id="likeBtn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span id="likeBtnText">Like</span>
+        <span id="likeBtnCount" style="font-family:var(--mono);font-size:11px;opacity:.7"></span>
+      </button>
+      <button class="action-btn" id="shareBtn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+      <button class="action-btn" id="copyLinkBtn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Copy Link
+      </button>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <button class="action-btn" id="scrollTopBtn" title="Back to top">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          Top
+        </button>
+        <a class="action-btn" href="blogs.html">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          All Blogs
+        </a>
+      </div>
+    </div>
+
+    <!-- Related posts -->
+    <div class="related-section" id="relatedSection" style="display:none">
+      <div class="related-eyebrow">More to read</div>
+      <div class="related-title">You might also <em>enjoy</em></div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- Error state -->
+  <div class="error-state" id="errorState" style="display:none">
+    <div class="error-icon">📭</div>
+    <div class="error-title">Blog not found</div>
+    <div class="error-sub">This article may have been removed or the link is incorrect.</div>
+    <a class="error-btn" href="blogs.html">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Blogs
+    </a>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="ti"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-copy">© 2025 Books Coffee and Dreams</div>
+    <div class="footer-love">Made with <em>love</em> for curious minds</div>
+  </div>
+</footer>
+
+<script>
+// Mode
+const H=document.documentElement;
+const sv=localStorage.getItem('bcd-settings-mode')||'dark';
+H.setAttribute('data-mode',sv);
+function updateMode(){document.getElementById('modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+updateMode();
+document.getElementById('modeToggle').addEventListener('click',()=>{
+  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode',n);localStorage.setItem('bcd-settings-mode',n);updateMode();
+});
+
+// Reading progress bar
+window.addEventListener('scroll',()=>{
+  const el=document.documentElement;
+  const scrolled=(el.scrollTop||document.body.scrollTop);
+  const total=el.scrollHeight-el.clientHeight;
+  document.getElementById('readProgress').style.width=(total?Math.round(scrolled/total*100):0)+'%';
+});
+
+// Toast
+let toastTimer;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  const icon=t.querySelector('.ti svg');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast '+type;
+  icon.innerHTML=type==='success'
+    ?'<polyline points="20 6 9 17 4 12"/>'
+    :'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Scroll top
+document.getElementById('scrollTopBtn').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// Share / copy
+document.getElementById('shareBtn').addEventListener('click',async()=>{
+  if(navigator.share){
+    try{ await navigator.share({title:document.title,url:location.href}); }catch(e){}
+  } else {
+    await navigator.clipboard.writeText(location.href);
+    const btn=document.getElementById('shareBtn');
+    btn.classList.add('share-success');
+    showToast('Link copied to clipboard!');
+    setTimeout(()=>btn.classList.remove('share-success'),2000);
+  }
+});
+document.getElementById('copyLinkBtn').addEventListener('click',async()=>{
+  await navigator.clipboard.writeText(location.href);
+  const btn=document.getElementById('copyLinkBtn');
+  btn.classList.add('share-success');
+  showToast('Link copied!');
+  setTimeout(()=>btn.classList.remove('share-success'),2000);
+});
+
+// Estimated read time
+function calcReadTime(text){
+  const words=(text||'').trim().split(/\s+/).length;
+  return Math.max(1,Math.ceil(words/200));
+}
+
+function formatDate(val){
+  if(!val) return '—';
+  try{
+    const d=val.toDate?val.toDate():new Date(val);
+    return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  }catch(e){return String(val)}
+}
+</script>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain:"bcd-discord.firebaseapp.com",
+  projectId:"bcd-discord",
+  storageBucket:"bcd-discord.appspot.com",
+  messagingSenderId:"278895155371",
+  appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"
+});
+const auth=firebase.auth();
+const db=firebase.firestore();
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+
+let currentUser=null, blogId=null, blogData=null, userLiked=false;
+
+// Auth
+auth.onAuthStateChanged(user=>{
+  currentUser=user;
+  const nu=document.getElementById('navUser'), nl=document.getElementById('navLogin');
+  if(user){
+    nu.style.display='flex'; nl.style.display='none';
+    const av=document.getElementById('navAvatar');
+    av.src=user.photoURL||DEF_AV; av.onerror=()=>av.src=DEF_AV;
+    document.getElementById('navName').textContent=user.displayName||user.email?.split('@')[0]||'Account';
+    // Check if already liked once blog is loaded
+    if(blogId) checkLiked();
+  } else { nu.style.display='none'; nl.style.display='flex'; }
+});
+
+async function checkLiked(){
+  if(!currentUser||!blogId) return;
+  try{
+    const snap=await db.collection('blogs').doc(blogId).get();
+    if(!snap.exists) return;
+    const d=snap.data();
+    userLiked=(d.likedBy||[]).includes(currentUser.uid);
+    updateLikeBtn();
+  }catch(e){}
+}
+
+function updateLikeBtn(){
+  const btn=document.getElementById('likeBtn');
+  if(userLiked){
+    btn.classList.add('liked');
+    btn.querySelector('svg').setAttribute('fill','currentColor');
+    document.getElementById('likeBtnText').textContent='Liked';
+  } else {
+    btn.classList.remove('liked');
+    btn.querySelector('svg').setAttribute('fill','none');
+    document.getElementById('likeBtnText').textContent='Like';
+  }
+}
+
+// Like
+document.getElementById('likeBtn').addEventListener('click',async()=>{
+  if(!currentUser){
+    showToast('Sign in to like this post','error');
+    setTimeout(()=>location.href='login.html?redirect='+encodeURIComponent(location.href),1200);
+    return;
+  }
+  if(userLiked){ showToast('You already liked this!','error'); return; }
+  try{
+    await db.collection('blogs').doc(blogId).update({
+      likes:firebase.firestore.FieldValue.increment(1),
+      likedBy:firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+    });
+    userLiked=true;
+    updateLikeBtn();
+    const lc=document.getElementById('likeCount');
+    const lbc=document.getElementById('likeBtnCount');
+    const newCount=(parseInt(lc.textContent)||0)+1;
+    lc.textContent=newCount;
+    lbc.textContent=newCount;
+    showToast('Thanks for the love! ❤️');
+  }catch(e){ showToast('Could not like post','error'); }
+});
+
+// Load blog
+async function loadBlog(){
+  blogId=new URLSearchParams(location.search).get('id');
+  if(!blogId){
+    document.getElementById('skeletonWrap').style.display='none';
+    document.getElementById('errorState').style.display='block';
+    return;
+  }
+  try{
+    const snap=await db.collection('blogs').doc(blogId).get();
+    if(!snap.exists){
+      document.getElementById('skeletonWrap').style.display='none';
+      document.getElementById('errorState').style.display='block';
+      return;
+    }
+    blogData=snap.data();
+
+    // Increment views
+    db.collection('blogs').doc(blogId).update({
+      views:firebase.firestore.FieldValue.increment(1)
+    }).catch(()=>{});
+
+    // Set page title
+    document.title=(blogData.title||'Blog')+' · Books Coffee and Dreams';
+
+    // Hero image
+    const heroImg=document.getElementById('heroImg');
+    if(blogData.imageUrl){
+      heroImg.src=blogData.imageUrl;
+      heroImg.alt=blogData.title||'';
+      heroImg.onerror=()=>document.getElementById('heroImgWrap').style.display='none';
+    } else {
+      document.getElementById('heroImgWrap').style.display='none';
     }
 
-    function likeBlog(e, id) {
-      e.stopPropagation();
-      const user = auth.currentUser;
-      if (!user) return alert("Please sign in to like this blog.");
+    // Featured badge
+    if(blogData.isFeatured) document.getElementById('featuredBadge').style.display='flex';
 
-      const blogRef = db.collection("blogs").doc(id);
-      blogRef.get().then(doc => {
-        const data = doc.data();
-        const likedBy = data.likedBy || [];
-        if (likedBy.includes(user.uid)) return alert("You already liked this blog.");
+    // Tags
+    const tagsEl=document.getElementById('articleTags');
+    (blogData.tags||[]).forEach(t=>{
+      const s=document.createElement('span');s.className='article-tag';s.textContent=t;
+      tagsEl.appendChild(s);
+    });
 
-        blogRef.update({
-          likes: firebase.firestore.FieldValue.increment(1),
-          likedBy: firebase.firestore.FieldValue.arrayUnion(user.uid)
-        }).then(() => {
-          const count = document.getElementById(`like-count-${id}`);
-          if (count) count.textContent = (data.likes || 0) + 1;
-        });
-      });
+    // Title — italic last word in serif style
+    const title=blogData.title||'Untitled';
+    const words=title.trim().split(/\s+/);
+    document.getElementById('articleTitle').innerHTML=
+      words.length>1
+        ?`${words.slice(0,-1).join(' ')} <em>${words[words.length-1]}</em>`
+        :`<em>${title}</em>`;
+
+    // Description
+    if(blogData.description){
+      document.getElementById('articleDesc').textContent=blogData.description;
+    } else {
+      document.getElementById('articleDesc').style.display='none';
     }
 
-    function shareBlog(link) {
-      navigator.clipboard.writeText(link).then(() => alert("Link copied to clipboard!"));
+    // Author
+    let authorImg=`https://api.dicebear.com/6.x/thumbs/svg?seed=${encodeURIComponent(blogData.author||'BCD')}`;
+    if(blogData.authorId){
+      try{
+        const uSnap=await db.collection('users').doc(blogData.authorId).get();
+        if(uSnap.exists&&uSnap.data().photoURL) authorImg=uSnap.data().photoURL;
+      }catch(e){}
+    }
+    document.getElementById('authorAv').src=authorImg;
+    document.getElementById('authorName').textContent=blogData.author||'BCD Team';
+    document.getElementById('authorDate').textContent=formatDate(blogData.createdAt||blogData.date);
+
+    // Stats
+    const views=blogData.views||0;
+    const likes=blogData.likes||0;
+    document.getElementById('viewCount').textContent=views;
+    document.getElementById('likeCount').textContent=likes;
+    document.getElementById('likeBtnCount').textContent=likes||'';
+
+    // Read time
+    const mins=calcReadTime((blogData.content||'')+(blogData.description||''));
+    document.getElementById('readTime').textContent=`${mins} min read`;
+
+    // Body content — supports HTML or plain text
+    const body=document.getElementById('articleBody');
+    const content=blogData.content||'';
+    if(content.trim().startsWith('<')){
+      // HTML content
+      body.innerHTML=content;
+    } else {
+      // Plain text — wrap paragraphs
+      body.innerHTML=content.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
     }
 
-    loadBlog();
-  </script>
+    // Check if user already liked
+    if(currentUser) checkLiked();
+
+    // Show article
+    document.getElementById('skeletonWrap').style.display='none';
+    document.getElementById('articleWrap').style.display='block';
+
+    // Load related posts
+    loadRelated();
+
+  }catch(e){
+    console.error(e);
+    document.getElementById('skeletonWrap').style.display='none';
+    document.getElementById('errorState').style.display='block';
+  }
+}
+
+async function loadRelated(){
+  try{
+    const tags=blogData.tags||[];
+    if(!tags.length) return;
+    const snap=await db.collection('blogs')
+      .where('tags','array-contains',tags[0])
+      .orderBy('createdAt','desc')
+      .limit(5)
+      .get();
+    const related=snap.docs
+      .filter(d=>d.id!==blogId)
+      .slice(0,2);
+    if(!related.length) return;
+    const section=document.getElementById('relatedSection');
+    const grid=document.getElementById('relatedGrid');
+    section.style.display='block';
+    related.forEach(d=>{
+      const r=d.data();
+      const card=document.createElement('div');
+      card.className='related-card';
+      const thumb=r.imageUrl||`https://placehold.co/400x225/1a1917/d97706?text=${encodeURIComponent((r.title||'').slice(0,8))}`;
+      const rDate=formatDate(r.createdAt||r.date);
+      card.innerHTML=`
+        <div class="related-img"><img src="${thumb}" alt="${(r.title||'').replace(/"/g,'')}" loading="lazy"/></div>
+        <div class="related-body">
+          <div class="related-tags">${(r.tags||[]).slice(0,2).map(t=>`<span class="related-tag">${t}</span>`).join('')}</div>
+          <div class="related-name">${r.title||'Untitled'}</div>
+          <div class="related-date">${rDate}</div>
+        </div>`;
+      card.addEventListener('click',()=>location.href=`blog-detail.html?id=${d.id}`);
+      grid.appendChild(card);
+    });
+  }catch(e){}
+}
+
+loadBlog();
+</script>
 </body>
 </html>
