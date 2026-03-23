@@ -586,7 +586,7 @@ auth.onAuthStateChanged(async user=>{
   document.getElementById('sXP').textContent = xp;
   document.getElementById('sLevel').textContent = level;
   document.getElementById('sPosts').textContent = postsSnap.size;
-  document.getElementById('sCourses').textContent = purchasesSnap.size;
+  document.getElementById('sCourses').textContent = purchasesSnap.size; // updated after courses_main loads
   const badges = ud.badges||[];
   document.getElementById('sBadges').textContent = badges.length;
   document.getElementById('sStreak').textContent = (ud.streak||0)+'d';
@@ -615,44 +615,107 @@ auth.onAuthStateChanged(async user=>{
     bl.innerHTML='<div class="badge-none">No badges yet. Keep engaging!</div>';
   }
 
-  // ── COURSES ──
+  // ── COURSES (merged from both purchases + courses_main) ──
   const grid = document.getElementById('coursesGrid');
   grid.innerHTML='';
-  if(purchasesSnap.empty){
+
+  // Source 1: purchases collection → courses collection
+  const purchasedIds = purchasesSnap.docs.map(d=>d.data().courseId).filter(Boolean);
+
+  // Source 2: courses_main collection where students[] contains uid
+  let mainEnrolled = [];
+  try{
+    const mainSnap = await db.collection('courses_main').get();
+    mainEnrolled = mainSnap.docs
+      .filter(d => (d.data().students||[]).includes(user.uid))
+      .map(d => ({ id: d.id, source: 'main', ...d.data() }));
+  }catch(e){ console.warn('courses_main fetch failed:', e); }
+
+  // Update stat count to reflect both sources
+  const totalEnrolled = new Set([...purchasedIds, ...mainEnrolled.map(c=>c.id)]).size;
+  document.getElementById('sCourses').textContent = totalEnrolled;
+
+  // Build display list — deduplicated, max 8
+  const allEnrolled = [];
+  // Add purchased courses first (with progress)
+  for(const cid of [...new Set(purchasedIds)].slice(0,6)){
+    allEnrolled.push({ id: cid, source: 'purchases' });
+  }
+  // Add courses_main enrolled (not already in list)
+  const existingIds = new Set(allEnrolled.map(c=>c.id));
+  for(const c of mainEnrolled){
+    if(!existingIds.has(c.id)) allEnrolled.push({ id: c.id, source: 'main', data: c });
+    if(allEnrolled.length >= 8) break;
+  }
+
+  if(!allEnrolled.length){
     grid.innerHTML=`<div class="course-empty">No enrolled courses yet.</div>
       <a href="courses.html" class="course-cta">
         <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="13" height="13"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         Browse Courses
       </a>`;
   } else {
-    const courseIds = purchasesSnap.docs.map(d=>d.data().courseId).filter(Boolean);
-    const uniqueIds = [...new Set(courseIds)].slice(0,6);
-    for(const cid of uniqueIds){
+    for(const enrolled of allEnrolled){
       try{
-        const [cSnap, progSnap] = await Promise.all([
-          db.collection('courses').doc(cid).get(),
-          db.collection('userCourseProgress').where('uid','==',user.uid).where('courseId','==',cid).get()
-        ]);
-        if(!cSnap.exists) continue;
-        const c = cSnap.data();
-        const totalLessons = (c.modules||[]).reduce((n,m)=>n+((m.lessons||[]).length),0);
-        const doneLessons = progSnap.docs.filter(d=>d.data().completed).length;
-        const pct = totalLessons ? Math.round(doneLessons/totalLessons*100) : 0;
-        const thumb = c.thumbnailURL||`https://placehold.co/60x42/1a1917/d97706?text=C`;
+        let c, thumb, title, totalLessons=0, doneLessons=0, pct=0, detailHref;
+
+        if(enrolled.source === 'purchases'){
+          // From courses collection (Razorpay purchases)
+          const [cSnap, progSnap] = await Promise.all([
+            db.collection('courses').doc(enrolled.id).get(),
+            db.collection('userCourseProgress').where('uid','==',user.uid).where('courseId','==',enrolled.id).get()
+          ]);
+          if(!cSnap.exists) continue;
+          c = cSnap.data();
+          thumb = c.thumbnailURL || '';
+          title = c.title || 'Untitled';
+          totalLessons = (c.modules||[]).reduce((n,m)=>n+((m.lessons||[]).length),0);
+          doneLessons = progSnap.docs.filter(d=>d.data().completed).length;
+          pct = totalLessons ? Math.round(doneLessons/totalLessons*100) : 0;
+          detailHref = `course-detail.html?id=${enrolled.id}`;
+        } else {
+          // From courses_main collection (students[] enrollment)
+          c = enrolled.data;
+          thumb = c.thumbnails?.[0]?.url || c.thumbnailURL || '';
+          title = c.title || 'Untitled';
+          // courses_main has no granular progress — show category & duration as subtitle
+          totalLessons = 0; doneLessons = 0; pct = 0;
+          detailHref = `course-content.html?id=${enrolled.id}`;
+        }
+
+        const fallbackThumb = `https://placehold.co/60x42/2c2a25/d97706?text=${encodeURIComponent(title.slice(0,2))}`;
         const row = document.createElement('div'); row.className='course-row';
-        row.innerHTML=`
-          <img class="course-thumb" src="${thumb}" alt="" loading="lazy" onerror="this.src='https://placehold.co/60x42/2c2a25/d97706?text=C'"/>
-          <div class="course-info">
-            <div class="course-title">${c.title||'Untitled'}</div>
-            <div class="course-prog-track"><div class="course-prog-fill" style="width:${pct}%"></div></div>
-            <div class="course-meta">
-              <span class="course-pct">${pct}% complete</span>
-              <span class="course-lessons">${doneLessons}/${totalLessons} lessons</span>
-            </div>
-          </div>`;
-        row.addEventListener('click',()=>location.href=`course-detail.html?id=${cid}`);
+
+        if(enrolled.source === 'purchases'){
+          row.innerHTML=`
+            <img class="course-thumb" src="${thumb||fallbackThumb}" alt="" loading="lazy" onerror="this.src='${fallbackThumb}'"/>
+            <div class="course-info">
+              <div class="course-title">${title}</div>
+              <div class="course-prog-track"><div class="course-prog-fill" style="width:${pct}%"></div></div>
+              <div class="course-meta">
+                <span class="course-pct">${pct}% complete</span>
+                <span class="course-lessons">${doneLessons}/${totalLessons} lessons</span>
+              </div>
+            </div>`;
+        } else {
+          // courses_main — show category/duration, free/paid badge instead of progress
+          const isFree = c.price == 0 || !c.price;
+          row.innerHTML=`
+            <img class="course-thumb" src="${thumb||fallbackThumb}" alt="" loading="lazy" onerror="this.src='${fallbackThumb}'"/>
+            <div class="course-info">
+              <div class="course-title">${title}</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+                ${c.category ? `<span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--tx4)">${c.category}</span>` : ''}
+                ${c.duration ? `<span style="font-family:var(--mono);font-size:9px;color:var(--tx4)">· ${c.duration}</span>` : ''}
+                <span style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:99px;background:${isFree?'rgba(22,163,74,.1)':'rgba(217,119,6,.1)'};border:1px solid ${isFree?'rgba(22,163,74,.25)':'rgba(217,119,6,.25)'};color:${isFree?'var(--green)':'var(--amber)'}">
+                  ${isFree?'Free':'Paid'}
+                </span>
+              </div>
+            </div>`;
+        }
+        row.addEventListener('click',()=>location.href=detailHref);
         grid.appendChild(row);
-      }catch(e){}
+      }catch(e){ console.warn('Course row error:', e); }
     }
     if(!grid.children.length)
       grid.innerHTML='<div class="course-empty">Course details unavailable.</div>';
