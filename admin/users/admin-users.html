@@ -1,465 +1,583 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Manage Users | Books Coffee and Dreams</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Manage Users · BCD Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
 
-  <!-- Tailwind + font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+:root{
+  --in:#6366f1;--in2:#818cf8;--in3:#a5b4fc;
+  --cy:#06b6d4;--cy2:#22d3ee;--cy3:#67e8f9;
+  --vi:#8b5cf6;--vi2:#a78bfa;
+  --red:#ef4444;--green:#10b981;--amber:#f59e0b;
+  --serif:"Instrument Serif",serif;--sans:"DM Sans",sans-serif;--mono:"IBM Plex Mono",monospace;
+  --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.4,0,.2,1);
+}
+[data-mode="dark"]{
+  --bg:#060709;--bg2:#09090f;
+  --sur:#0d0f18;--sur2:#111422;--sur3:#15182a;--sur4:#1a1e33;
+  --bdr:rgba(99,102,241,.11);--bdr2:rgba(99,102,241,.24);
+  --tx:#e2e8f0;--tx2:#cbd5e1;--tx3:#94a3b8;--tx4:#3d4d63;
+  --sh:0 4px 28px rgba(0,0,0,.85);--sh2:0 20px 64px rgba(0,0,0,.95);
+}
+[data-mode="light"]{
+  --bg:#eceef8;--bg2:#e3e6f5;
+  --sur:#ffffff;--sur2:#f4f5fc;--sur3:#eaecf8;--sur4:#dfe2f4;
+  --bdr:rgba(99,102,241,.1);--bdr2:rgba(99,102,241,.22);
+  --tx:#0f172a;--tx2:#1e293b;--tx3:#475569;--tx4:#94a3b8;
+  --sh:0 4px 20px rgba(15,23,42,.08);--sh2:0 16px 48px rgba(15,23,42,.12);
+}
 
-  <!-- SweetAlert -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;
+  display:flex;overflow-x:hidden;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+input,textarea,select{font-family:var(--sans)}
+img{display:block;max-width:100%}
 
-  <link href="/logo.png" rel="icon">
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20h40M20 0v40' stroke='%236366f1' stroke-width='.18' stroke-opacity='.09'/%3E%3C/svg%3E");
+  background-size:40px 40px}
+.glow-1{position:fixed;width:55vw;height:55vw;top:-20%;left:-10%;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,.09),transparent 60%);
+  pointer-events:none;z-index:0;animation:gd 25s ease-in-out infinite alternate}
+.glow-2{position:fixed;width:40vw;height:40vw;bottom:-10%;right:-8%;border-radius:50%;
+  background:radial-gradient(circle,rgba(6,182,212,.06),transparent 60%);
+  pointer-events:none;z-index:0;animation:gd 32s ease-in-out infinite alternate-reverse}
+@keyframes gd{0%{transform:translate(0,0)}100%{transform:translate(4vw,3vh)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes scan{0%{background-position:0%}100%{background-position:200%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes gem-pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.5)}60%{box-shadow:0 0 0 8px rgba(99,102,241,0)}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  <style>
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(to bottom right,#f3e8ff,#ede9fe); }
-    .blur-glow { position: absolute; width: 260px; height: 260px; background: radial-gradient(circle at center, rgba(168,85,247,0.36), transparent); filter: blur(80px); z-index:-1;}
-    .card { background: rgba(255,255,255,0.95); border-radius: 14px; box-shadow: 0 10px 40px rgba(128,90,213,0.12); border: 1px solid rgba(0,0,0,0.04); }
-    .role-badge { padding:.25rem .6rem; border-radius:999px; font-weight:600; font-size:.8rem; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
-    .role-avatar { width:20px; height:20px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:white; flex:0 0 20px; }
-    .small { font-size: .85rem; }
+/* SIDEBAR */
+.sb{position:fixed;top:0;left:0;bottom:0;width:230px;z-index:100;
+  background:var(--sur);border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(0,0,0,.5),1px 0 0 rgba(99,102,241,.08)}
+[data-mode="light"] .sb{box-shadow:0 0 30px rgba(15,23,42,.07),1px 0 0 rgba(99,102,241,.05)}
+.sb-logo{padding:20px 16px 16px;display:flex;align-items:center;gap:11px;position:relative}
+.sb-logo::after{content:"";position:absolute;bottom:0;left:16px;right:16px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.3),rgba(6,182,212,.3),transparent)}
+.sb-gem{width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#312e81,#4f46e5,#0891b2);
+  display:flex;align-items:center;justify-content:center;animation:gem-pulse 3s ease-in-out infinite;overflow:hidden;position:relative}
+.sb-gem::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 55%)}
+.sb-gem svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-brand-name{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--tx);line-height:1.15}
+.sb-brand-tag{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--tx4);margin-top:2px}
+.sb-scroll{flex:1;overflow-y:auto;padding:8px 8px 0}
+.sb-scroll::-webkit-scrollbar{width:0}
+.sb-grp{margin-bottom:4px}
+.sb-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--tx4);padding:10px 10px 3px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:8.5px 10px;border-radius:9px;
+  font-size:13px;font-weight:500;color:var(--tx3);transition:all .15s;position:relative}
+.sb-link:hover{background:var(--sur2);color:var(--tx2)}
+.sb-link.active{background:linear-gradient(90deg,rgba(99,102,241,.14),rgba(99,102,241,.03) 70%,transparent);
+  color:var(--in2);border:1px solid rgba(99,102,241,.18)}
+.sb-link.active::before{content:"";position:absolute;left:-1px;top:28%;bottom:28%;width:2.5px;
+  border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--in2),var(--cy2))}
+.sb-link svg{width:15px;height:15px;flex-shrink:0;opacity:.8}
+.sb-link.active svg{opacity:1}
+.sb-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:99px;
+  background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.22)}
+.sb-foot{padding:10px 8px;border-top:1px solid var(--bdr)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;
+  background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .18s}
+.sb-user:hover{border-color:var(--bdr2)}
+.sb-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(var(--sur2),var(--sur2)) padding-box,linear-gradient(135deg,var(--in2),var(--cy2)) border-box}
+.sb-u-name{font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-u-role{font-family:var(--mono);font-size:9px;color:var(--in2);margin-top:1px;letter-spacing:.05em}
+.sb-out{width:26px;height:26px;border-radius:7px;flex-shrink:0;
+  background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);
+  display:flex;align-items:center;justify-content:center;color:var(--red);transition:all .18s}
+.sb-out:hover{background:rgba(239,68,68,.2);transform:scale(1.1)}
+.sb-out svg{width:12px;height:12px}
 
-    /* Text-only role styles (same technique as role editor) */
-    .role-text { display:inline-block; font-weight:700; font-size:0.9rem; line-height:1; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:currentColor; vertical-align:middle; }
+/* MAIN */
+.main{position:relative;z-index:2;flex:1;margin-left:230px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;background:rgba(6,7,9,.78);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50}
+[data-mode="light"] .topbar{background:rgba(236,238,248,.88)}
+.tb-l{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;color:var(--tx4)}
+.tb-cur{color:var(--tx3)}.tb-sep{opacity:.4}
+.tb-r{display:flex;align-items:center;gap:9px}
+.live-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;
+  background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.16);
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:#34d399}
+.l-dot{width:5px;height:5px;border-radius:50%;background:#34d399;animation:blink 2s infinite}
+.mode-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:99px;
+  background:var(--sur2);border:1px solid var(--bdr);font-family:var(--mono);
+  font-size:10px;color:var(--tx3);transition:all .18s}
+.mode-btn:hover{border-color:var(--bdr2);color:var(--in2)}
+.mode-btn svg{width:12px;height:12px}
+.i-sun,.i-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .i-sun{display:none}[data-mode="dark"] .i-moon{display:block}
+[data-mode="light"] .i-sun{display:block}[data-mode="light"] .i-moon{display:none}
+.page{flex:1;padding:26px 28px 64px}
 
-    /* solid: just color via inline style on element */
-    /* animated gradient sheen (three-stop) */
-    .anim-gradient-sheen{
-      --g1: var(--g1, #FF66CC);
-      --g2: var(--g2, #FF99CC);
-      --g3: var(--g3, var(--g1));
-      background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3));
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: sheenPan 4.6s cubic-bezier(.22,.9,.32,.99) infinite;
-    }
-    @keyframes sheenPan{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+/* BLOCK */
+.block{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;overflow:hidden;box-shadow:var(--sh)}
+.block-stripe{height:2px;background:linear-gradient(90deg,#312e81,#6366f1,#06b6d4,transparent);opacity:.8}
+.block-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr);background:var(--sur2)}
+.bh-ico{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(99,102,241,.06));
+  border:1px solid rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;color:var(--in2)}
+.bh-ico svg{width:14px;height:14px}
+.bh-t{font-family:var(--serif);font-size:16px;color:var(--tx);letter-spacing:-.01em}
+.bh-sub{font-size:11px;color:var(--tx4);font-family:var(--mono);margin-top:1px}
+.block-body{padding:18px}
 
-    /* holographic */
-    .holo-text{
-      background: conic-gradient(from 0deg, #ffd36b, #ff8bf2, #8da0ff, #7bf2d4, #ffd36b);
-      background-size: 400% 400%;
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      animation: holoFlow 6.5s linear infinite;
-      filter: saturate(1.05) contrast(1.02);
-    }
-    @keyframes holoFlow{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+/* FORMS */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+.inp{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
+  color:var(--tx);font-size:14px;outline:none;transition:all .2s}
+.inp::placeholder{color:var(--tx4)}
+.inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
+.inp.error{border-color:rgba(239,68,68,.5)}
+textarea.inp{resize:vertical;min-height:90px;line-height:1.6}
+select.inp{cursor:pointer;appearance:none}
 
-    /* small controls */
-    .role-select { padding:.35rem .5rem; border-radius:.5rem; border:1px solid #e6e6ee; background:white; min-width:180px; }
-    .assign-btn { padding:.35rem .6rem; border-radius:.5rem; background:#7c3aed; color:white; border:0; cursor:pointer; }
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;
+  background:linear-gradient(135deg,#3730a3,#6366f1);color:#fff;font-size:13px;font-weight:600;
+  transition:all .2s;box-shadow:0 4px 16px rgba(99,102,241,.3);position:relative;overflow:hidden}
+.btn-primary::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 55%)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.5)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary svg{width:14px;height:14px}
+.btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;
+  background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;transition:all .2s}
+.btn-ghost:hover{border-color:var(--bdr2);color:var(--tx2);background:var(--sur3)}
+.btn-ghost svg{width:14px;height:14px}
+.btn-danger{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red);font-size:13px;font-weight:500;transition:all .2s}
+.btn-danger:hover{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.35)}
+.btn-danger svg{width:14px;height:14px}
+.btn-cy{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;
+  background:linear-gradient(135deg,#0e7490,#06b6d4);color:#fff;font-size:13px;font-weight:600;
+  transition:all .2s;box-shadow:0 4px 16px rgba(6,182,212,.3)}
+.btn-cy:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(6,182,212,.5)}
+.btn-cy svg{width:14px;height:14px}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:8px}
 
-    table td, table th { vertical-align: middle; }
-  </style>
+/* CHIPS / BADGES */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase}
+.chip-in{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:var(--in2)}
+.chip-cy{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);color:var(--cy2)}
+.chip-gr{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#34d399}
+.chip-re{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171}
+.chip-am{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fcd34d}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--sur);border:1px solid var(--bdr2);border-radius:18px;
+  width:100%;max-width:600px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 32px 80px rgba(0,0,0,.8);animation:fade-up .3s var(--spring) both}
+.modal-stripe{height:2px;background:linear-gradient(90deg,#312e81,#6366f1,#06b6d4,transparent)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--bdr)}
+.modal-title{font-family:var(--serif);font-size:20px;color:var(--tx);letter-spacing:-.01em}
+.modal-close{width:30px;height:30px;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .18s}
+.modal-close:hover{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2);color:var(--red)}
+.modal-close svg{width:14px;height:14px}
+.modal-body{padding:22px}
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:9px;
+  padding:14px 22px;border-top:1px solid var(--bdr)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tx4);padding:10px 14px;text-align:left;border-bottom:1px solid var(--bdr)}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--bdr);font-size:13px;color:var(--tx3);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:background .15s}
+.tbl tbody tr:hover{background:var(--sur2)}
+
+/* SEARCH */
+.search-wrap{position:relative;flex:1}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;color:var(--tx4);pointer-events:none}
+.search-inp{width:100%;padding:10px 14px 10px 38px;background:var(--sur);border:1px solid var(--bdr);
+  border-radius:10px;color:var(--tx);font-size:13px;outline:none;transition:all .2s}
+.search-inp::placeholder{color:var(--tx4)}
+.search-inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
+
+/* SKELETON */
+.sk{background:var(--sur2);border-radius:8px;position:relative;overflow:hidden}
+.sk::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.05),transparent);
+  animation:shimmer 2s ease-in-out infinite}
+
+/* SECTION LABEL */
+.sec-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--tx4);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;
+  padding:11px 18px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);
+  z-index:999;opacity:0;transition:all .3s var(--spring);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok .t-ico{color:var(--green)}.toast.err .t-ico{color:var(--red)}
+.t-ico svg{width:14px;height:14px}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:56px 20px;color:var(--tx4)}
+.empty-icon{font-size:40px;margin-bottom:14px;opacity:.5}
+.empty-title{font-family:var(--serif);font-size:20px;color:var(--tx3);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+/* GRID 2-3 COL */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:4px}
+.tab-btn{flex:1;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;
+  color:var(--tx4);transition:all .18s;text-align:center}
+.tab-btn:hover{color:var(--tx3)}
+.tab-btn.active{background:var(--sur);color:var(--in2);box-shadow:var(--sh);border:1px solid var(--bdr)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* RESPONSIVE */
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:700px){.sb{transform:translateX(-100%)}.main{margin-left:0}.page{padding:16px 14px 48px}}
+
+
+.role-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;
+  font-size:12px;font-weight:600;white-space:nowrap}
+.user-av-sm{width:36px;height:36px;border-radius:50%;object-fit:cover;
+  border:1.5px solid var(--bdr);background:var(--sur3);flex-shrink:0}
+.assign-wrap{display:flex;align-items:center;gap:6px}
+.role-sel{padding:6px 10px;background:var(--bg2);border:1px solid var(--bdr);
+  border-radius:8px;color:var(--tx);font-size:12px;outline:none;cursor:pointer;
+  max-width:160px;transition:border-color .18s}
+.role-sel:focus{border-color:var(--bdr2)}
+.assign-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;
+  background:linear-gradient(135deg,#3730a3,#6366f1);color:#fff;font-size:11px;font-weight:600;
+  transition:all .18s;cursor:pointer}
+.assign-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(99,102,241,.4)}
+.view-btn{display:inline-flex;align-items:center;padding:6px 10px;border-radius:8px;
+  background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:11px;
+  transition:all .18s;cursor:pointer}
+.view-btn:hover{border-color:var(--bdr2);color:var(--tx2)}
+
+</style>
 </head>
-
-<body class="min-h-screen p-6 relative overflow-y-auto">
-
-  <!-- Glow -->
-  <div class="blur-glow top-10 left-10"></div>
-  <div class="blur-glow bottom-10 right-10"></div>
-
-  <div class="max-w-6xl mx-auto">
-
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-500">
-          Manage Users
-        </h1>
-        <p class="text-sm text-gray-600 mt-1">View, assign roles (Discord-style) and manage users.</p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <input id="searchInput" placeholder="Search by name or email..." class="px-4 py-2 rounded-xl border border-gray-200 shadow-sm w-80" />
-        <button id="refreshBtn" class="px-4 py-2 rounded-xl bg-white border border-gray-200 shadow-sm hover:scale-105">Refresh</button>
-        <a href="https://bookscoffeedreams.github.io/admin/admin-dashboard.html" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white">Dashboard</a>
-      </div>
+<body>
+<div class="glow-1"></div><div class="glow-2"></div>
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-gem"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div><div class="sb-brand-name">BCD Admin</div><div class="sb-brand-tag">Control Panel</div></div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-grp">
+      <div class="sb-lbl">Navigation</div>
+      <a class="sb-link " href="/admin/admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a class="sb-link active" href="/admin/users/admin-users.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users</a>
+      <a class="sb-link " href="/admin/courses/admin-courses.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Courses</a>
+      <a class="sb-link " href="/admin/blogs/admin-blogs.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Blogs</a>
+      <a class="sb-link " href="/admin/content/admin-content.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Content</a>
+      <a class="sb-link " href="/admin/roles/admin-roles.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Roles</a>
     </div>
-
-    <!-- Card -->
-    <div class="card p-6">
-
-      <!-- Stats -->
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex gap-4 items-center small">
-          <div class="px-4 py-2 rounded-lg bg-white border shadow-sm text-sm">
-            Total users: <span id="totalUsers">0</span>
-          </div>
-          <div class="px-4 py-2 rounded-lg bg-white border shadow-sm text-sm">
-            With role: <span id="totalWithRole">0</span>
-          </div>
-          <div class="px-4 py-2 rounded-lg bg-white border shadow-sm text-sm">
-            No role: <span id="totalNoRole">0</span>
-          </div>
-        </div>
-        <div class="text-sm text-gray-500">Live list — changes apply immediately.</div>
-      </div>
-
-      <!-- Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left">
-          <thead class="text-sm text-gray-600">
-            <tr>
-              <th class="py-3 px-2 w-12">#</th>
-              <th class="py-3 px-2">User</th>
-              <th class="py-3 px-2">Email</th>
-              <th class="py-3 px-2">Role</th>
-              <th class="py-3 px-2">XP</th>
-              <th class="py-3 px-2">Assign Role</th>
-            </tr>
-          </thead>
-          <tbody id="usersTbody"></tbody>
-        </table>
-      </div>
-
+    <div class="sb-grp">
+      <div class="sb-lbl">Staff</div>
+      <a class="sb-link " href="/admin/staff/bio.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
+      <a class="sb-link" href="/staffApplications.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Applications</a>
+    </div>
+    <div class="sb-grp">
+      <div class="sb-lbl">Go to</div>
+      <a class="sb-link" href="/index.html" target="_blank"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Live Site</a>
+      <a class="sb-link" href="/dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>User Dashboard</a>
     </div>
   </div>
-
-  <!-- Modal -->
-  <div id="userModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-40">
-    <div class="bg-white rounded-xl p-6 w-full max-w-md card">
-      <div class="flex justify-between items-start">
-        <h3 class="text-lg font-bold">User details</h3>
-        <button id="closeModal" class="text-gray-500">Close</button>
-      </div>
-      <div class="mt-4" id="modalContent"></div>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="location.href='/profile.html'">
+      <img class="sb-av" id="sbAv" src="" alt=""/>
+      <div style="flex:1;min-width:0"><div class="sb-u-name" id="sbName">Loading…</div><div class="sb-u-role" id="sbRole">—</div></div>
+      <button class="sb-out" id="logoutBtn" title="Sign out"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
     </div>
   </div>
+</aside>
+<div class="main">
+<div class="topbar">
+  <div class="tb-l">
+    <span>BCD</span><span class="tb-sep">/</span>
+    <span>Admin</span><span class="tb-sep">/</span>
+    <span class="tb-cur">Users</span>
+  </div>
+  <div class="tb-r">
+    <div class="live-pill"><span class="l-dot"></span>LIVE</div>
+    <button class="mode-btn" id="modeBtn">
+      <span class="i-sun"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+      <span class="i-moon"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+      <span id="modeLabel">Light</span>
+    </button>
+  </div>
+</div>
+<div class="page">
 
-  <!-- Firebase (modular) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, collection, onSnapshot, query, orderBy,
-      updateDoc, doc, getDoc, serverTimestamp, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;animation:fade-up .5s var(--spring) .03s both">
+  <div>
+    <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.02em;color:var(--tx)">Manage <em style="font-style:italic;background:linear-gradient(90deg,var(--in2),var(--cy2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Users</em></div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:4px">Assign roles, view XP, manage accounts</div>
+  </div>
+  <button class="btn-ghost" id="refreshBtn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    Refresh
+  </button>
+</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-      authDomain: "bcd-discord.firebaseapp.com",
-      projectId: "bcd-discord",
-      storageBucket: "bcd-discord.appspot.com",
-      messagingSenderId: "278895155371",
-      appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
-    };
+<!-- Stats -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;animation:fade-up .5s var(--spring) .05s both">
+  <div class="block" style="padding:16px 20px">
+    <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.03em;background:linear-gradient(90deg,var(--in2),var(--in3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="totalUsersN">—</div>
+    <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--tx4);margin-top:4px">Total Users</div>
+  </div>
+  <div class="block" style="padding:16px 20px">
+    <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.03em;background:linear-gradient(90deg,var(--cy2),var(--in2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="withRoleN">—</div>
+    <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--tx4);margin-top:4px">With Role</div>
+  </div>
+  <div class="block" style="padding:16px 20px">
+    <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.03em;background:linear-gradient(90deg,var(--in2),var(--vi2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="noRoleN">—</div>
+    <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--tx4);margin-top:4px">No Role</div>
+  </div>
+</div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
+<!-- Toolbar -->
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;animation:fade-up .5s var(--spring) .07s both">
+  <div class="search-wrap" style="max-width:360px">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-inp" id="searchInp" placeholder="Search by name or email…"/>
+  </div>
+  <div style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--tx4);display:flex;align-items:center">
+    Live · updates automatically
+  </div>
+</div>
 
-    const tbody = document.getElementById("usersTbody");
-    const searchInput = document.getElementById("searchInput");
-    const totalUsersEl = document.getElementById("totalUsers");
-    const totalWithRoleEl = document.getElementById("totalWithRole");
-    const totalNoRoleEl = document.getElementById("totalNoRole");
-    const userModal = document.getElementById("userModal");
-    const modalContent = document.getElementById("modalContent");
-    const refreshBtn = document.getElementById("refreshBtn");
+<!-- Table -->
+<div class="block" style="animation:fade-up .5s var(--spring) .09s both">
+  <div class="block-stripe"></div>
+  <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>#</th><th>User</th><th>Email</th><th>Current Role</th><th>XP</th><th>Assign Role</th>
+        </tr>
+      </thead>
+      <tbody id="usersTbody">
+        <tr><td colspan="6" style="text-align:center;padding:40px"><div class="sk" style="height:14px;width:200px;margin:0 auto"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    // Roles map (roleId -> roleData)
-    let rolesMap = {};
-    let allRoles = []; // array for dropdown ordering
+<!-- User detail modal -->
+<div class="modal-bg" id="userModal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-stripe"></div>
+    <div class="modal-head">
+      <div class="modal-title">User Details</div>
+      <button class="modal-close" id="userModalClose"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" id="userModalContent"></div>
+  </div>
+</div>
 
-    // current users snapshot rows
-    let currentRows = [];
+</div>
+</div>
+<div class="toast" id="adminToast">
+  <span class="t-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg"></span>
+</div>
+<script>
 
-    function escapeHTML(str) {
-      if (!str) return "";
-      return String(str).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
-    }
-
-    function resolvePhoto(u) {
-      if (u.photoURL?.trim()) return u.photoURL;
-      if (u.profileURL?.trim()) return u.profileURL;
-      return "https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/main/assets/images/account_logo_default.png";
-    }
-
-    // render a role badge using stored role object (or fallback)
-    function renderRoleBadgeForUser(user) {
-      const rid = user.roleId;
-      const r = rolesMap[rid];
-
-      if (!r) {
-        return `<span class="role-badge" style="background:#eef2ff;color:#374151">No role</span>`;
-      }
-
-      // avatar circle (first letter if no icon)
-      const avatarHtml = r.iconUrl
-        ? `<img src="${escapeHTML(r.iconUrl)}" class="role-avatar" style="width:20px;height:20px;border-radius:999px;object-fit:cover" />`
-        : `<span class="role-avatar" style="background:${escapeHTML(r.color || '#6b7280')}">${escapeHTML((r.name||'R').slice(0,1).toUpperCase())}</span>`;
-
-      // text label styled according to r.style
-      let textSpan = '';
-      if (r.style === 'solid') {
-        textSpan = `<span class="role-text" style="color: ${escapeHTML(r.color || '#000')};">${escapeHTML(r.name || 'Role')}</span>`;
-      } else if (r.style === 'gradient') {
-        // three-stop shimmer: set CSS variables inline
-        const g1 = r.gradientFrom || r.color || '#FF66CC';
-        const g2 = r.gradientTo || '#FF99CC';
-        textSpan = `<span class="role-text anim-gradient-sheen" style="--g1:${escapeHTML(g1)};--g2:${escapeHTML(g2)};--g3:${escapeHTML(g1)};">${escapeHTML(r.name || 'Role')}</span>`;
-      } else { // holo
-        textSpan = `<span class="role-text holo-text">${escapeHTML(r.name || 'Role')}</span>`;
-      }
-
-      // combine
-      return `<span class="role-badge" title="${escapeHTML(r.name || '')}">${avatarHtml}${textSpan}</span>`;
-    }
-
-    // listen auth + admin guard
-    onAuthStateChanged(auth, async (user) => {
-  if (!user) return location.href = "https://bookscoffeedreams.github.io/login.html";
-
-  // NEW SYSTEM: permission guard handles access
-  // Just start listeners
-  listenRoles();
-  listenUsers();
+// Mode toggle
+const H=document.documentElement;
+const sv=localStorage.getItem('bcd-admin-mode')||'dark';
+H.setAttribute('data-mode',sv);
+function updM(){const btn=document.getElementById('modeBtn');if(btn)btn.querySelector('#modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+updM();
+document.getElementById('modeBtn')?.addEventListener('click',()=>{
+  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode',n);localStorage.setItem('bcd-admin-mode',n);updM();
 });
 
-    // Roles: live listener for organizations/bcd/roles
-    function listenRoles() {
-      const rolesCol = collection(db, "organizations", "bcd", "roles");
-      // using onSnapshot is ideal, but modular onSnapshot import omitted earlier — we'll use onSnapshot via getDocs on every refresh for simplicity
-      // however we can attempt onSnapshot — but for code clarity here we'll poll once and set up a button to refresh
-      // Let's do a one-time load and also re-run on refresh click.
+// Toast
+let toastT;
+function toast(msg,type='ok'){
+  const t=document.getElementById('adminToast');
+  if(!t)return;
+  t.querySelector('#toastMsg').textContent=msg;
+  t.className='toast '+type;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),3500);
+}
 
-      loadRoles();
-      refreshBtn.onclick = () => loadRoles();
-    }
+// Sidebar init
+firebase.initializeApp({apiKey:'AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A',authDomain:'bcd-discord.firebaseapp.com',projectId:'bcd-discord',storageBucket:'bcd-discord.appspot.com',messagingSenderId:'278895155371',appId:'1:278895155371:web:177a468f5fa3f0abfe3fee'});
+const auth=firebase.auth(),db=firebase.firestore();
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
 
-    async function loadRoles() {
-      try {
-        const snaps = await getDocs(collection(db, "organizations", "bcd", "roles"));
-        rolesMap = {};
-        allRoles = [];
-        snaps.forEach(d => {
-          const data = d.data();
-          const id = d.id;
-          const roleObj = {
-            id,
-            name: data.name || id,
-            style: data.style || 'solid',
-            color: data.color || '#6b7280',
-            gradientFrom: data.gradientId ? (data.gradientFrom || data.color) : (data.gradientFrom || data.color),
-            gradientTo: data.gradientTo || data.color,
-            iconUrl: data.iconUrl || null,
-            raw: data
-          };
-          // if role stored gradientId but not gradientFrom/gradientTo, try to derive from raw
-          if (data.gradientId && !roleObj.gradientFrom) {
-            // attempt to read gradient stops in either gradientFrom/gradientTo fields or fallback to first color
-            roleObj.gradientFrom = data.gradientFrom || data.color || '#FF66CC';
-            roleObj.gradientTo = data.gradientTo || data.color || '#FF99CC';
-          }
-          rolesMap[id] = roleObj;
-          allRoles.push(roleObj);
-        });
-        // re-render users with fresh role info
-        renderUsers(currentRows);
-      } catch (err) {
-        console.error("Failed to load roles:", err);
-        Swal.fire('Error','Failed to load roles. Check console.','error');
-      }
-    }
+auth.onAuthStateChanged(async user=>{
+  if(!user){location.href='/login.html';return}
+  const us=await db.collection('users').doc(user.uid).get();
+  const ud=us.exists?us.data():{};
+  let perms={},rname='Staff';
+  if(ud.roleId){try{const rs=await db.collection('organizations').doc('bcd').collection('roles').doc(ud.roleId).get();if(rs.exists){perms=rs.data().permissions||{};rname=rs.data().name||'Staff'}}catch(e){}}
+  if(ud.role==='admin')perms.admin=true;
+  if(!perms.admin&&!Object.values(perms).some(v=>v===true)){alert('Access denied.');location.href='/index.html';return}
+  
+  const photo=ud.photoURL||ud.profileURL||user.photoURL||DEF_AV;
+  const sbAv=document.getElementById('sbAv');
+  if(sbAv){sbAv.src=photo;sbAv.onerror=()=>sbAv.src=DEF_AV}
+  const sbName=document.getElementById('sbName');if(sbName)sbName.textContent=ud.name||user.displayName||'Admin';
+  const sbRole=document.getElementById('sbRole');if(sbRole)sbRole.textContent=rname;
+  document.getElementById('logoutBtn')?.addEventListener('click',e=>{e.stopPropagation();auth.signOut().then(()=>location.href='/login.html')});
+  
+  if(typeof onAdminReady==='function') onAdminReady(user,ud,perms,rname);
+});
 
-    // Users: listen to users collection
-    function listenUsers() {
-      const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
-      onSnapshot(q, (snapshot) => {
-        const rows = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        currentRows = rows;
-        renderUsers(rows);
-      }, (err) => {
-        console.error("Users snapshot error:", err);
-        Swal.fire('Error','Failed to listen users: '+err.message,'error');
-      });
-    }
+function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
+function ago(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-    // render rows
-    function renderUsers(rows) {
-      totalUsersEl.textContent = rows.length;
-      totalWithRoleEl.textContent = rows.filter(u => u.roleId).length;
-      totalNoRoleEl.textContent = rows.filter(u => !u.roleId).length;
 
-      const f = (searchInput.value || '').toLowerCase();
+let allUsers=[],rolesMap={},allRoles=[];
 
-      tbody.innerHTML = rows
-        .filter(u =>
-          (!f) ||
-          (u.name && u.name.toLowerCase().includes(f)) ||
-          (u.email && u.email.toLowerCase().includes(f))
-        )
-        .map((u, i) => {
-          const img = resolvePhoto(u);
-          // role badge (from rolesMap)
-          const roleBadge = renderRoleBadgeForUser(u);
+function renderRoleBadge(user){
+  const rid=user.roleId;const r=rolesMap[rid];
+  if(!r)return`<span class="role-pill" style="background:var(--sur3);color:var(--tx4);border:1px solid var(--bdr)">No role</span>`;
+  const color=r.color||"#6366f1";
+  if(r.style==="holo")return`<span class="role-pill" style="background:linear-gradient(90deg,rgba(255,211,107,.15),rgba(255,139,242,.15),rgba(141,160,255,.15));border:1px solid rgba(99,102,241,.2);color:var(--in2)">${esc(r.name)}</span>`;
+  if(r.style==="gradient")return`<span class="role-pill" style="background:linear-gradient(90deg,${esc(r.gradientFrom||color)},${esc(r.gradientTo||color)});color:#fff">${esc(r.name)}</span>`;
+  return`<span class="role-pill" style="background:${esc(color)}22;border:1px solid ${esc(color)}44;color:${esc(color)}">${esc(r.name)}</span>`;
+}
 
-          // dropdown options markup
-          const options = [
-            `<option value="">— No role —</option>`,
-            ...allRoles.map(r => `<option value="${escapeHTML(r.id)}"${r.id === (u.roleId||'') ? ' selected' : ''}>${escapeHTML(r.name)}</option>`)
-          ].join('');
+function renderUsers(rows){
+  document.getElementById("totalUsersN").textContent=rows.length;
+  document.getElementById("withRoleN").textContent=rows.filter(u=>u.roleId).length;
+  document.getElementById("noRoleN").textContent=rows.filter(u=>!u.roleId).length;
+  const q=(document.getElementById("searchInp").value||"").toLowerCase();
+  const filtered=rows.filter(u=>!q||(u.name||"").toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q));
+  const tbody=document.getElementById("usersTbody");tbody.innerHTML="";
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--tx4);font-family:var(--mono);font-size:12px">No users found</td></tr>`;return;
+  }
+  filtered.forEach((u,i)=>{
+    const img=u.photoURL||u.profileURL||"https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png";
+    const opts=allRoles.map(r=>`<option value="${esc(r.id)}"${r.id===(u.roleId||"")?" selected":""}>${esc(r.name)}</option>`).join("");
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="color:var(--tx4);font-family:var(--mono);font-size:11px">${i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:9px">
+        <img class="user-av-sm" src="${esc(img)}" onerror="this.src='${esc(img)}'" alt=""/>
+        <span style="font-weight:600;color:var(--tx2)">${esc(u.name||"—")}</span>
+      </div></td>
+      <td style="color:var(--tx4);font-size:12px">${esc(u.email||"—")}</td>
+      <td>${renderRoleBadge(u)}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--in2)">${u.xp??0}</td>
+      <td><div class="assign-wrap">
+        <select class="role-sel" data-uid="${esc(u.id)}">
+          <option value="">— No role —</option>${opts}
+        </select>
+        <button class="assign-btn" data-uid="${esc(u.id)}">Assign</button>
+        <button class="view-btn" data-uid="${esc(u.id)}">View</button>
+      </div></td>`;
+    tbody.appendChild(tr);
+  });
+  attachTableHandlers();
+}
 
-          return `
-            <tr class="small border-b">
-              <td class="py-3 px-2">${i + 1}</td>
-
-              <td class="py-3 px-2">
-                <div class="flex items-center gap-3">
-                  <img src="${escapeHTML(img)}" class="w-10 h-10 rounded-full border object-cover">
-                  <div class="font-semibold">${escapeHTML(u.name || "—")}</div>
-                </div>
-              </td>
-
-              <td class="py-3 px-2">${escapeHTML(u.email || "—")}</td>
-
-              <td class="py-3 px-2">${roleBadge}</td>
-
-              <td class="py-3 px-2">${u.xp ?? 0}</td>
-
-              <td class="py-3 px-2 flex gap-2 items-center">
-                <select class="role-select" data-uid="${escapeHTML(u.id)}">
-                  ${options}
-                </select>
-                <button class="assign-btn" data-uid="${escapeHTML(u.id)}">Assign</button>
-                <button class="btn-view px-3 py-1 border rounded" data-uid="${escapeHTML(u.id)}">View</button>
-              </td>
-            </tr>
-          `;
-        })
-        .join("");
-
-      attachEventHandlers();
-    }
-
-    // attach handlers to the generated DOM
-    function attachEventHandlers() {
-      // Assign buttons
-      document.querySelectorAll(".assign-btn").forEach(btn => {
-        btn.onclick = async () => {
-          const uid = btn.dataset.uid;
-          const sel = document.querySelector(`select.role-select[data-uid="${uid}"]`);
-          const chosenRoleId = sel?.value || null;
-          await assignRoleToUser(uid, chosenRoleId);
-        };
-      });
-
-      // View buttons
-      document.querySelectorAll(".btn-view").forEach(btn => {
-        btn.onclick = () => openModal(btn.dataset.uid);
-      });
-
-      // Enter-to-search already bound below
-    }
-
-    async function assignRoleToUser(uid, roleId) {
-      const displayName = (currentRows.find(r => r.id === uid)?.name) || uid;
-      const label = roleId ? (rolesMap[roleId]?.name || roleId) : 'No role';
-      const ok = await Swal.fire({
-        title: `Assign ${label}?`,
-        text: `Set role for ${displayName} → ${label}`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, assign',
-        confirmButtonColor: '#7c3aed'
-      });
-      if (!ok.isConfirmed) return;
-
-      try {
-        const userRef = doc(db, "users", uid);
-        // store only roleId (your chosen option A)
-        await updateDoc(userRef, {
-          roleId: roleId || null,
-          updatedAt: serverTimestamp()
-        });
-        Swal.fire('Done', `Assigned role: ${label}`, 'success');
-      } catch (err) {
-        console.error("Assign failed:", err);
-        Swal.fire('Error', 'Assign failed — check console', 'error');
-      }
-    }
-
-    async function openModal(uid) {
-      try {
-        const snap = await getDoc(doc(db, "users", uid));
-        const u = snap.exists() ? snap.data() : null;
-        if (!u) return Swal.fire('Not found', 'User doc missing', 'error');
-
-        const img = resolvePhoto(u);
-        // role display
-        const roleHtml = renderRoleBadgeForUser(u);
-
-        modalContent.innerHTML = `
-          <div class="flex gap-4 items-center">
-            <img src="${escapeHTML(img)}" class="w-16 h-16 rounded-full border object-cover">
-            <div>
-              <div class="font-bold text-lg">${escapeHTML(u.name)}</div>
-              <div class="text-sm text-gray-600">${escapeHTML(u.email)}</div>
-              <div class="mt-1">${roleHtml}</div>
-            </div>
-          </div>
-
-          <div class="mt-4 text-sm">
-            <p><strong>XP:</strong> ${u.xp ?? 0}</p>
-            <p><strong>Badges:</strong> ${(u.badges || []).join(", ")}</p>
-            <p><strong>UID:</strong> <span class="text-xs text-gray-500">${escapeHTML(uid)}</span></p>
-            <p><strong>RoleId:</strong> <span class="text-xs text-gray-500">${escapeHTML(u.roleId || '')}</span></p>
-          </div>
-
-          <div class="mt-4 flex gap-2">
-            <button id="modalAssignBtn" class="px-3 py-2 rounded bg-indigo-500 text-white">Assign role</button>
-            <button id="modalRemoveBtn" class="px-3 py-2 rounded border">Remove role</button>
-          </div>
-        `;
-
-        document.getElementById("modalAssignBtn").onclick = async () => {
-          // quick assign first role (open a small select)
-          const pick = await Swal.fire({
-            title: 'Select role to assign',
-            input: 'select',
-            inputOptions: Object.fromEntries(allRoles.map(r => [r.id, r.name])),
-            showCancelButton: true,
-            inputPlaceholder: 'Choose role'
-          });
-          if (!pick.isConfirmed) return;
-          await assignRoleToUser(uid, pick.value);
-          userModal.classList.add("hidden");
-          userModal.classList.remove("flex");
-        };
-
-        document.getElementById("modalRemoveBtn").onclick = async () => {
-          await assignRoleToUser(uid, null);
-          userModal.classList.add("hidden");
-          userModal.classList.remove("flex");
-        };
-
-        userModal.classList.remove("hidden");
-        userModal.classList.add("flex");
-      } catch (err) {
-        console.error("Open modal failed:", err);
-        Swal.fire('Error', 'Failed to open modal', 'error');
-      }
-    }
-
-    document.getElementById("closeModal").onclick = () => {
-      userModal.classList.add("hidden");
-      userModal.classList.remove("flex");
+function attachTableHandlers(){
+  document.querySelectorAll(".assign-btn").forEach(btn=>{
+    btn.onclick=async()=>{
+      const uid=btn.dataset.uid;
+      const sel=document.querySelector(`.role-sel[data-uid="${uid}"]`);
+      const roleId=sel?.value||null;
+      const roleName=roleId?(rolesMap[roleId]?.name||roleId):"No role";
+      if(!confirm(`Assign "${roleName}" to this user?`))return;
+      try{
+        await db.collection("users").doc(uid).update({roleId:roleId||null,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+        toast("Role assigned: "+roleName,"ok");
+      }catch(e){toast("Failed: "+e.message,"err")}
     };
+  });
+  document.querySelectorAll(".view-btn").forEach(btn=>{
+    btn.onclick=async()=>{
+      const uid=btn.dataset.uid;
+      const snap=await db.collection("users").doc(uid).get();
+      const u=snap.data();if(!u)return;
+      const img=u.photoURL||u.profileURL||"";
+      document.getElementById("userModalContent").innerHTML=`
+        <div style="display:flex;gap:14px;align-items:center;margin-bottom:18px">
+          <img src="${esc(img)}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--bdr)" onerror="this.style.display='none'"/>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--tx2)">${esc(u.name||"—")}</div>
+            <div style="font-size:12px;color:var(--tx4);margin-top:2px">${esc(u.email||"—")}</div>
+            <div style="margin-top:6px">${renderRoleBadge({...u,id:uid})}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--sur2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--tx4);margin-bottom:4px">XP</div>
+            <div style="font-family:var(--serif);font-size:22px;color:var(--in2)">${u.xp??0}</div>
+          </div>
+          <div style="background:var(--sur2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+            <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--tx4);margin-bottom:4px">Badges</div>
+            <div style="font-size:13px;color:var(--tx3)">${(u.badges||[]).length||"None"}</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;background:var(--sur2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--tx4);margin-bottom:6px">UID</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--tx3);word-break:break-all">${esc(uid)}</div>
+        </div>`;
+      document.getElementById("userModal").classList.add("show");
+    };
+  });
+}
 
-    // search handler
-    searchInput.oninput = () => renderUsers(currentRows);
+document.getElementById("userModalClose").onclick=()=>document.getElementById("userModal").classList.remove("show");
+document.getElementById("userModal").onclick=e=>{if(e.target===document.getElementById("userModal"))document.getElementById("userModal").classList.remove("show")};
+document.getElementById("searchInp").addEventListener("input",()=>renderUsers(allUsers));
+document.getElementById("refreshBtn").onclick=()=>loadRolesAndUsers();
 
-    // init: nothing to do — auth listener will trigger
-  </script>
-  <script type="module">
-  import { requirePermission } from "/admin/js/guard-v10.js";
-  await requirePermission("manageUsers"); // ONLY ADMINS & ROLES WITH manageUsers CAN ACCESS
+async function loadRolesAndUsers(){
+  const snap=await db.collection("organizations").doc("bcd").collection("roles").get();
+  rolesMap={};allRoles=[];
+  snap.forEach(d=>{const r={id:d.id,...d.data()};rolesMap[d.id]=r;allRoles.push(r)});
+  db.collection("users").orderBy("createdAt","desc").onSnapshot(snap=>{
+    allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderUsers(allUsers);
+  });
+}
+
+function onAdminReady(){loadRolesAndUsers()}
+
 </script>
 </body>
 </html>
