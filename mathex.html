@@ -6,12 +6,8 @@
 <title>MATHEX — Advanced Math Solver</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg: #03050a;--surface: #070c14;--card: #0a1120;--border: #162030;--border2: #1e3045;
-  --cyan: #00e5ff;--violet: #8b5cf6;--orange: #f97316;--text: #ddeeff;--muted: #3a5570;--muted2: #5a7a98;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
+:root{--bg:#03050a;--surface:#070c14;--card:#0a1120;--border:#162030;--border2:#1e3045;--cyan:#00e5ff;--violet:#8b5cf6;--orange:#f97316;--green:#22c55e;--text:#ddeeff;--muted:#3a5570;--muted2:#5a7a98;}
+*{box-sizing:border-box;margin:0;padding:0;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,229,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.022) 1px,transparent 1px);background-size:52px 52px;}
 .orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;}
@@ -26,13 +22,27 @@ header{text-align:center;margin-bottom:48px;}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,14vw,108px);letter-spacing:12px;background:linear-gradient(135deg,#00e5ff 0%,#2979ff 48%,#8b5cf6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;filter:drop-shadow(0 0 55px rgba(0,229,255,.28));animation:logopulse 4s ease-in-out infinite alternate;}
 @keyframes logopulse{from{filter:drop-shadow(0 0 30px rgba(0,229,255,.18));}to{filter:drop-shadow(0 0 70px rgba(0,229,255,.45));}}
 .sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-top:10px;}
-.rule{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px auto 0;max-width:360px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;}
+.rule{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px auto 0;max-width:400px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;}
 .rule::before,.rule::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border2));}
 .rule::after{background:linear-gradient(90deg,var(--border2),transparent);}
+
+/* THINKING BADGE */
+.thinking-badge{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+  background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(139,92,246,.08));
+  border:1px solid rgba(139,92,246,.3);border-radius:100px;
+  padding:7px 18px;font-family:'Space Mono',monospace;font-size:9px;
+  letter-spacing:3px;color:#a78bfa;text-transform:uppercase;
+  animation:badgeglow 3s ease-in-out infinite alternate;
+}
+@keyframes badgeglow{from{box-shadow:0 0 10px rgba(139,92,246,.1);}to{box-shadow:0 0 22px rgba(139,92,246,.3);}}
+.thinking-badge::before{content:'🧠';}
+
+/* KEY BANNER */
 #keyBanner{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:14px;padding:20px 22px;margin-bottom:18px;}
-.key-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .key-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .key-label::before{content:'';width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);}
+.key-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .key-input{flex:1;min-width:220px;background:rgba(0,0,0,.3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color .2s,box-shadow .2s;}
 .key-input:focus{border-color:rgba(0,229,255,.4);box-shadow:0 0 18px rgba(0,229,255,.1);}
 .key-input::placeholder{color:var(--muted);}
@@ -41,24 +51,47 @@ header{text-align:center;margin-bottom:48px;}
 .key-note{font-size:11.5px;color:var(--muted2);margin-top:8px;line-height:1.6;}
 .key-note a{color:var(--cyan);text-decoration:none;}
 .key-note a:hover{text-decoration:underline;}
-.key-saved-bar{display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px;color:#22c55e;letter-spacing:2px;margin-top:10px;}
+.key-saved-bar{display:none;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:2px;margin-top:10px;}
 .key-saved-bar.show{display:flex;}
-.dot-green{width:6px;height:6px;background:#22c55e;border-radius:50%;box-shadow:0 0 8px #22c55e;}
+.dot-green{width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);}
+
+/* MODEL SELECTOR */
+.model-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.model-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;width:100%;margin-bottom:4px;}
+.model-btn{
+  background:rgba(0,0,0,.2);border:1px solid var(--border2);
+  color:var(--muted2);font-family:'Space Mono',monospace;
+  padding:9px 14px;border-radius:10px;cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;gap:3px;align-items:flex-start;
+}
+.model-btn:hover{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.3);color:#a78bfa;}
+.model-btn.active{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.5);color:#a78bfa;box-shadow:0 0 18px rgba(139,92,246,.12);}
+.model-btn.recommended.active{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(139,92,246,.1));border-color:rgba(0,229,255,.4);color:var(--cyan);box-shadow:0 0 22px rgba(0,229,255,.12);}
+.model-btn.recommended:hover{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(139,92,246,.1));border-color:rgba(0,229,255,.3);color:var(--cyan);}
+.model-name{font-size:10px;font-weight:700;letter-spacing:1px;}
+.model-tag{font-size:8px;letter-spacing:2px;opacity:.65;}
+.model-star{font-size:8px;color:#fbbf24;letter-spacing:1px;}
+
+/* INPUT */
 .izone{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .3s,box-shadow .3s;}
 .izone:focus-within{border-color:rgba(0,229,255,.3);box-shadow:0 0 28px rgba(0,229,255,.08);}
 .field-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .field-label::before{content:'';width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);}
 textarea{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:16px;font-weight:300;line-height:1.75;resize:none;caret-color:var(--cyan);}
 textarea::placeholder{color:var(--muted);}
+
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
 .chip-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;width:100%;margin-bottom:2px;}
 .chip{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.07);color:var(--muted2);font-family:'Space Mono',monospace;font-size:10px;padding:5px 13px;border-radius:100px;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .chip:hover{background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.25);color:var(--cyan);}
+
 .solve-btn{width:100%;padding:17px;background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(41,121,255,.07));border:1px solid rgba(0,229,255,.22);border-radius:12px;color:var(--cyan);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:7px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
 .solve-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(41,121,255,.12));opacity:0;transition:opacity .3s;}
 .solve-btn:hover:not(:disabled)::after{opacity:1;}
 .solve-btn:hover:not(:disabled){box-shadow:0 0 44px rgba(0,229,255,.18);border-color:rgba(0,229,255,.5);transform:translateY(-1px);}
 .solve-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+
+/* LOADER */
 #loader{display:none;text-align:center;padding:50px;}
 #loader.on{display:block;}
 .spinner{width:54px;height:54px;margin:0 auto 20px;position:relative;}
@@ -68,8 +101,17 @@ textarea::placeholder{color:var(--muted);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .load-msg{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;animation:blink 1.5s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* THINKING PANEL */
+#thinkBox{display:none;margin-top:20px;background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:16px 20px;}
+#thinkBox.on{display:block;}
+.think-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;color:#a78bfa;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.think-label::before{content:'';width:5px;height:5px;background:#a78bfa;border-radius:50%;box-shadow:0 0 8px #a78bfa;animation:blink 1.2s ease-in-out infinite;}
+#thinkText{font-size:12px;line-height:1.7;color:var(--muted2);font-family:'Space Mono',monospace;max-height:160px;overflow-y:auto;white-space:pre-wrap;}
+
 #errBox{display:none;background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:16px 20px;color:var(--orange);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin-top:14px;line-height:1.8;white-space:pre-wrap;}
 #errBox.on{display:block;}
+
 #result{display:none;animation:fadeup .45s ease forwards;}
 #result.on{display:block;}
 @keyframes fadeup{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
@@ -77,30 +119,25 @@ textarea::placeholder{color:var(--muted);}
 .badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;padding:3px 11px;border-radius:100px;}
 .b-domain{background:rgba(0,229,255,.07);color:var(--cyan);border:1px solid rgba(0,229,255,.18);}
 .b-diff{background:rgba(139,92,246,.07);color:#a78bfa;border:1px solid rgba(139,92,246,.2);}
+.b-model{background:rgba(34,197,94,.07);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
 .sec{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;}
 .sec::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
 .sec.sol::before{background:linear-gradient(180deg,var(--cyan),transparent);}
 .sec.steps::before{background:linear-gradient(180deg,var(--violet),transparent);}
 .sec.insight::before{background:linear-gradient(180deg,var(--orange),transparent);}
 .sec-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;margin-bottom:16px;}
-.sec.sol .sec-title{color:var(--cyan);}
-.sec.steps .sec-title{color:#a78bfa;}
-.sec.insight .sec-title{color:var(--orange);}
+.sec.sol .sec-title{color:var(--cyan);}.sec.steps .sec-title{color:#a78bfa;}.sec.insight .sec-title{color:var(--orange);}
 .prose{font-size:14.5px;line-height:1.85;color:#aac8e0;}
-.prose strong{color:var(--text);}
-.prose em{color:#a78bfa;font-style:italic;}
+.prose strong{color:var(--text);}.prose em{color:#a78bfa;font-style:italic;}
 .prose code{font-family:'Space Mono',monospace;background:rgba(0,229,255,.07);padding:2px 7px;border-radius:4px;font-size:12.5px;color:var(--cyan);}
 .prose .math-block{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:10px;padding:14px 20px;margin:12px 0;text-align:center;font-size:15px;overflow-x:auto;}
-.prose p{margin-bottom:10px;}
-.prose ul,.prose ol{padding-left:20px;margin-bottom:10px;}
-.prose li{margin-bottom:5px;}
+.prose p{margin-bottom:10px;}.prose ul,.prose ol{padding-left:20px;margin-bottom:10px;}.prose li{margin-bottom:5px;}
 .prose blockquote{border-left:2px solid var(--violet);padding-left:14px;color:var(--muted2);font-style:italic;margin:10px 0;}
 .prose h3{font-family:'Space Mono',monospace;font-size:12px;color:var(--cyan);margin:18px 0 8px;letter-spacing:1px;}
 .step-row{display:flex;gap:13px;margin-bottom:14px;align-items:flex-start;}
 .step-num{flex-shrink:0;width:26px;height:26px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:#a78bfa;margin-top:2px;}
 .step-txt{font-size:14px;line-height:1.8;color:#aac8e0;}
-#history{margin-top:36px;display:none;}
-#history.on{display:block;}
+#history{margin-top:36px;display:none;}#history.on{display:block;}
 .hist-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
 .hist-item{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;cursor:pointer;transition:all .2s;}
 .hist-item:hover{border-color:rgba(0,229,255,.18);background:var(--card);}
@@ -114,8 +151,9 @@ textarea::placeholder{color:var(--muted);}
 <div class="wrap">
   <header>
     <div class="logo">MATHEX</div>
-    <div class="sub">Advanced Mathematical Intelligence · Powered by Gemini 2.0 Flash</div>
+    <div class="sub">Advanced Mathematical Intelligence · Powered by Gemini Thinking</div>
     <div class="rule">∞ · any problem · any domain · ∞</div>
+    <div class="thinking-badge">Gemini 2.0 Flash Thinking · Reasoning Model</div>
   </header>
 
   <div id="keyBanner">
@@ -134,9 +172,30 @@ textarea::placeholder{color:var(--muted);}
     </div>
   </div>
 
+  <div class="model-row">
+    <div class="model-lbl">Model →</div>
+    <button class="model-btn recommended active" onclick="setModel('gemini-2.0-flash-thinking-exp',this)">
+      <span class="model-name">2.0 FLASH THINKING</span>
+      <span class="model-star">★ BEST FOR MATH</span>
+      <span class="model-tag">REASONING · FREE</span>
+    </button>
+    <button class="model-btn" onclick="setModel('gemini-2.0-flash-lite',this)">
+      <span class="model-name">2.0 FLASH LITE</span>
+      <span class="model-tag">FASTEST · FREE</span>
+    </button>
+    <button class="model-btn" onclick="setModel('gemini-2.0-flash',this)">
+      <span class="model-name">2.0 FLASH</span>
+      <span class="model-tag">BALANCED · FREE</span>
+    </button>
+    <button class="model-btn" onclick="setModel('gemini-1.5-flash',this)">
+      <span class="model-name">1.5 FLASH</span>
+      <span class="model-tag">FALLBACK · FREE</span>
+    </button>
+  </div>
+
   <div class="izone">
     <div class="field-label">Enter Your Problem</div>
-    <textarea id="mathInput" rows="4" placeholder="Type any math problem, no matter how hard...&#10;e.g. Solve the Riemann Hypothesis, ∫e^(−x²)dx, Navier-Stokes equations, P vs NP, d/dx[x^x]..."></textarea>
+    <textarea id="mathInput" rows="4" placeholder="Type any math problem, no matter how hard...&#10;e.g. ∫e^(−x²)dx, Riemann Hypothesis, Navier-Stokes, P vs NP, d/dx[x^x]..."></textarea>
   </div>
 
   <div class="chips">
@@ -152,13 +211,21 @@ textarea::placeholder{color:var(--muted);}
   </div>
 
   <button class="solve-btn" id="solveBtn" onclick="solve()">SOLVE →</button>
-  <div id="loader"><div class="spinner"></div><div class="load-msg" id="loadMsg">Initialising...</div></div>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="load-msg" id="loadMsg">Initialising...</div>
+  </div>
+  <div id="thinkBox">
+    <div class="think-label">Thinking in progress...</div>
+    <div id="thinkText"></div>
+  </div>
   <div id="errBox"></div>
 
   <div id="result">
     <div class="res-head">
       <span class="badge b-domain" id="rDomain"></span>
       <span class="badge b-diff" id="rDiff"></span>
+      <span class="badge b-model" id="rModel"></span>
     </div>
     <div class="sec sol"><div class="sec-title">▸ Solution</div><div class="prose" id="rSolution"></div></div>
     <div class="sec steps" id="stepsCard"><div class="sec-title">▸ Step-by-Step</div><div id="rSteps"></div></div>
@@ -174,35 +241,55 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <script>
 let apiKey = localStorage.getItem('gemini_mathex_key') || '';
-function updateKeyUI() {
+let currentModel = 'gemini-2.0-flash-thinking-exp';
+
+function updateKeyUI(){
   document.getElementById('keyInput').value = apiKey;
   document.getElementById('keySavedBar').classList.toggle('show', !!apiKey);
 }
 updateKeyUI();
-function saveKey() {
+function saveKey(){
   const val = document.getElementById('keyInput').value.trim();
-  if (!val) return;
+  if(!val) return;
   apiKey = val;
   localStorage.setItem('gemini_mathex_key', val);
   updateKeyUI();
 }
-function clearKey() {
+function clearKey(){
   apiKey = '';
   document.getElementById('keyInput').value = '';
   localStorage.removeItem('gemini_mathex_key');
   updateKeyUI();
 }
+function setModel(model, btn){
+  currentModel = model;
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
 
-const MSGS=['Searching the mathematical cosmos...','Traversing axiom space...','Applying advanced theorems...','Crunching infinities...','Converging on the truth...','Evaluating limits and bounds...'];
+const MSGS = [
+  'Engaging reasoning engine...',
+  'Thinking deeply about your problem...',
+  'Traversing the proof space...',
+  'Applying advanced theorems...',
+  'Crunching infinities...',
+  'Verifying each step rigorously...',
+  'Converging on the truth...',
+];
 let loadTimer;
-function startLoader(){let i=0;document.getElementById('loadMsg').textContent=MSGS[0];loadTimer=setInterval(()=>{i=(i+1)%MSGS.length;document.getElementById('loadMsg').textContent=MSGS[i];},1800);}
-function stopLoader(){clearInterval(loadTimer);}
-function use(el){document.getElementById('mathInput').value=el.textContent;}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function startLoader(){
+  let i=0;
+  document.getElementById('loadMsg').textContent = MSGS[0];
+  loadTimer = setInterval(()=>{ i=(i+1)%MSGS.length; document.getElementById('loadMsg').textContent=MSGS[i]; }, 2000);
+}
+function stopLoader(){ clearInterval(loadTimer); }
+
+function use(el){ document.getElementById('mathInput').value = el.textContent; }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function renderMd(text){
-  if(!text)return'';
-  text=text
+  if(!text) return '';
+  text = text
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.*?)\*/g,'<em>$1</em>')
     .replace(/`([^`]+)`/g,'<code>$1</code>')
@@ -212,30 +299,30 @@ function renderMd(text){
     .replace(/^\s*>\s+(.+)$/gm,'<blockquote>$1</blockquote>')
     .replace(/\$\$([\s\S]+?)\$\$/g,'<div class="math-block">\\[$1\\]</div>')
     .replace(/\$([^\$\n]{1,120})\$/g,'\\($1\\)');
-  text=text.replace(/(<li>.*<\/li>\n?)+/gs,m=>`<ul>${m}</ul>`);
-  text='<p>'+text.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>')+'</p>';
-  text=text.replace(/<p>(\s*<(h3|ul|div|blockquote))/g,'$1');
-  text=text.replace(/<p>\s*<\/p>/g,'');
+  text = text.replace(/(<li>.*<\/li>\n?)+/gs, m=>`<ul>${m}</ul>`);
+  text = '<p>' + text.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+  text = text.replace(/<p>(\s*<(h3|ul|div|blockquote))/g,'$1');
+  text = text.replace(/<p>\s*<\/p>/g,'');
   return text;
 }
 
 function parseSteps(text){
-  if(!text)return[];
-  const lines=text.split('\n').filter(l=>l.trim());
-  const steps=[];let cur=null;
+  if(!text) return [];
+  const lines = text.split('\n').filter(l=>l.trim());
+  const steps = []; let cur = null;
   for(const line of lines){
-    const m=line.match(/^(\d+)[.)]\s+(.+)/);
-    if(m){if(cur)steps.push(cur);cur={n:m[1],t:m[2]};}
-    else if(cur)cur.t+=' '+line.trim();
+    const m = line.match(/^(\d+)[.)]\s+(.+)/);
+    if(m){ if(cur) steps.push(cur); cur={n:m[1],t:m[2]}; }
+    else if(cur) cur.t += ' ' + line.trim();
   }
-  if(cur)steps.push(cur);
-  return steps.length?steps:[{n:'1',t:text}];
+  if(cur) steps.push(cur);
+  return steps.length ? steps : [{n:'1',t:text}];
 }
 
-let history=[];
+let hist = [];
 function addHistory(q){
-  history=[q,...history.filter(x=>x!==q)].slice(0,6);
-  document.getElementById('histList').innerHTML=history.map(h=>`
+  hist = [q,...hist.filter(x=>x!==q)].slice(0,6);
+  document.getElementById('histList').innerHTML = hist.map(h=>`
     <div class="hist-item" onclick="document.getElementById('mathInput').value=this.querySelector('.hist-q').textContent;window.scrollTo({top:0,behavior:'smooth'})">
       <div class="hist-q">${esc(h)}</div><div class="hist-arr">→</div>
     </div>`).join('');
@@ -243,85 +330,129 @@ function addHistory(q){
 }
 
 async function solve(){
-  const q=document.getElementById('mathInput').value.trim();
-  if(!q)return;
-  if(!apiKey){alert('Please paste your Gemini API key first!');return;}
+  const q = document.getElementById('mathInput').value.trim();
+  if(!q) return;
+  if(!apiKey){ alert('Please paste your Gemini API key first!'); return; }
 
-  document.getElementById('solveBtn').disabled=true;
+  document.getElementById('solveBtn').disabled = true;
   document.getElementById('loader').classList.add('on');
   document.getElementById('result').classList.remove('on');
   document.getElementById('errBox').classList.remove('on');
+  document.getElementById('thinkBox').classList.remove('on');
+  document.getElementById('thinkText').textContent = '';
   startLoader();
 
-  const prompt=`You are MATHEX, an elite mathematics AI. Solve this problem with full rigour:\n\n"${q}"\n\nInstructions:\n- For UNSOLVED problems (Riemann Hypothesis, P vs NP, Collatz, etc.), clearly state they are open, explain what IS known, and summarise current approaches.\n- For any problem, provide the best possible answer with full mathematical detail.\n\nRespond ONLY with a raw JSON object (absolutely no markdown fences, no backticks, no preamble — start your response with { and end with }) with exactly these keys:\n{\n  "domain": "Mathematical domain",\n  "difficulty": "Elementary / Intermediate / Advanced / Research-Level / Open Problem",\n  "solution": "Full explanation. Use **bold**, $inline math$, $$display math$$.",\n  "steps": "Numbered steps, each on its own line: 1. ... 2. ... etc.",\n  "insights": "Historical context, related theorems, applications."\n}`;
+  const isThinking = currentModel.includes('thinking');
+
+  const prompt = isThinking
+    ? `You are MATHEX, an elite mathematics AI. Solve this problem with complete rigour:\n\n"${q}"\n\nFor UNSOLVED problems (Riemann Hypothesis, P vs NP, Collatz, etc.), clearly state they are open, explain what IS known, and summarise current approaches and partial results.\n\nAfter your reasoning, respond with a JSON object (no markdown fences) with exactly these keys:\n{\n  "domain": "Mathematical domain",\n  "difficulty": "Elementary / Intermediate / Advanced / Research-Level / Open Problem",\n  "solution": "Full explanation. Use **bold**, $inline math$, $$display math$$.",\n  "steps": "Numbered steps each on own line: 1. ... 2. ...",\n  "insights": "Historical context, related theorems, applications."\n}`
+    : `You are MATHEX, an elite mathematics AI. Solve this problem with full rigour:\n\n"${q}"\n\nFor UNSOLVED problems (Riemann Hypothesis, P vs NP, Collatz, etc.), clearly state they are open, explain what IS known, and summarise current approaches.\n\nRespond ONLY with a raw JSON object (no markdown fences, start with { end with }) with exactly these keys:\n{\n  "domain": "Mathematical domain",\n  "difficulty": "Elementary / Intermediate / Advanced / Research-Level / Open Problem",\n  "solution": "Full explanation. Use **bold**, $inline math$, $$display math$$.",\n  "steps": "Numbered steps each on own line: 1. ... 2. ...",\n  "insights": "Historical context, related theorems, applications."\n}`;
 
   try {
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-    const res=await fetch(url,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:[{parts:[{text:prompt}]}],
-        generationConfig:{temperature:0.2,maxOutputTokens:8192}
-      })
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(currentModel)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: isThinking ? 0.7 : 0.2, maxOutputTokens: 16384 }
+    };
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
     });
 
     if(!res.ok){
-      let errMsg=`HTTP ${res.status}`;
-      try{const e=await res.json();errMsg=e?.error?.message||errMsg;}catch(x){}
+      let errMsg = `HTTP ${res.status}`;
+      try{ const e = await res.json(); errMsg = e?.error?.message || errMsg; }catch(x){}
+      if(/quota/i.test(errMsg))
+        errMsg += '\n\n→ Quota exceeded for "' + currentModel + '". Switch to a different model above — each has its own free quota.';
+      else if(/API_KEY_INVALID|invalid.*key/i.test(errMsg))
+        errMsg += '\n\n→ Invalid API key. Copy fresh from aistudio.google.com';
       throw new Error(errMsg);
     }
 
-    const data=await res.json();
-    const rawText=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
-    if(!rawText)throw new Error('Empty response from Gemini. Please try again.');
+    const data = await res.json();
+    const parts = data.candidates?.[0]?.content?.parts || [];
 
-    // Aggressively strip any markdown fences
-    let cleaned=rawText.trim();
-    cleaned=cleaned.replace(/^```[\w]*\s*/,'').replace(/\s*```$/,'').trim();
+    // Separate thought parts from answer parts
+    let thoughtText = '';
+    let answerText = '';
+    for(const part of parts){
+      if(part.thought === true){
+        thoughtText += part.text || '';
+      } else {
+        answerText += part.text || '';
+      }
+    }
+
+    // Show thinking panel if we got thought content
+    if(thoughtText.trim()){
+      document.getElementById('thinkText').textContent = thoughtText.trim();
+      document.getElementById('thinkBox').classList.add('on');
+    }
+
+    // If no separate answer, the whole thing is the answer
+    if(!answerText.trim()) answerText = thoughtText;
+    if(!answerText.trim()) throw new Error('Empty response from Gemini. Please try again.');
+
+    // Extract JSON from answer
+    let cleaned = answerText.trim();
+    // Strip markdown fences
+    cleaned = cleaned.replace(/^```[\w]*\s*/,'').replace(/\s*```$/,'').trim();
+    // If thinking model mixed prose + JSON, extract just the JSON block
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if(jsonMatch) cleaned = jsonMatch[0];
 
     let parsed;
-    try{parsed=JSON.parse(cleaned);}
-    catch(e){parsed={domain:'Mathematics',difficulty:'Advanced',solution:rawText,steps:'',insights:''};}
+    try{ parsed = JSON.parse(cleaned); }
+    catch(e){ parsed = { domain:'Mathematics', difficulty:'Advanced', solution: answerText, steps:'', insights:'' }; }
 
     stopLoader();
     document.getElementById('loader').classList.remove('on');
-    document.getElementById('rDomain').textContent=parsed.domain||'Mathematics';
-    document.getElementById('rDiff').textContent=parsed.difficulty||'Advanced';
-    document.getElementById('rSolution').innerHTML=renderMd(parsed.solution||'');
 
-    const steps=parseSteps(parsed.steps||'');
-    const sc=document.getElementById('stepsCard');
-    if(steps.length&&parsed.steps&&parsed.steps.trim()){
-      document.getElementById('rSteps').innerHTML=steps.map(s=>`<div class="step-row"><div class="step-num">${s.n}</div><div class="step-txt prose">${renderMd(s.t)}</div></div>`).join('');
-      sc.style.display='block';
-    }else sc.style.display='none';
+    document.getElementById('rDomain').textContent = parsed.domain || 'Mathematics';
+    document.getElementById('rDiff').textContent = parsed.difficulty || 'Advanced';
+    document.getElementById('rModel').textContent = isThinking ? '🧠 Thinking' : currentModel.replace('gemini-','');
+    document.getElementById('rSolution').innerHTML = renderMd(parsed.solution || '');
 
-    const ic=document.getElementById('insightCard');
-    if(parsed.insights&&parsed.insights.trim()){
-      document.getElementById('rInsight').innerHTML=renderMd(parsed.insights);
-      ic.style.display='block';
-    }else ic.style.display='none';
+    const steps = parseSteps(parsed.steps || '');
+    const sc = document.getElementById('stepsCard');
+    if(steps.length && parsed.steps && parsed.steps.trim()){
+      document.getElementById('rSteps').innerHTML = steps.map(s=>`
+        <div class="step-row">
+          <div class="step-num">${s.n}</div>
+          <div class="step-txt prose">${renderMd(s.t)}</div>
+        </div>`).join('');
+      sc.style.display = 'block';
+    } else sc.style.display = 'none';
+
+    const ic = document.getElementById('insightCard');
+    if(parsed.insights && parsed.insights.trim()){
+      document.getElementById('rInsight').innerHTML = renderMd(parsed.insights);
+      ic.style.display = 'block';
+    } else ic.style.display = 'none';
 
     document.getElementById('result').classList.add('on');
-    if(window.MathJax?.typesetPromise)MathJax.typesetPromise([document.getElementById('result')]).catch(()=>{});
+    if(window.MathJax?.typesetPromise)
+      MathJax.typesetPromise([document.getElementById('result')]).catch(()=>{});
     addHistory(q);
 
-  }catch(err){
+  } catch(err){
     stopLoader();
     document.getElementById('loader').classList.remove('on');
-    let msg=err.message||'Something went wrong.';
-    if(/API_KEY_INVALID|invalid.*key|bad.*key/i.test(msg)||[400,401,403].some(c=>msg.includes(c)))
-      msg+='\\n\\n→ Your API key looks incorrect. Copy it fresh from aistudio.google.com → Get API Key.';
-    else if(/failed to fetch|networkerror|load failed/i.test(msg))
-      msg+='\\n\\n→ Could not reach Gemini. Check your internet connection.';
-    document.getElementById('errBox').textContent='⚠ '+msg;
+    let msg = err.message || 'Something went wrong.';
+    if(!/quota|key|http/i.test(msg) && /failed to fetch|networkerror|load failed/i.test(msg))
+      msg += '\n\n→ Open this file locally in your browser (double-click the .html file). It cannot run inside Claude\'s preview.';
+    document.getElementById('errBox').textContent = '⚠ ' + msg;
     document.getElementById('errBox').classList.add('on');
   }
-  document.getElementById('solveBtn').disabled=false;
+  document.getElementById('solveBtn').disabled = false;
 }
 
-document.getElementById('mathInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey)solve();});
+document.getElementById('mathInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.ctrlKey) solve();
+});
 </script>
 </body>
 </html>
