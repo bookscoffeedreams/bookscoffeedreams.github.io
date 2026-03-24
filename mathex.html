@@ -151,9 +151,9 @@ textarea::placeholder{color:var(--muted);}
 <div class="wrap">
   <header>
     <div class="logo">MATHEX</div>
-    <div class="sub">Advanced Mathematical Intelligence · Powered by Gemini Thinking</div>
+    <div class="sub">Advanced Mathematical Intelligence · Powered by Gemini 2.5 Flash Thinking</div>
     <div class="rule">∞ · any problem · any domain · ∞</div>
-    <div class="thinking-badge">Gemini 2.0 Flash Thinking · Reasoning Model</div>
+    <div class="thinking-badge">Gemini 2.5 Flash · Thinking Model</div>
   </header>
 
   <div id="keyBanner">
@@ -174,8 +174,8 @@ textarea::placeholder{color:var(--muted);}
 
   <div class="model-row">
     <div class="model-lbl">Model →</div>
-    <button class="model-btn recommended active" onclick="setModel('gemini-2.0-flash-thinking-exp',this)">
-      <span class="model-name">2.0 FLASH THINKING</span>
+    <button class="model-btn recommended active" onclick="setModel('gemini-2.5-flash-preview-04-17',this)">
+      <span class="model-name">2.5 FLASH PREVIEW</span>
       <span class="model-star">★ BEST FOR MATH</span>
       <span class="model-tag">REASONING · FREE</span>
     </button>
@@ -241,7 +241,7 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <script>
 let apiKey = localStorage.getItem('gemini_mathex_key') || '';
-let currentModel = 'gemini-2.0-flash-thinking-exp';
+let currentModel = 'gemini-2.5-flash-preview-04-17';
 
 function updateKeyUI(){
   document.getElementById('keyInput').value = apiKey;
