@@ -1,251 +1,481 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin • Payment Settings — BCD Courses</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Payment Editor · BCD Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
 
-  <!-- Tailwind + Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+:root{
+  --in:#6366f1;--in2:#818cf8;--in3:#a5b4fc;
+  --cy:#06b6d4;--cy2:#22d3ee;--cy3:#67e8f9;
+  --vi:#8b5cf6;--vi2:#a78bfa;
+  --red:#ef4444;--green:#10b981;--amber:#f59e0b;
+  --serif:"Instrument Serif",serif;--sans:"DM Sans",sans-serif;--mono:"IBM Plex Mono",monospace;
+  --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.4,0,.2,1);
+}
+[data-mode="dark"]{
+  --bg:#060709;--bg2:#09090f;
+  --sur:#0d0f18;--sur2:#111422;--sur3:#15182a;--sur4:#1a1e33;
+  --bdr:rgba(99,102,241,.11);--bdr2:rgba(99,102,241,.24);
+  --tx:#e2e8f0;--tx2:#cbd5e1;--tx3:#94a3b8;--tx4:#3d4d63;
+  --sh:0 4px 28px rgba(0,0,0,.85);--sh2:0 20px 64px rgba(0,0,0,.95);
+}
+[data-mode="light"]{
+  --bg:#eceef8;--bg2:#e3e6f5;
+  --sur:#ffffff;--sur2:#f4f5fc;--sur3:#eaecf8;--sur4:#dfe2f4;
+  --bdr:rgba(99,102,241,.1);--bdr2:rgba(99,102,241,.22);
+  --tx:#0f172a;--tx2:#1e293b;--tx3:#475569;--tx4:#94a3b8;
+  --sh:0 4px 20px rgba(15,23,42,.08);--sh2:0 16px 48px rgba(15,23,42,.12);
+}
 
-  <!-- SweetAlert -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;
+  display:flex;overflow-x:hidden;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+input,textarea,select{font-family:var(--sans)}
+img{display:block;max-width:100%}
 
-  <style>
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(to bottom right,#f3e8ff,#ede9fe); }
-    .card { background: white; border-radius: 14px; box-shadow: 0 10px 35px rgba(0,0,0,0.08); padding: 24px; }
-    .btn { padding: 10px 16px; border-radius: 10px; font-weight: 600; }
-    .input { padding: 12px; border-radius: 10px; border: 1px solid #ddd; width: 100%; }
-  </style>
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20h40M20 0v40' stroke='%236366f1' stroke-width='.18' stroke-opacity='.09'/%3E%3C/svg%3E");
+  background-size:40px 40px}
+.glow-1{position:fixed;width:55vw;height:55vw;top:-20%;left:-10%;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,.09),transparent 60%);
+  pointer-events:none;z-index:0;animation:gd 25s ease-in-out infinite alternate}
+.glow-2{position:fixed;width:40vw;height:40vw;bottom:-10%;right:-8%;border-radius:50%;
+  background:radial-gradient(circle,rgba(6,182,212,.06),transparent 60%);
+  pointer-events:none;z-index:0;animation:gd 32s ease-in-out infinite alternate-reverse}
+@keyframes gd{0%{transform:translate(0,0)}100%{transform:translate(4vw,3vh)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes scan{0%{background-position:0%}100%{background-position:200%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes gem-pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.5)}60%{box-shadow:0 0 0 8px rgba(99,102,241,0)}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SIDEBAR */
+.sb{position:fixed;top:0;left:0;bottom:0;width:230px;z-index:100;
+  background:var(--sur);border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(0,0,0,.5),1px 0 0 rgba(99,102,241,.08)}
+[data-mode="light"] .sb{box-shadow:0 0 30px rgba(15,23,42,.07),1px 0 0 rgba(99,102,241,.05)}
+.sb-logo{padding:20px 16px 16px;display:flex;align-items:center;gap:11px;position:relative}
+.sb-logo::after{content:"";position:absolute;bottom:0;left:16px;right:16px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.3),rgba(6,182,212,.3),transparent)}
+.sb-gem{width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#312e81,#4f46e5,#0891b2);
+  display:flex;align-items:center;justify-content:center;animation:gem-pulse 3s ease-in-out infinite;overflow:hidden;position:relative}
+.sb-gem::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 55%)}
+.sb-gem svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-brand-name{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--tx);line-height:1.15}
+.sb-brand-tag{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--tx4);margin-top:2px}
+.sb-scroll{flex:1;overflow-y:auto;padding:8px 8px 0}
+.sb-scroll::-webkit-scrollbar{width:0}
+.sb-grp{margin-bottom:4px}
+.sb-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--tx4);padding:10px 10px 3px}
+.sb-link{display:flex;align-items:center;gap:9px;padding:8.5px 10px;border-radius:9px;
+  font-size:13px;font-weight:500;color:var(--tx3);transition:all .15s;position:relative}
+.sb-link:hover{background:var(--sur2);color:var(--tx2)}
+.sb-link.active{background:linear-gradient(90deg,rgba(99,102,241,.14),rgba(99,102,241,.03) 70%,transparent);
+  color:var(--in2);border:1px solid rgba(99,102,241,.18)}
+.sb-link.active::before{content:"";position:absolute;left:-1px;top:28%;bottom:28%;width:2.5px;
+  border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--in2),var(--cy2))}
+.sb-link svg{width:15px;height:15px;flex-shrink:0;opacity:.8}
+.sb-link.active svg{opacity:1}
+.sb-badge{margin-left:auto;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:99px;
+  background:rgba(239,68,68,.14);color:#fca5a5;border:1px solid rgba(239,68,68,.22)}
+.sb-foot{padding:10px 8px;border-top:1px solid var(--bdr)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;
+  background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .18s}
+.sb-user:hover{border-color:var(--bdr2)}
+.sb-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(var(--sur2),var(--sur2)) padding-box,linear-gradient(135deg,var(--in2),var(--cy2)) border-box}
+.sb-u-name{font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-u-role{font-family:var(--mono);font-size:9px;color:var(--in2);margin-top:1px;letter-spacing:.05em}
+.sb-out{width:26px;height:26px;border-radius:7px;flex-shrink:0;
+  background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);
+  display:flex;align-items:center;justify-content:center;color:var(--red);transition:all .18s}
+.sb-out:hover{background:rgba(239,68,68,.2);transform:scale(1.1)}
+.sb-out svg{width:12px;height:12px}
+
+/* MAIN */
+.main{position:relative;z-index:2;flex:1;margin-left:230px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;background:rgba(6,7,9,.78);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50}
+[data-mode="light"] .topbar{background:rgba(236,238,248,.88)}
+.tb-l{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;color:var(--tx4)}
+.tb-cur{color:var(--tx3)}.tb-sep{opacity:.4}
+.tb-r{display:flex;align-items:center;gap:9px}
+.live-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;
+  background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.16);
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:#34d399}
+.l-dot{width:5px;height:5px;border-radius:50%;background:#34d399;animation:blink 2s infinite}
+.mode-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:99px;
+  background:var(--sur2);border:1px solid var(--bdr);font-family:var(--mono);
+  font-size:10px;color:var(--tx3);transition:all .18s}
+.mode-btn:hover{border-color:var(--bdr2);color:var(--in2)}
+.mode-btn svg{width:12px;height:12px}
+.i-sun,.i-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .i-sun{display:none}[data-mode="dark"] .i-moon{display:block}
+[data-mode="light"] .i-sun{display:block}[data-mode="light"] .i-moon{display:none}
+.page{flex:1;padding:26px 28px 64px}
+
+/* BLOCK */
+.block{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;overflow:hidden;box-shadow:var(--sh)}
+.block-stripe{height:2px;background:linear-gradient(90deg,#312e81,#6366f1,#06b6d4,transparent);opacity:.8}
+.block-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr);background:var(--sur2)}
+.bh-ico{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(99,102,241,.06));
+  border:1px solid rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;color:var(--in2)}
+.bh-ico svg{width:14px;height:14px}
+.bh-t{font-family:var(--serif);font-size:16px;color:var(--tx);letter-spacing:-.01em}
+.bh-sub{font-size:11px;color:var(--tx4);font-family:var(--mono);margin-top:1px}
+.block-body{padding:18px}
+
+/* FORMS */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+.inp{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
+  color:var(--tx);font-size:14px;outline:none;transition:all .2s}
+.inp::placeholder{color:var(--tx4)}
+.inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
+.inp.error{border-color:rgba(239,68,68,.5)}
+textarea.inp{resize:vertical;min-height:90px;line-height:1.6}
+select.inp{cursor:pointer;appearance:none}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;
+  background:linear-gradient(135deg,#3730a3,#6366f1);color:#fff;font-size:13px;font-weight:600;
+  transition:all .2s;box-shadow:0 4px 16px rgba(99,102,241,.3);position:relative;overflow:hidden}
+.btn-primary::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 55%)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.5)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary svg{width:14px;height:14px}
+.btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;
+  background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;font-weight:500;transition:all .2s}
+.btn-ghost:hover{border-color:var(--bdr2);color:var(--tx2);background:var(--sur3)}
+.btn-ghost svg{width:14px;height:14px}
+.btn-danger{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red);font-size:13px;font-weight:500;transition:all .2s}
+.btn-danger:hover{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.35)}
+.btn-danger svg{width:14px;height:14px}
+.btn-cy{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;
+  background:linear-gradient(135deg,#0e7490,#06b6d4);color:#fff;font-size:13px;font-weight:600;
+  transition:all .2s;box-shadow:0 4px 16px rgba(6,182,212,.3)}
+.btn-cy:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(6,182,212,.5)}
+.btn-cy svg{width:14px;height:14px}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:8px}
+
+/* CHIPS / BADGES */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase}
+.chip-in{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:var(--in2)}
+.chip-cy{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);color:var(--cy2)}
+.chip-gr{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#34d399}
+.chip-re{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171}
+.chip-am{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fcd34d}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--sur);border:1px solid var(--bdr2);border-radius:18px;
+  width:100%;max-width:600px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 32px 80px rgba(0,0,0,.8);animation:fade-up .3s var(--spring) both}
+.modal-stripe{height:2px;background:linear-gradient(90deg,#312e81,#6366f1,#06b6d4,transparent)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--bdr)}
+.modal-title{font-family:var(--serif);font-size:20px;color:var(--tx);letter-spacing:-.01em}
+.modal-close{width:30px;height:30px;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .18s}
+.modal-close:hover{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2);color:var(--red)}
+.modal-close svg{width:14px;height:14px}
+.modal-body{padding:22px}
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:9px;
+  padding:14px 22px;border-top:1px solid var(--bdr)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tx4);padding:10px 14px;text-align:left;border-bottom:1px solid var(--bdr)}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--bdr);font-size:13px;color:var(--tx3);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:background .15s}
+.tbl tbody tr:hover{background:var(--sur2)}
+
+/* SEARCH */
+.search-wrap{position:relative;flex:1}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;color:var(--tx4);pointer-events:none}
+.search-inp{width:100%;padding:10px 14px 10px 38px;background:var(--sur);border:1px solid var(--bdr);
+  border-radius:10px;color:var(--tx);font-size:13px;outline:none;transition:all .2s}
+.search-inp::placeholder{color:var(--tx4)}
+.search-inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
+
+/* SKELETON */
+.sk{background:var(--sur2);border-radius:8px;position:relative;overflow:hidden}
+.sk::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.05),transparent);
+  animation:shimmer 2s ease-in-out infinite}
+
+/* SECTION LABEL */
+.sec-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--tx4);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;
+  padding:11px 18px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);
+  z-index:999;opacity:0;transition:all .3s var(--spring);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok .t-ico{color:var(--green)}.toast.err .t-ico{color:var(--red)}
+.t-ico svg{width:14px;height:14px}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:56px 20px;color:var(--tx4)}
+.empty-icon{font-size:40px;margin-bottom:14px;opacity:.5}
+.empty-title{font-family:var(--serif);font-size:20px;color:var(--tx3);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+/* GRID 2-3 COL */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:4px}
+.tab-btn{flex:1;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;
+  color:var(--tx4);transition:all .18s;text-align:center}
+.tab-btn:hover{color:var(--tx3)}
+.tab-btn.active{background:var(--sur);color:var(--in2);box-shadow:var(--sh);border:1px solid var(--bdr)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* RESPONSIVE */
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:700px){.sb{transform:translateX(-100%)}.main{margin-left:0}.page{padding:16px 14px 48px}}
+
+
+</style>
 </head>
-
-<body class="min-h-screen p-6 overflow-y-auto">
-
-  <div class="max-w-3xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-500">
-        Course Payment Settings
-      </h1>
-      <a href="admin-manage-courses.html" class="btn bg-white border">← Back</a>
+<body>
+<div class="glow-1"></div><div class="glow-2"></div>
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-gem"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div><div class="sb-brand-name">BCD Admin</div><div class="sb-brand-tag">Control Panel</div></div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-grp">
+      <div class="sb-lbl">Navigation</div>
+      <a class="sb-link " href="/admin/admin-dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a class="sb-link " href="/admin/users/admin-users.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users</a>
+      <a class="sb-link active" href="/admin/courses/admin-courses.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Courses</a>
+      <a class="sb-link " href="/admin/blogs/admin-blogs.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Blogs</a>
+      <a class="sb-link " href="/admin/content/admin-content.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Content</a>
+      <a class="sb-link " href="/admin/roles/admin-roles.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Roles</a>
     </div>
+    <div class="sb-grp">
+      <div class="sb-lbl">Staff</div>
+      <a class="sb-link " href="/admin/staff/bio.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
+      <a class="sb-link" href="/staffApplications.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Applications</a>
+    </div>
+    <div class="sb-grp">
+      <div class="sb-lbl">Go to</div>
+      <a class="sb-link" href="/index.html" target="_blank"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Live Site</a>
+      <a class="sb-link" href="/dashboard.html"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>User Dashboard</a>
+    </div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="location.href='/profile.html'">
+      <img class="sb-av" id="sbAv" src="" alt=""/>
+      <div style="flex:1;min-width:0"><div class="sb-u-name" id="sbName">Loading…</div><div class="sb-u-role" id="sbRole">—</div></div>
+      <button class="sb-out" id="logoutBtn" title="Sign out"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+    </div>
+  </div>
+</aside>
+<div class="main">
+<div class="topbar">
+  <div class="tb-l">
+    <span>BCD</span><span class="tb-sep">/</span>
+    <span>Admin</span><span class="tb-sep">/</span>
+    <span class="tb-cur">Payment Editor</span>
+  </div>
+  <div class="tb-r">
+    <div class="live-pill"><span class="l-dot"></span>LIVE</div>
+    <button class="mode-btn" id="modeBtn">
+      <span class="i-sun"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+      <span class="i-moon"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+      <span id="modeLabel">Light</span>
+    </button>
+  </div>
+</div>
+<div class="page">
 
-    <div class="card space-y-6">
+<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:fade-up .5s var(--spring) .03s both">
+  <a class="btn-ghost btn-sm" id="backLink" href="/admin/courses/admin-courses.html">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Back
+  </a>
+  <div style="flex:1">
+    <div style="font-family:var(--serif);font-size:22px;letter-spacing:-.02em;color:var(--tx)">Payment <em style="font-style:italic;background:linear-gradient(90deg,var(--in2),var(--cy2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Editor</em></div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:3px" id="courseIdDisplay">Loading…</div>
+  </div>
+  <button class="btn-primary" id="savePayBtn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save
+  </button>
+</div>
 
-      <h2 id="courseTitle" class="text-2xl font-bold">Loading...</h2>
-      <p id="courseDescription" class="text-gray-600"></p>
-
-      <hr>
-
-      <div>
-        <label class="font-semibold">Paid course?</label>
-        <select id="isPaid" class="input mt-1">
-          <option value="false">Free Course</option>
-          <option value="true">Paid Course</option>
-        </select>
+<div style="max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:16px;animation:fade-up .5s var(--spring) .05s both">
+  <div class="block">
+    <div class="block-stripe"></div>
+    <div class="block-head"><div class="bh-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="bh-t">Pricing</div><div class="bh-sub">Set course price and payment type</div></div></div>
+    <div class="block-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="field"><label class="field-label">Price (₹) *</label><input class="inp" type="number" id="price" min="0" placeholder="0"/></div>
+      <div class="field"><label class="field-label">Course Type</label>
+        <select class="inp" id="isPaid"><option value="false">Free</option><option value="true">Paid (Razorpay)</option></select>
       </div>
-
-      <div>
-        <label class="font-semibold">Course Price (INR)</label>
-        <input id="coursePrice" type="number" class="input mt-1" placeholder="Enter price e.g. 499" />
-      </div>
-
-      <div>
-        <label class="font-semibold">Payment Description</label>
-        <input id="paymentDesc" class="input mt-1" placeholder="Appears in Razorpay checkout" />
-      </div>
-
-      <hr>
-
-      <div class="space-y-3">
-        <button id="saveBtn" class="btn bg-gradient-to-r from-purple-600 to-indigo-600 text-white w-full">
-          Save Payment Settings
-        </button>
-
-        <button id="testBtn" class="btn bg-white border w-full">
-          🔥 Test Razorpay Payment
-        </button>
-      </div>
-
+      <div class="field"><label class="field-label">Original Price (₹) — for strikethrough</label><input class="inp" type="number" id="originalPrice" min="0" placeholder="e.g. 4999"/></div>
+      <div class="field"><label class="field-label">Discount %</label><input class="inp" type="number" id="discount" min="0" max="100" placeholder="0"/></div>
     </div>
   </div>
 
-  <!-- Firebase + Razorpay Logic -->
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { 
-    getFirestore, doc, getDoc, updateDoc, serverTimestamp 
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <div class="block">
+    <div class="block-stripe"></div>
+    <div class="block-head"><div class="bh-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div><div class="bh-t">Razorpay Config</div><div class="bh-sub">Payment gateway settings</div></div></div>
+    <div class="block-body" style="display:flex;flex-direction:column;gap:14px">
+      <div class="field"><label class="field-label">Razorpay Plan ID (for subscriptions)</label><input class="inp" id="razorpayPlanId" placeholder="plan_xxxx…"/></div>
+      <div class="field"><label class="field-label">Payment Description</label><input class="inp" id="paymentDesc" placeholder="Shown on Razorpay checkout…"/></div>
+      <div style="padding:13px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:10px">
+        <div style="font-size:12px;color:var(--tx4)">Payment worker: <strong style="color:var(--cy2)">bcd-razorpay-worker.anshumanbahekar-iitb.workers.dev</strong><br/>Purchases are saved to <strong style="color:var(--cy2)">purchases</strong> collection after verification.</div>
+      </div>
+    </div>
+  </div>
 
-  import { requirePermission } from "/admin/guard-v10.js";
+  <div class="block">
+    <div class="block-stripe"></div>
+    <div class="block-head"><div class="bh-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="bh-t">What's Included</div><div class="bh-sub">Features shown on the course detail page</div></div></div>
+    <div class="block-body">
+      <div id="featuresList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px"></div>
+      <button class="btn-ghost btn-sm" id="addFeatureBtn">+ Add Feature</button>
+    </div>
+  </div>
+</div>
 
-  /* ------------------------------
-       FIREBASE INIT
-  --------------------------------*/
-  const firebaseConfig = {
-    apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-    authDomain: "bcd-discord.firebaseapp.com",
-    projectId: "bcd-discord",
-    storageBucket: "bcd-discord.appspot.com",
-    messagingSenderId: "278895155371",
-    appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
-  };
+</div>
+</div>
+<div class="toast" id="adminToast">
+  <span class="t-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg"></span>
+</div>
+<script>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+// Mode toggle
+const H=document.documentElement;
+const sv=localStorage.getItem('bcd-admin-mode')||'dark';
+H.setAttribute('data-mode',sv);
+function updM(){const btn=document.getElementById('modeBtn');if(btn)btn.querySelector('#modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+updM();
+document.getElementById('modeBtn')?.addEventListener('click',()=>{
+  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode',n);localStorage.setItem('bcd-admin-mode',n);updM();
+});
 
-  /* ------------------------------
-       PERMISSION GUARD (NEW SYSTEM)
-       Requires: manageCourses
-  --------------------------------*/
-  const { user, role } = await requirePermission("manageCourses");
+// Toast
+let toastT;
+function toast(msg,type='ok'){
+  const t=document.getElementById('adminToast');
+  if(!t)return;
+  t.querySelector('#toastMsg').textContent=msg;
+  t.className='toast '+type;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),3500);
+}
 
-  /* ------------------------------
-       GET COURSE ID
-  --------------------------------*/
-  const params = new URLSearchParams(window.location.search);
-  const courseId = params.get("id");
+// Sidebar init
+firebase.initializeApp({apiKey:'AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A',authDomain:'bcd-discord.firebaseapp.com',projectId:'bcd-discord',storageBucket:'bcd-discord.appspot.com',messagingSenderId:'278895155371',appId:'1:278895155371:web:177a468f5fa3f0abfe3fee'});
+const auth=firebase.auth(),db=firebase.firestore();
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
 
-  if (!courseId) {
-    Swal.fire("Missing ID", "Course ID is not in URL (?id=...)", "error");
-    throw new Error("Missing course ID");
-  }
+auth.onAuthStateChanged(async user=>{
+  if(!user){location.href='/login.html';return}
+  const us=await db.collection('users').doc(user.uid).get();
+  const ud=us.exists?us.data():{};
+  let perms={},rname='Staff';
+  if(ud.roleId){try{const rs=await db.collection('organizations').doc('bcd').collection('roles').doc(ud.roleId).get();if(rs.exists){perms=rs.data().permissions||{};rname=rs.data().name||'Staff'}}catch(e){}}
+  if(ud.role==='admin')perms.admin=true;
+  if(!perms.admin&&!Object.values(perms).some(v=>v===true)){alert('Access denied.');location.href='/index.html';return}
+  
+  const photo=ud.photoURL||ud.profileURL||user.photoURL||DEF_AV;
+  const sbAv=document.getElementById('sbAv');
+  if(sbAv){sbAv.src=photo;sbAv.onerror=()=>sbAv.src=DEF_AV}
+  const sbName=document.getElementById('sbName');if(sbName)sbName.textContent=ud.name||user.displayName||'Admin';
+  const sbRole=document.getElementById('sbRole');if(sbRole)sbRole.textContent=rname;
+  document.getElementById('logoutBtn')?.addEventListener('click',e=>{e.stopPropagation();auth.signOut().then(()=>location.href='/login.html')});
+  
+  if(typeof onAdminReady==='function') onAdminReady(user,ud,perms,rname);
+});
 
-  /* ------------------------------
-       DOM ELEMENTS
-  --------------------------------*/
-  const titleEl = document.getElementById("courseTitle");
-  const descEl = document.getElementById("courseDescription");
-  const isPaidEl = document.getElementById("isPaid");
-  const priceEl = document.getElementById("coursePrice");
-  const paymentDescEl = document.getElementById("paymentDesc");
+function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
+function ago(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-  /* ------------------------------
-       LOAD COURSE DATA
-  --------------------------------*/
-  async function loadCourse() {
-    const snap = await getDoc(doc(db, "courses", courseId));
 
-    if (!snap.exists()) {
-      Swal.fire("Not found", "Course does not exist.", "error");
-      return;
-    }
+let courseId=null;
+function getParam(k){return new URL(location.href).searchParams.get(k)}
 
-    const c = snap.data();
+function addFeatureRow(v=""){
+  const row=document.createElement("div");row.style.cssText="display:flex;gap:8px;align-items:center";
+  row.innerHTML=`<input class="inp feature-inp" style="flex:1" placeholder="e.g. Lifetime access" value="${esc(v)}"/><button class="btn-danger btn-sm" onclick="this.closest('div').remove()">✕</button>`;
+  document.getElementById("featuresList").appendChild(row);
+}
+document.getElementById("addFeatureBtn").onclick=()=>addFeatureRow();
 
-    titleEl.textContent = c.title;
-    descEl.textContent = c.description || "";
+async function loadPayment(id){
+  const snap=await db.collection("courses").doc(id).get();
+  if(!snap.exists){toast("Not found","err");return}
+  const d=snap.data();
+  document.getElementById("courseIdDisplay").textContent=d.title||id;
+  document.getElementById("backLink").href="/admin/courses/admin-courses-editor.html?id="+id;
+  document.getElementById("price").value=d.price??0;
+  document.getElementById("isPaid").value=String(d.isPaid||false);
+  document.getElementById("originalPrice").value=d.originalPrice??0;
+  document.getElementById("discount").value=d.discount??0;
+  document.getElementById("razorpayPlanId").value=d.razorpayPlanId||"";
+  document.getElementById("paymentDesc").value=d.paymentDesc||"";
+  (d.features||[]).forEach(f=>addFeatureRow(f));
+}
 
-    isPaidEl.value = c.isPaid ? "true" : "false";
-    priceEl.value = c.price ?? "";
-    paymentDescEl.value = c.paymentDescription ?? "";
-  }
-
-  await loadCourse();
-
-  /* ------------------------------
-       SAVE PAYMENT SETTINGS
-  --------------------------------*/
-  document.getElementById("saveBtn").onclick = async () => {
-    const isPaid = isPaidEl.value === "true";
-    const price = Number(priceEl.value);
-
-    if (isPaid && (!price || price <= 0)) {
-      Swal.fire("Invalid price", "Paid course must have a valid price.", "warning");
-      return;
-    }
-
-    await updateDoc(doc(db, "courses", courseId), {
-      isPaid,
-      price,
-      paymentDescription: paymentDescEl.value.trim(),
-      paymentUpdatedAt: serverTimestamp()
+document.getElementById("savePayBtn").onclick=async()=>{
+  const btn=document.getElementById("savePayBtn");btn.disabled=true;
+  try{
+    const features=[...document.querySelectorAll(".feature-inp")].map(i=>i.value.trim()).filter(Boolean);
+    await db.collection("courses").doc(courseId).update({
+      price:Number(document.getElementById("price").value)||0,
+      isPaid:document.getElementById("isPaid").value==="true",
+      originalPrice:Number(document.getElementById("originalPrice").value)||0,
+      discount:Number(document.getElementById("discount").value)||0,
+      razorpayPlanId:document.getElementById("razorpayPlanId").value.trim(),
+      paymentDesc:document.getElementById("paymentDesc").value.trim(),
+      features,updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     });
+    toast("Payment settings saved!","ok");
+  }catch(e){toast("Error: "+e.message,"err")}
+  btn.disabled=false;
+};
 
-    Swal.fire("Saved", "Payment settings updated!", "success");
-  };
-
-  /* ------------------------------
-       RAZORPAY TEST PAYMENT
-  --------------------------------*/
-  const WORKER_URL = "https://bcd-razorpay-worker.anshumanbahekar-iitb.workers.dev";
-
-  document.getElementById("testBtn").onclick = async () => {
-    const price = Number(priceEl.value);
-
-    if (!price || price <= 0) {
-      Swal.fire("Invalid Price", "Enter valid amount before testing.", "warning");
-      return;
-    }
-
-    Swal.fire({ title: "Creating order...", allowOutsideClick: false });
-    Swal.showLoading();
-
-    // Create order via Cloudflare Worker
-    const orderRes = await fetch(`${WORKER_URL}/createOrder`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: price })
-    });
-
-    const order = await orderRes.json();
-    if (!order.id) {
-      Swal.fire("Error", "Failed to create Razorpay order.", "error");
-      return;
-    }
-
-    Swal.close();
-
-    // Fetch Razorpay key
-    const keyRes = await fetch(`${WORKER_URL}/getKey`);
-    const keyJson = await keyRes.json();
-    const key = keyJson.key;
-
-    if (!key) {
-      Swal.fire("Error", "Failed to fetch Razorpay key.", "error");
-      return;
-    }
-
-    // Dynamically load Razorpay SDK
-    await new Promise(resolve => {
-      const s = document.createElement("script");
-      s.src = "https://checkout.razorpay.com/v1/checkout.js";
-      s.onload = resolve;
-      document.body.appendChild(s);
-    });
-
-    const options = {
-      key,
-      amount: order.amount,
-      currency: "INR",
-      name: "Books Coffee and Dreams",
-      description: paymentDescEl.value || "Test Payment",
-      order_id: order.id,
-      handler: async (response) => {
-        Swal.fire({ title: "Verifying...", allowOutsideClick: false });
-        Swal.showLoading();
-
-        const verifyRes = await fetch(`${WORKER_URL}/verifyPayment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(response)
-        });
-
-        const verifyJson = await verifyRes.json();
-
-        if (verifyJson.verified) {
-          Swal.fire("Success", "Payment verified successfully!", "success");
-        } else {
-          Swal.fire("Failed", "Payment verification failed!", "error");
-        }
-      }
-    };
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-  };
+function onAdminReady(){courseId=getParam("id");if(courseId)loadPayment(courseId)}
 
 </script>
-
 </body>
 </html>
