@@ -266,19 +266,30 @@ select.inp{cursor:pointer;appearance:none}
 @media(max-width:700px){.sb{transform:translateX(-100%)}.main{margin-left:0}.page{padding:16px 14px 48px}}
 
 
-.content-item{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);transition:all .2s;display:flex;align-items:center;gap:0}
+.content-item{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:var(--sh);transition:all .2s;display:flex;align-items:center;gap:0;cursor:grab}
+.content-item:active{cursor:grabbing}
 .content-item::before{content:"";display:block;width:3px;flex-shrink:0;background:linear-gradient(180deg,var(--in),var(--cy));opacity:.5}
 .content-item:hover{border-color:var(--bdr2)}
 .content-item:hover::before{opacity:1}
-.content-item-body{flex:1;padding:12px 16px}
+.content-item.sortable-ghost{opacity:.4}
+.content-item.sortable-chosen{box-shadow:var(--sh2)}
+.content-item-body{flex:1;padding:11px 14px}
 .content-item-title{font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:3px}
-.content-item-sub{font-size:12px;color:var(--tx4)}
-.content-item-actions{display:flex;gap:5px;padding:0 14px;flex-shrink:0}
-.c-card{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:16px;box-shadow:var(--sh);transition:all .2s}
+.content-item-sub{font-size:11px;color:var(--tx4)}
+.content-item-actions{display:flex;gap:5px;padding:0 12px;flex-shrink:0}
+.c-card{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:16px;box-shadow:var(--sh);transition:all .2s;position:relative;overflow:hidden}
 .c-card::before{content:"";display:block;height:2px;background:linear-gradient(90deg,var(--in),var(--cy),transparent);margin-bottom:12px;opacity:.7}
 .c-card:hover{border-color:var(--bdr2)}
+.icon-tile{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .18s;cursor:default}
+.icon-tile:hover{border-color:var(--bdr2)}
+.icon-tile img{width:40px;height:40px;object-fit:contain;border-radius:6px}
+.icon-tile-name{font-family:var(--mono);font-size:9px;color:var(--tx4);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:72px}
+.icon-tile-del{font-size:9px;color:var(--red);cursor:pointer;opacity:.7}
+.icon-tile-del:hover{opacity:1}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 </head>
 <body>
 <div class="glow-1"></div><div class="glow-2"></div>
@@ -336,7 +347,7 @@ select.inp{cursor:pointer;appearance:none}
 
 <div style="margin-bottom:20px;animation:fade-up .5s var(--spring) .03s both">
   <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.02em;color:var(--tx)">Manage <em style="font-style:italic;background:linear-gradient(90deg,var(--in2),var(--cy2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Content</em></div>
-  <div style="font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:4px">Banners, services, testimonials and homepage sections</div>
+  <div style="font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:4px">Banners, services, testimonials, announcements and subject/chapter icons</div>
 </div>
 
 <div class="tab-bar" style="margin-bottom:18px;animation:fade-up .5s var(--spring) .05s both">
@@ -344,24 +355,22 @@ select.inp{cursor:pointer;appearance:none}
   <button class="tab-btn" onclick="switchContentTab('services',this)">Services</button>
   <button class="tab-btn" onclick="switchContentTab('testimonials',this)">Testimonials</button>
   <button class="tab-btn" onclick="switchContentTab('announcements',this)">Announcements</button>
+  <button class="tab-btn" onclick="switchContentTab('icons',this)">Icons</button>
 </div>
 
 <!-- BANNERS -->
-<div id="tab-banners" class="tab-panel active" style="animation:fade-up .4s var(--spring) both">
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="btn-primary" onclick="openContentModal('banner')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Banner
-    </button>
+<div id="tab-banners" class="tab-panel active">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--tx4)">Drag to reorder</div>
+    <button class="btn-primary btn-sm" onclick="openContentModal('banner')">+ Add Banner</button>
   </div>
-  <div id="bannersList" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div id="bannersList" style="display:flex;flex-direction:column;gap:8px"></div>
 </div>
 
 <!-- SERVICES -->
 <div id="tab-services" class="tab-panel">
   <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="btn-primary" onclick="openContentModal('service')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Service
-    </button>
+    <button class="btn-primary btn-sm" onclick="openContentModal('service')">+ Add Service</button>
   </div>
   <div id="servicesList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"></div>
 </div>
@@ -369,9 +378,7 @@ select.inp{cursor:pointer;appearance:none}
 <!-- TESTIMONIALS -->
 <div id="tab-testimonials" class="tab-panel">
   <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="btn-primary" onclick="openContentModal('testimonial')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Testimonial
-    </button>
+    <button class="btn-primary btn-sm" onclick="openContentModal('testimonial')">+ Add Testimonial</button>
   </div>
   <div id="testimonialsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
 </div>
@@ -379,11 +386,56 @@ select.inp{cursor:pointer;appearance:none}
 <!-- ANNOUNCEMENTS -->
 <div id="tab-announcements" class="tab-panel">
   <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="btn-primary" onclick="openContentModal('announcement')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Announcement
-    </button>
+    <button class="btn-primary btn-sm" onclick="openContentModal('announcement')">+ Add Announcement</button>
   </div>
-  <div id="announcementsList" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div id="announcementsList" style="display:flex;flex-direction:column;gap:8px"></div>
+</div>
+
+<!-- ICONS -->
+<div id="tab-icons" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+    <!-- Subject Icons -->
+    <div class="block">
+      <div class="block-stripe"></div>
+      <div class="block-head">
+        <div class="bh-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <div><div class="bh-t">Subject Icons</div><div class="bh-sub">subject_icons collection</div></div>
+        <button class="btn-primary btn-sm" id="addSubjectIconBtn" style="margin-left:auto">+ Add</button>
+      </div>
+      <div class="block-body">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          <input class="inp" id="siName" placeholder="Subject name…"/>
+          <div style="display:flex;gap:8px">
+            <input class="inp" id="siUrl" placeholder="Icon URL…" style="flex:1"/>
+            <button class="btn-ghost btn-sm" id="siUploadBtn">Upload</button>
+          </div>
+        </div>
+        <div id="subjectIconsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px"></div>
+      </div>
+    </div>
+
+    <!-- Chapter Icons -->
+    <div class="block">
+      <div class="block-stripe"></div>
+      <div class="block-head">
+        <div class="bh-ico"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div>
+        <div><div class="bh-t">Chapter Icons</div><div class="bh-sub">chapter_icons collection</div></div>
+        <button class="btn-primary btn-sm" id="addChapterIconBtn" style="margin-left:auto">+ Add</button>
+      </div>
+      <div class="block-body">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          <input class="inp" id="ciName" placeholder="Chapter name…"/>
+          <div style="display:flex;gap:8px">
+            <input class="inp" id="ciUrl" placeholder="Icon URL…" style="flex:1"/>
+            <button class="btn-ghost btn-sm" id="ciUploadBtn">Upload</button>
+          </div>
+        </div>
+        <div id="chapterIconsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px"></div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- Generic content modal -->
@@ -463,26 +515,18 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 
 
 let contentEditId=null,contentType=null;
-
-function switchContentTab(tab,btn){
-  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("tab-"+tab).classList.add("active");
-  btn.classList.add("active");
-}
-
 const SCHEMAS={
   banner:{title:"Banner",col:"banners",fields:[
     {id:"imageUrl",label:"Image URL",type:"text",placeholder:"https://…"},
     {id:"link",label:"Link (optional)",type:"text",placeholder:"https://…"},
     {id:"title",label:"Caption",type:"text",placeholder:"Banner caption…"},
-    {id:"order",label:"Order",type:"number",placeholder:"1"}
+    {id:"order",label:"Order",type:"number",placeholder:"0"}
   ]},
   service:{title:"Service",col:"services",fields:[
     {id:"icon",label:"Icon Emoji",type:"text",placeholder:"📚"},
     {id:"title",label:"Title",type:"text",placeholder:"Service name…"},
     {id:"description",label:"Description",type:"textarea",placeholder:"Brief description…"},
-    {id:"order",label:"Order",type:"number",placeholder:"1"}
+    {id:"order",label:"Order",type:"number",placeholder:"0"}
   ]},
   testimonial:{title:"Testimonial",col:"testimonials",fields:[
     {id:"name",label:"Name",type:"text",placeholder:"Student name…"},
@@ -495,65 +539,85 @@ const SCHEMAS={
   ]}
 };
 
+function switchContentTab(tab,btn){
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+tab).classList.add("active");btn.classList.add("active");
+}
+
 function openContentModal(type,editData=null){
   contentType=type;contentEditId=editData?.id||null;
   const s=SCHEMAS[type];
   document.getElementById("contentModalTitle").textContent=(editData?"Edit ":"Add ")+s.title;
   document.getElementById("contentModalFields").innerHTML=s.fields.map(f=>`
-    <div class="field">
-      <label class="field-label">${f.label}</label>
-      ${f.type==="textarea"
-        ?`<textarea class="inp" id="cf_${f.id}" placeholder="${f.placeholder||""}">${esc(editData?.[f.id]||"")}</textarea>`
-        :`<input class="inp" type="${f.type}" id="cf_${f.id}" placeholder="${f.placeholder||""}" value="${esc(String(editData?.[f.id]||""))}">`
-      }
+    <div class="field"><label class="field-label">${f.label}</label>
+      ${f.type==="textarea"?`<textarea class="inp" id="cf_${f.id}">${esc(editData?.[f.id]||"")}</textarea>`
+        :`<input class="inp" type="${f.type}" id="cf_${f.id}" placeholder="${f.placeholder||""}" value="${esc(String(editData?.[f.id]||""))}">`}
     </div>`).join("");
+  // Cloudinary upload button for banners
+  if(type==="banner"){
+    document.getElementById("contentModalFields").insertAdjacentHTML("beforeend",
+      `<button class="btn-ghost btn-sm" id="bannerUploadBtn" type="button">Upload via Cloudinary</button>`);
+    document.getElementById("bannerUploadBtn").onclick=()=>{
+      if(typeof cloudinary==="undefined"){toast("Cloudinary not loaded","err");return}
+      const w=cloudinary.createUploadWidget({cloudName:"dkxuilgai",uploadPreset:"bcd_courses",sources:["local","url"],multiple:false,resourceType:"image"},(err,result)=>{
+        if(!err&&result&&result.event==="success"){document.getElementById("cf_imageUrl").value=result.info.secure_url;toast("Uploaded!","ok")}
+      });w.open();
+    };
+  }
   document.getElementById("contentModal").classList.add("show");
   document.getElementById("contentSaveBtn").onclick=()=>saveContentItem(type,editData?.id);
 }
-function closeContentModal(){document.getElementById("contentModal").classList.remove("show");contentEditId=null;contentType=null}
+function closeContentModal(){document.getElementById("contentModal").classList.remove("show")}
 
 async function saveContentItem(type,editId){
   const s=SCHEMAS[type];const btn=document.getElementById("contentSaveBtn");btn.disabled=true;
   try{
-    const data={};
-    s.fields.forEach(f=>{
-      let v=document.getElementById("cf_"+f.id)?.value||"";
-      if(f.type==="number")v=Number(v)||0;
-      data[f.id]=v;
-    });
-    data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+    const data={};s.fields.forEach(f=>{let v=document.getElementById("cf_"+f.id)?.value||"";if(f.type==="number")v=Number(v)||0;data[f.id]=v});
+    data.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
     if(editId)await db.collection(s.col).doc(editId).update(data);
     else await db.collection(s.col).add(data);
-    toast((editId?"Updated":"Added")+" "+s.title,"ok");
-    closeContentModal();
+    toast((editId?"Updated":"Added")+" "+s.title,"ok");closeContentModal();
   }catch(e){toast("Error: "+e.message,"err")}
   btn.disabled=false;
 }
-
-async function deleteContentItem(col,id,name){
-  if(!confirm("Delete \""+name+"\"?"))return;
+async function deleteContentItem(col,id){
+  if(!confirm("Delete?"))return;
   try{await db.collection(col).doc(id).delete();toast("Deleted","ok")}
   catch(e){toast("Error: "+e.message,"err")}
 }
 
+// BANNERS — with SortableJS drag reorder
 function renderBanners(docs){
   const el=document.getElementById("bannersList");el.innerHTML="";
   if(!docs.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🖼️</div><div class="empty-title">No banners</div></div>`;return}
   docs.forEach(d=>{
     const div=document.createElement("div");div.className="content-item";
-    div.innerHTML=`${d.imageUrl?`<img src="${esc(d.imageUrl)}" style="width:90px;height:54px;object-fit:cover;flex-shrink:0" alt=""/>`:``}
+    div.dataset.id=d.id;
+    div.innerHTML=`${d.imageUrl?`<img src="${esc(d.imageUrl)}" style="width:90px;height:54px;object-fit:cover;flex-shrink:0" alt=""/>`:""}
       <div class="content-item-body">
         <div class="content-item-title">${esc(d.title||d.imageUrl||"Banner")}</div>
         <div class="content-item-sub">${esc(d.link||"No link")} · Order ${d.order||0}</div>
       </div>
       <div class="content-item-actions">
-        <button class="act-btn edit" onclick='openContentModal("banner",{...${JSON.stringify(d).replace(/'/g,"&#39;")},id:"${d.id}"})'>
+        <button class="act-btn edit" onclick='openContentModal("banner",${JSON.stringify(d).replace(/'/g,"&#39;")})'>
           <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
-        <button class="act-btn del" onclick='deleteContentItem("banners","${d.id}","Banner")'><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <button class="act-btn del" onclick='deleteContentItem("banners","${d.id}")'>
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
       </div>`;
     el.appendChild(div);
   });
+  if(typeof Sortable!=="undefined"){
+    Sortable.create(el,{animation:150,ghostClass:"sortable-ghost",chosenClass:"sortable-chosen",
+      onEnd:async()=>{
+        const ids=[...el.querySelectorAll(".content-item")].map(c=>c.dataset.id);
+        try{const batch=db.batch();ids.forEach((id,i)=>{batch.update(db.collection("banners").doc(id),{order:i})});await batch.commit();toast("Order saved","ok")}
+        catch(e){toast("Error saving order","err")}
+      }
+    });
+  }
 }
 
 function renderServices(docs){
@@ -567,8 +631,8 @@ function renderServices(docs){
       </div>
       <div style="font-size:12px;color:var(--tx4);margin-bottom:12px">${esc(d.description||"")}</div>
       <div style="display:flex;gap:6px">
-        <button class="btn-ghost btn-sm" onclick='openContentModal("service",{...${JSON.stringify(d).replace(/'/g,"&#39;")},id:"${d.id}"})'>Edit</button>
-        <button class="btn-danger btn-sm" onclick='deleteContentItem("services","${d.id}","${esc(d.title||"Service")}")'>Delete</button>
+        <button class="btn-ghost btn-sm" onclick='openContentModal("service",${JSON.stringify(d).replace(/'/g,"&#39;")})'>Edit</button>
+        <button class="btn-danger btn-sm" onclick='deleteContentItem("services","${d.id}")'>Delete</button>
       </div>`;
     el.appendChild(div);
   });
@@ -583,8 +647,8 @@ function renderTestimonials(docs){
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div><div style="font-size:13px;font-weight:700;color:var(--tx2)">${esc(d.name||"—")}</div><div style="font-family:var(--mono);font-size:10px;color:var(--tx4)">${esc(d.country||"")}</div></div>
         <div style="display:flex;gap:6px">
-          <button class="btn-ghost btn-sm" onclick='openContentModal("testimonial",{...${JSON.stringify(d).replace(/'/g,"&#39;")},id:"${d.id}"})'>Edit</button>
-          <button class="btn-danger btn-sm" onclick='deleteContentItem("testimonials","${d.id}","Testimonial")'>Del</button>
+          <button class="btn-ghost btn-sm" onclick='openContentModal("testimonial",${JSON.stringify(d).replace(/'/g,"&#39;")})'>Edit</button>
+          <button class="btn-danger btn-sm" onclick='deleteContentItem("testimonials","${d.id}")'>Del</button>
         </div>
       </div>`;
     el.appendChild(div);
@@ -595,26 +659,63 @@ function renderAnnouncements(docs){
   const el=document.getElementById("announcementsList");el.innerHTML="";
   if(!docs.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📣</div><div class="empty-title">No announcements</div></div>`;return}
   docs.forEach(d=>{
-    const div=document.createElement("div");div.className="content-item";
+    const div=document.createElement("div");div.className="content-item";div.dataset.id=d.id;
     div.innerHTML=`<div class="content-item-body">
         <div class="content-item-title">${esc(d.title||"Announcement")}</div>
         <div class="content-item-sub">${esc((d.message||"").slice(0,80))}${(d.message||"").length>80?"…":""}</div>
       </div>
       <div class="content-item-actions">
-        <button class="act-btn edit" onclick='openContentModal("announcement",{...${JSON.stringify(d).replace(/'/g,"&#39;")},id:"${d.id}"})'>
+        <button class="act-btn edit" onclick='openContentModal("announcement",${JSON.stringify(d).replace(/'/g,"&#39;")})'>
           <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
-        <button class="act-btn del" onclick='deleteContentItem("announcements","${d.id}","Announcement")'><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <button class="act-btn del" onclick='deleteContentItem("announcements","${d.id}")'>
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
       </div>`;
     el.appendChild(div);
   });
 }
+
+// ICONS
+function openCloudinaryWidget(cb){
+  if(typeof cloudinary==="undefined"){toast("Cloudinary not loaded","err");return}
+  const w=cloudinary.createUploadWidget({cloudName:"dkxuilgai",uploadPreset:"bcd_courses",sources:["local","url"],multiple:false,resourceType:"image"},(err,result)=>{if(!err&&result&&result.event==="success")cb(result.info.secure_url)});w.open();
+}
+
+function renderIconTiles(docs,elId,col){
+  const el=document.getElementById(elId);el.innerHTML="";
+  if(!docs.length){el.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--tx4)">No icons yet</div>`;return}
+  docs.forEach(d=>{
+    const tile=document.createElement("div");tile.className="icon-tile";
+    tile.innerHTML=`${d.url?`<img src="${esc(d.url)}" alt="${esc(d.name||"")}"/>`:`<div style="width:40px;height:40px;background:var(--sur3);border-radius:6px"></div>`}
+      <div class="icon-tile-name">${esc(d.name||"—")}</div>
+      <div class="icon-tile-del" onclick="deleteContentItem('${col}','${d.id}')">✕ delete</div>`;
+    el.appendChild(tile);
+  });
+}
+
+document.getElementById("addSubjectIconBtn").onclick=async()=>{
+  const name=document.getElementById("siName").value.trim();const url=document.getElementById("siUrl").value.trim();
+  if(!name){toast("Name required","err");return}
+  try{await db.collection("subject_icons").add({name,url,createdAt:firebase.firestore.FieldValue.serverTimestamp()});toast("Subject icon added","ok");document.getElementById("siName").value="";document.getElementById("siUrl").value=""}
+  catch(e){toast("Error: "+e.message,"err")}
+};
+document.getElementById("addChapterIconBtn").onclick=async()=>{
+  const name=document.getElementById("ciName").value.trim();const url=document.getElementById("ciUrl").value.trim();
+  if(!name){toast("Name required","err");return}
+  try{await db.collection("chapter_icons").add({name,url,createdAt:firebase.firestore.FieldValue.serverTimestamp()});toast("Chapter icon added","ok");document.getElementById("ciName").value="";document.getElementById("ciUrl").value=""}
+  catch(e){toast("Error: "+e.message,"err")}
+};
+document.getElementById("siUploadBtn").onclick=()=>openCloudinaryWidget(url=>document.getElementById("siUrl").value=url);
+document.getElementById("ciUploadBtn").onclick=()=>openCloudinaryWidget(url=>document.getElementById("ciUrl").value=url);
 
 function onAdminReady(){
   db.collection("banners").orderBy("order","asc").onSnapshot(s=>renderBanners(s.docs.map(d=>({id:d.id,...d.data()}))));
   db.collection("services").orderBy("order","asc").onSnapshot(s=>renderServices(s.docs.map(d=>({id:d.id,...d.data()}))));
   db.collection("testimonials").onSnapshot(s=>renderTestimonials(s.docs.map(d=>({id:d.id,...d.data()}))));
   db.collection("announcements").orderBy("createdAt","desc").onSnapshot(s=>renderAnnouncements(s.docs.map(d=>({id:d.id,...d.data()}))));
+  db.collection("subject_icons").onSnapshot(s=>renderIconTiles(s.docs.map(d=>({id:d.id,...d.data()})),"subjectIconsList","subject_icons"));
+  db.collection("chapter_icons").onSnapshot(s=>renderIconTiles(s.docs.map(d=>({id:d.id,...d.data()})),"chapterIconsList","chapter_icons"));
 }
 
 </script>
