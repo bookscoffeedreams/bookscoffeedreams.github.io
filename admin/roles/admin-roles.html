@@ -267,18 +267,19 @@ select.inp{cursor:pointer;appearance:none}
 
 
 .role-card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;
-  padding:18px;box-shadow:var(--sh);transition:all .22s;position:relative;overflow:hidden}
+  padding:18px;box-shadow:var(--sh);transition:all .22s;position:relative;overflow:hidden;cursor:grab}
+.role-card:active{cursor:grabbing}
 .role-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#312e81,#6366f1,#06b6d4,transparent);
-  opacity:0;transition:opacity .22s}
+  background:linear-gradient(90deg,#312e81,#6366f1,#06b6d4,transparent);opacity:0;transition:opacity .22s}
 .role-card:hover{border-color:var(--bdr2);transform:translateY(-2px);box-shadow:var(--sh2)}
 .role-card:hover::before{opacity:.8}
+.role-card.dragging{opacity:.5;transform:scale(.98);box-shadow:var(--sh2)}
+.role-card.drag-over{border-color:var(--in);box-shadow:0 0 0 2px rgba(99,102,241,.3)}
 .role-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0;
-  position:relative;overflow:hidden}
+  justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0;position:relative;overflow:hidden}
 .role-avatar::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 55%)}
 .role-name-display{font-weight:700;font-size:16px}
-.anim-sheen{background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:sheen-pan 4.6s cubic-bezier(.22,.9,.32,.99) infinite}
+.anim-sheen{background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:sheen-pan 4.6s ease infinite}
 @keyframes sheen-pan{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .holo-name{background:conic-gradient(from 0deg,#ffd36b,#ff8bf2,#8da0ff,#7bf2d4,#ffd36b);background-size:400% 400%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:holo-flow 6.5s linear infinite;font-weight:800}
 @keyframes holo-flow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -286,6 +287,7 @@ select.inp{cursor:pointer;appearance:none}
 .role-perm-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
 .rpb{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:99px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15);color:var(--in2)}
 .role-actions{display:flex;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)}
+.drag-hint{font-family:var(--mono);font-size:9px;color:var(--tx4);display:flex;align-items:center;gap:4px;position:absolute;top:10px;right:12px}
 
 </style>
 </head>
@@ -346,7 +348,7 @@ select.inp{cursor:pointer;appearance:none}
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;animation:fade-up .5s var(--spring) .03s both">
   <div>
     <div style="font-family:var(--serif);font-size:28px;letter-spacing:-.02em;color:var(--tx)">Manage <em style="font-style:italic;background:linear-gradient(90deg,var(--in2),var(--cy2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Roles</em></div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:4px">Discord-style role system with granular permissions</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--tx4);margin-top:4px">Discord-style role system · drag to reorder</div>
   </div>
   <div style="display:flex;gap:9px">
     <div class="search-wrap" style="max-width:220px">
@@ -366,14 +368,14 @@ select.inp{cursor:pointer;appearance:none}
 
 <!-- Delete confirm modal -->
 <div class="modal-bg" id="delModal">
-  <div class="modal" style="max-width:400px">
+  <div class="modal" style="max-width:420px">
     <div class="modal-stripe"></div>
     <div class="modal-head">
       <div class="modal-title">Delete Role?</div>
       <button class="modal-close" onclick="document.getElementById('delModal').classList.remove('show')"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
-      <p style="font-size:14px;color:var(--tx3);line-height:1.65">Deleting <strong id="delRoleName" style="color:var(--tx2)"></strong> will remove it from all users. This cannot be undone.</p>
+      <p style="font-size:14px;color:var(--tx3);line-height:1.65">Deleting <strong id="delRoleName" style="color:var(--tx2)"></strong> will remove it from all users. Cannot be undone.</p>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="document.getElementById('delModal').classList.remove('show')">Cancel</button>
@@ -442,33 +444,29 @@ function ago(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return s+'s ag
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 
-let allRoles=[],userCountMap={},roleToDelete=null;
+let allRoles=[],userCountMap={},roleToDelete=null,dragSrcId=null,cardOrder=[];
 
-function sanitizeColor(c){if(!c)return"#6366f1";return(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(c.trim()))?c:"#6366f1"}
+function sanitizeColor(c){return(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test((c||"").trim()))?c:"#6366f1"}
 
 function renderRoleName(r){
   if(r.style==="holo")return`<span class="role-name-display holo-name">${esc(r.name||"Role")}</span>`;
-  if(r.style==="gradient"){
-    const g1=r.gradientFrom||r.color||"#6366f1";const g2=r.gradientTo||r.color||"#06b6d4";
-    return`<span class="role-name-display anim-sheen" style="background-image:linear-gradient(90deg,${esc(g1)},${esc(g2)},${esc(g1)})">${esc(r.name||"Role")}</span>`;
-  }
+  if(r.style==="gradient"){const g1=r.gradientFrom||r.color||"#6366f1";const g2=r.gradientTo||r.color||"#06b6d4";
+    return`<span class="role-name-display anim-sheen" style="background-image:linear-gradient(90deg,${esc(g1)},${esc(g2)},${esc(g1)})">${esc(r.name||"Role")}</span>`}
   return`<span class="role-name-display" style="color:${esc(sanitizeColor(r.color))}">${esc(r.name||"Role")}</span>`;
 }
 
 function renderRoles(roles){
   const q=(document.getElementById("searchInp").value||"").toLowerCase();
   const filtered=roles.filter(r=>!q||(r.name||"").toLowerCase().includes(q));
-  document.getElementById("statusBar").textContent=`${filtered.length} role${filtered.length!==1?"s":""} · ${Object.values(userCountMap).reduce((a,b)=>a+b,0)} users assigned`;
+  document.getElementById("statusBar").textContent=`${filtered.length} role${filtered.length!==1?"s":""} · drag to reorder`;
   const grid=document.getElementById("rolesGrid");grid.innerHTML="";
-  if(!filtered.length){
-    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🛡️</div><div class="empty-title">No roles yet</div><div class="empty-sub">Create your first role to get started</div></div>`;return;
-  }
+  if(!filtered.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🛡️</div><div class="empty-title">No roles yet</div><div class="empty-sub">Create your first role</div></div>`;return}
   filtered.forEach(r=>{
     const count=userCountMap[r.id]||0;
     const perms=Object.entries(r.permissions||{}).filter(([,v])=>v===true).map(([k])=>k);
-    const card=document.createElement("div");card.className="role-card";
     const color=sanitizeColor(r.color);
-    card.innerHTML=`
+    const card=document.createElement("div");card.className="role-card";card.setAttribute("draggable","true");card.dataset.roleId=r.id;
+    card.innerHTML=`<div class="drag-hint"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="11" height="11"><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>drag</div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
         <div class="role-avatar" style="background:${esc(r.style==="gradient"?`linear-gradient(135deg,${r.gradientFrom||color},${r.gradientTo||color})`:color)}">
           ${r.iconUrl?`<img src="${esc(r.iconUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt=""/>`:`<span>${esc((r.name||"R").slice(0,1).toUpperCase())}</span>`}
@@ -479,52 +477,71 @@ function renderRoles(roles){
         </div>
         <div style="font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:99px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.18);color:var(--in2)">${count}</div>
       </div>
-      ${perms.length?`<div class="role-perm-badges">${perms.slice(0,4).map(p=>`<span class="rpb">${esc(p)}</span>`).join("")}${perms.length>4?`<span class="rpb">+${perms.length-4} more</span>`:""}</div>`:""}
+      ${perms.length?`<div class="role-perm-badges">${perms.slice(0,4).map(p=>`<span class="rpb">${esc(p)}</span>`).join("")}${perms.length>4?`<span class="rpb">+${perms.length-4}</span>`:""}</div>`:""}
       <div class="role-actions">
-        <a class="btn-ghost btn-sm" style="flex:1;justify-content:center" href="/admin/roles/admin-roles-editor.html?id=${esc(r.id)}">
-          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit
-        </a>
-        <button class="btn-danger btn-sm" onclick='confirmDelete("${esc(r.id)}","${esc(r.name||"Role")}")'>
-          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Delete
-        </button>
+        <a class="btn-ghost btn-sm" style="flex:1;justify-content:center" href="/admin/roles/admin-roles-editor.html?roleId=${esc(r.id)}">Edit</a>
+        <button class="btn-ghost btn-sm" onclick="duplicateRole('${esc(r.id)}')">Duplicate</button>
+        <button class="btn-danger btn-sm" onclick="confirmDelete('${esc(r.id)}','${esc(r.name||"Role")}')">Delete</button>
       </div>`;
+    // Drag events
+    card.addEventListener("dragstart",e=>{dragSrcId=r.id;card.classList.add("dragging");e.dataTransfer.effectAllowed="move"});
+    card.addEventListener("dragend",()=>{card.classList.remove("dragging");dragSrcId=null;document.querySelectorAll(".role-card").forEach(c=>c.classList.remove("drag-over"))});
+    card.addEventListener("dragover",e=>{e.preventDefault();if(dragSrcId&&dragSrcId!==r.id){card.classList.add("drag-over")}});
+    card.addEventListener("dragleave",()=>card.classList.remove("drag-over"));
+    card.addEventListener("drop",async e=>{
+      e.preventDefault();card.classList.remove("drag-over");
+      if(!dragSrcId||dragSrcId===r.id)return;
+      // Reorder in allRoles array
+      const fromIdx=allRoles.findIndex(x=>x.id===dragSrcId);
+      const toIdx=allRoles.findIndex(x=>x.id===r.id);
+      if(fromIdx<0||toIdx<0)return;
+      const moved=allRoles.splice(fromIdx,1)[0];allRoles.splice(toIdx,0,moved);
+      renderRoles(allRoles);
+      // Persist order with writeBatch
+      try{
+        const batch=db.batch();
+        allRoles.forEach((role,idx)=>{batch.update(db.collection("organizations").doc("bcd").collection("roles").doc(role.id),{order:idx})});
+        await batch.commit();toast("Order saved","ok");
+      }catch(e){toast("Order save failed","err")}
+    });
     grid.appendChild(card);
   });
 }
 
-function confirmDelete(id,name){
-  roleToDelete=id;
-  document.getElementById("delRoleName").textContent=name;
-  document.getElementById("delModal").classList.add("show");
+async function duplicateRole(id){
+  const r=allRoles.find(x=>x.id===id);if(!r)return;
+  try{
+    const newData={...r,name:(r.name||"Role")+" (copy)",createdAt:firebase.firestore.FieldValue.serverTimestamp(),order:(allRoles.length)};
+    delete newData.id;
+    await db.collection("organizations").doc("bcd").collection("roles").add(newData);
+    toast("Role duplicated!","ok");
+  }catch(e){toast("Error: "+e.message,"err")}
 }
+
+function confirmDelete(id,name){roleToDelete=id;document.getElementById("delRoleName").textContent=name;document.getElementById("delModal").classList.add("show")}
 document.getElementById("confirmDelBtn").onclick=async()=>{
   if(!roleToDelete)return;
-  try{
-    await db.collection("organizations").doc("bcd").collection("roles").doc(roleToDelete).delete();
-    toast("Role deleted","ok");
-    document.getElementById("delModal").classList.remove("show");
-    roleToDelete=null;
-  }catch(e){toast("Error: "+e.message,"err")}
+  try{await db.collection("organizations").doc("bcd").collection("roles").doc(roleToDelete).delete();toast("Role deleted","ok");document.getElementById("delModal").classList.remove("show");roleToDelete=null}
+  catch(e){toast("Error: "+e.message,"err")}
 };
-
-document.getElementById("createBtn").onclick=()=>{
-  location.href="/admin/roles/admin-roles-editor.html?new=1";
-};
+document.getElementById("createBtn").onclick=()=>{location.href="/admin/roles/admin-roles-editor.html"};
 document.getElementById("searchInp").addEventListener("input",()=>renderRoles(allRoles));
 
 function onAdminReady(){
-  // Track user counts
+  // Live user counts
   db.collection("users").onSnapshot(snap=>{
-    userCountMap={};
-    snap.forEach(d=>{const uid=d.data().roleId;if(uid)userCountMap[uid]=(userCountMap[uid]||0)+1});
+    userCountMap={};snap.forEach(d=>{const uid=d.data().roleId;if(uid)userCountMap[uid]=(userCountMap[uid]||0)+1});
     renderRoles(allRoles);
   });
-  // Live roles
-  db.collection("organizations").doc("bcd").collection("roles").onSnapshot(snap=>{
+  // Live roles — onSnapshot
+  db.collection("organizations").doc("bcd").collection("roles").orderBy("order","asc").onSnapshot(snap=>{
     allRoles=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderRoles(allRoles);
+  },()=>{
+    // fallback if no order field yet
+    db.collection("organizations").doc("bcd").collection("roles").onSnapshot(snap=>{
+      allRoles=snap.docs.map(d=>({id:d.id,...d.data()}));renderRoles(allRoles);
+    });
   });
 }
 
