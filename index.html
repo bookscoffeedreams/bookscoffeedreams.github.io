@@ -268,7 +268,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
    SERVICES
 ═══════════════════════════════════════ */
 .services-section{position:relative;z-index:2;padding:80px 0}
-.services-grid{max-width:1200px;margin:0 auto;padding:0 36px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.services-grid{max-width:1200px;margin:0 auto;padding:0 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 
 .service-card{
   background:var(--sur);border:1px solid var(--bdr);
@@ -305,7 +305,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
    TESTIMONIALS
 ═══════════════════════════════════════ */
 .testimonials-section{position:relative;z-index:2;padding:80px 0}
-.testimonials-grid{max-width:1200px;margin:0 auto;padding:0 36px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.testimonials-grid{max-width:1200px;margin:0 auto;padding:0 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .testimonial-card{
   background:var(--sur);border:1px solid var(--bdr);
   border-radius:16px;overflow:hidden;box-shadow:var(--sh);
@@ -391,115 +391,6 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
   .cta-inner{padding:28px 24px}
   .footer-bottom{flex-direction:column;gap:8px;text-align:center}
 }
-
-/* ── PARTNER PLATFORMS ── */
-.partners-section{position:relative;z-index:2;padding:80px 0}
-.partners-grid{max-width:1200px;margin:0 auto;padding:0 36px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.p-card{
-  border-radius:18px;padding:26px;position:relative;overflow:hidden;
-  display:flex;flex-direction:column;gap:12px;
-  transition:transform .25s var(--spring),box-shadow .25s;
-  text-decoration:none;
-}
-.p-card:hover{transform:translateY(-5px)}
-/* SP — gold dark */
-.p-sp{background:linear-gradient(135deg,#1a1508,#251c0c);border:1px solid rgba(245,197,24,.18);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.p-sp:hover{border-color:rgba(245,197,24,.4);box-shadow:0 20px 56px rgba(200,150,20,.15)}
-/* Zenith — purple dark */
-.p-zen{background:linear-gradient(135deg,#0d0f14,#13112a);border:1px solid rgba(139,115,255,.18);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.p-zen:hover{border-color:rgba(139,115,255,.4);box-shadow:0 20px 56px rgba(139,115,255,.14)}
-/* Wrokoo — blue dark */
-.p-wrk{background:linear-gradient(135deg,#080d1a,#0d1530);border:1px solid rgba(37,99,235,.18);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.p-wrk:hover{border-color:rgba(37,99,235,.4);box-shadow:0 20px 56px rgba(37,99,235,.14)}
-
-.p-gem{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.p-head{display:flex;align-items:center;gap:12px}
-.p-name{font-family:var(--serif);font-size:18px;font-weight:400;letter-spacing:-.01em;line-height:1.1}
-.p-sub{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;margin-top:2px;opacity:.6}
-.p-desc{font-size:13px;line-height:1.65;flex:1}
-.p-tags{display:flex;flex-wrap:wrap;gap:5px}
-.p-tag{font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:99px}
-.p-link{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;margin-top:auto;transition:gap .2s}
-.p-card:hover .p-link{gap:9px}
-.p-link svg{width:13px;height:13px}
-
-/* light mode — soften cards */
-[data-mode="light"] .p-sp{background:linear-gradient(135deg,#fffbef,#fef5d0);border-color:rgba(180,130,10,.22)}
-[data-mode="light"] .p-sp .p-name,[data-mode="light"] .p-sp .p-desc{color:#2c1e04}
-[data-mode="light"] .p-sp .p-sub,[data-mode="light"] .p-sp .p-link{color:#8b6010}
-[data-mode="light"] .p-zen{background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-color:rgba(109,75,255,.22)}
-[data-mode="light"] .p-zen .p-name,[data-mode="light"] .p-zen .p-desc{color:#1a0e40}
-[data-mode="light"] .p-zen .p-sub,[data-mode="light"] .p-zen .p-link{color:#6b4fcf}
-[data-mode="light"] .p-wrk{background:linear-gradient(135deg,#eef4ff,#e0ecff);border-color:rgba(29,78,216,.22)}
-[data-mode="light"] .p-wrk .p-name,[data-mode="light"] .p-wrk .p-desc{color:#060e28}
-[data-mode="light"] .p-wrk .p-sub,[data-mode="light"] .p-wrk .p-link{color:#1d4ed8}
-
-/* ── DREAMERS ELITE ── */
-.de-section{position:relative;z-index:2;padding:0 36px 80px}
-.de-wrap{
-  max-width:1200px;margin:0 auto;border-radius:22px;overflow:hidden;position:relative;
-  background:linear-gradient(135deg,#0a0804 0%,#15100a 50%,#0a0804 100%);
-  border:1px solid rgba(200,160,60,.2);
-  box-shadow:0 0 0 1px rgba(200,160,60,.06),0 24px 80px rgba(0,0,0,.6);
-  padding:52px 56px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;
-}
-.de-wrap::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,#a07828 25%,#f5e0a0 50%,#a07828 75%,transparent);
-  background-size:200% 100%;animation:de-scan 4s linear infinite}
-@keyframes de-scan{0%{background-position:0%}100%{background-position:200%}}
-.de-wrap::after{content:"";position:absolute;top:-30%;right:-5%;width:45%;height:180%;
-  background:radial-gradient(ellipse,rgba(200,160,60,.06),transparent 65%);pointer-events:none}
-.de-ey{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
-  color:#c9a84c;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.de-ey::before{content:"";width:20px;height:1px;background:linear-gradient(90deg,#a07828,#f5e0a0)}
-.de-ey-badge{background:rgba(200,160,60,.12);border:1px solid rgba(200,160,60,.3);
-  padding:2px 10px;border-radius:99px;font-size:9px;color:#e8c96a;letter-spacing:.1em}
-.de-title{font-family:var(--serif);font-size:clamp(30px,4vw,54px);font-weight:400;
-  letter-spacing:-.03em;line-height:1.05;margin-bottom:10px;
-  background:linear-gradient(135deg,#f5e0a0 0%,#e8c96a 40%,#c9a84c 70%,#f0d070 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.de-title em{font-style:italic}
-.de-desc{font-size:14px;color:rgba(245,224,160,.55);line-height:1.75;max-width:500px;margin-bottom:24px}
-.de-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:28px}
-.de-pill{font-family:var(--mono);font-size:9px;padding:4px 11px;border-radius:99px;letter-spacing:.1em;text-transform:uppercase;
-  background:rgba(200,160,60,.08);border:1px solid rgba(200,160,60,.2);color:#c9a84c}
-.de-pill.gold{background:rgba(200,160,60,.16);border-color:rgba(240,200,80,.4);color:#e8c96a}
-.de-cta{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;border-radius:11px;
-  background:linear-gradient(135deg,#a07828,#c9a84c,#e8d060);color:#0a0804;
-  font-weight:700;font-size:14px;transition:all .25s;text-decoration:none;
-  box-shadow:0 8px 28px rgba(180,140,40,.3)}
-.de-cta:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(180,140,40,.5)}
-.de-cta svg{width:15px;height:15px}
-.de-badge{width:110px;height:110px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#1a1408,#0a0804);
-  border:1.5px solid rgba(200,160,60,.35);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  box-shadow:0 0 0 8px rgba(200,160,60,.05),0 0 0 16px rgba(200,160,60,.025);
-  animation:de-float 4s ease-in-out infinite;position:relative;overflow:hidden;flex-shrink:0}
-.de-badge::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,224,160,.1),transparent 55%)}
-@keyframes de-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.de-badge-ico{font-size:34px;line-height:1;position:relative;z-index:1}
-.de-badge-lbl{font-family:var(--mono);font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:#c9a84c;text-align:center;position:relative;z-index:1}
-
-[data-mode="light"] .de-wrap{background:linear-gradient(135deg,#fdf8ef,#f5eccc);border-color:rgba(160,120,40,.3);box-shadow:0 8px 48px rgba(160,120,40,.12)}
-[data-mode="light"] .de-title{background:linear-gradient(135deg,#7a5a10,#c9a84c,#a07828);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-[data-mode="light"] .de-desc{color:rgba(80,55,10,.65)}
-[data-mode="light"] .de-badge{background:linear-gradient(135deg,#fdf5e0,#f0e4b8);border-color:rgba(160,120,40,.4)}
-
-@media(max-width:900px){
-  .partners-grid{grid-template-columns:repeat(2,1fr);padding:0 20px}
-  .de-wrap{grid-template-columns:1fr;padding:36px 28px;gap:24px}
-  .de-badge{display:none}
-}
-
-
-/* RankForge — red dark */
-.p-rf{background:linear-gradient(135deg,#130608,#1e0a0c);border:1px solid rgba(239,68,68,.18);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.p-rf:hover{border-color:rgba(239,68,68,.4);box-shadow:0 20px 56px rgba(239,68,68,.14)}
-[data-mode="light"] .p-rf{background:linear-gradient(135deg,#fff5f5,#ffe4e4);border-color:rgba(220,38,38,.22)}
-[data-mode="light"] .p-rf .p-name,[data-mode="light"] .p-rf .p-desc{color:#3b0a0a}
-[data-mode="light"] .p-rf .p-sub,[data-mode="light"] .p-rf .p-link{color:#dc2626}
-
 </style>
 </head>
 <body>
@@ -690,122 +581,6 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
     <div class="testimonial-card"><div class="testimonial-body"><div class="testimonial-quote">"</div><div class="testimonial-text">This community changed the way I approach reading. The conversations here are genuinely inspiring.</div><div class="testimonial-author"><div class="testimonial-av">A</div><div><div class="testimonial-name">Aisha</div><div class="testimonial-country">India</div></div></div></div></div>
     <div class="testimonial-card"><div class="testimonial-body"><div class="testimonial-quote">"</div><div class="testimonial-text">Best decision I made this year. The courses are incredible and the people even more so.</div><div class="testimonial-author"><div class="testimonial-av">M</div><div><div class="testimonial-name">Marcus</div><div class="testimonial-country">UK</div></div></div></div></div>
     <div class="testimonial-card"><div class="testimonial-body"><div class="testimonial-quote">"</div><div class="testimonial-text">Finally a community that feels like a cosy cafe — warm, calm, and full of good conversations.</div><div class="testimonial-author"><div class="testimonial-av">S</div><div><div class="testimonial-name">Sofia</div><div class="testimonial-country">Brazil</div></div></div></div></div>
-  </div>
-</section>
-
-
-<!-- ═══ PARTNER PLATFORMS ═══ -->
-<section class="partners-section reveal">
-  <div class="section-header" style="max-width:1200px;margin:0 auto;padding:0 36px 28px">
-    <div>
-      <div class="section-eyebrow">Ecosystem</div>
-      <div class="section-title">Partner <em>platforms</em></div>
-    </div>
-    <div style="max-width:340px;font-size:13px;color:var(--tx4);line-height:1.65">Communities and platforms built in the BCD family — each with their own identity.</div>
-  </div>
-  <div class="partners-grid">
-
-    <!-- Scholar Pathshala -->
-    <a class="p-card p-sp" href="/sp/sp.html">
-      <div class="p-head">
-        <div class="p-gem" style="background:var(--sur3);border:1px solid rgba(245,197,24,.2)"><img src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/scholar-pathshala.png?raw=true" style="width:34px;height:34px;object-fit:contain;border-radius:6px"/></div>
-        <div>
-          <div class="p-name" style="color:#f5e0a0">Scholar Pathshala</div>
-          <div class="p-sub" style="color:#a07828">Where Brilliance Begins</div>
-        </div>
-      </div>
-      <div class="p-desc" style="color:rgba(245,224,160,.65)">A premium academic platform for students who refuse to settle. Courses by India's best educators for JEE, NEET &amp; Boards.</div>
-      <div class="p-tags">
-        <span class="p-tag" style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.22);color:#e8c96a">JEE</span>
-        <span class="p-tag" style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.22);color:#e8c96a">NEET</span>
-        <span class="p-tag" style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.22);color:#e8c96a">Boards</span>
-        <span class="p-tag" style="background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.22);color:#e8c96a">Courses</span>
-      </div>
-      <div class="p-link" style="color:#c9a84c">Visit platform <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </a>
-
-    <!-- Zenith -->
-    <a class="p-card p-zen" href="/zenith/zenith.html">
-      <div class="p-head">
-        <div class="p-gem" style="background:var(--sur3);border:1px solid rgba(139,115,255,.2)"><img src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/zenith.png?raw=true" style="width:34px;height:34px;object-fit:contain;border-radius:6px"/></div>
-        <div>
-          <div class="p-name" style="color:#c4b5fd">Zenith</div>
-          <div class="p-sub" style="color:#6b4fcf">Study. Vibe. Rise.</div>
-        </div>
-      </div>
-      <div class="p-desc" style="color:rgba(196,181,253,.6)">A vibrant study community built for real students. Study hard, vibe harder — with people who actually get it.</div>
-      <div class="p-tags">
-        <span class="p-tag" style="background:rgba(139,115,255,.1);border:1px solid rgba(139,115,255,.22);color:#b09dff">Community</span>
-        <span class="p-tag" style="background:rgba(139,115,255,.1);border:1px solid rgba(139,115,255,.22);color:#b09dff">Study Groups</span>
-        <span class="p-tag" style="background:rgba(255,143,171,.1);border:1px solid rgba(255,143,171,.22);color:#ff8fab">Vibe</span>
-      </div>
-      <div class="p-link" style="color:#8b73ff">Join Zenith <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </a>
-
-    <!-- Wrokoo -->
-    <a class="p-card p-wrk" href="/wrokoo/wrokoo.html">
-      <div class="p-head">
-        <div class="p-gem" style="background:var(--sur3);border:1px solid rgba(37,99,235,.2)"><img src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/wrokoo.png?raw=true" style="width:34px;height:34px;object-fit:contain;border-radius:6px"/></div>
-        <div>
-          <div class="p-name" style="color:#93c5fd">Wrokoo</div>
-          <div class="p-sub" style="color:#1d4ed8">The Study Challenge Server</div>
-        </div>
-      </div>
-      <div class="p-desc" style="color:rgba(147,197,253,.6)">Stop wasting time. The most intense study challenge server — where accountability meets competition. Join the grind.</div>
-      <div class="p-tags">
-        <span class="p-tag" style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.22);color:#93c5fd">Challenges</span>
-        <span class="p-tag" style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.22);color:#93c5fd">Accountability</span>
-        <span class="p-tag" style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.22);color:#fb923c">Grind</span>
-      </div>
-      <div class="p-link" style="color:#3b82f6">Join the grind <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </a>
-
-
-    <!-- RankForge -->
-    <a class="p-card p-rf" href="/rankforge/rankforge.html">
-      <div class="p-head">
-        <div class="p-gem" style="background:var(--sur3);border:1px solid rgba(239,68,68,.2)"><img src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/rankforge.png?raw=true" style="width:34px;height:34px;object-fit:contain;border-radius:6px"/></div>
-        <div>
-          <div class="p-name" style="color:#fca5a5">RankForge</div>
-          <div class="p-sub" style="color:#ef4444">Forge Your Rank</div>
-        </div>
-      </div>
-      <div class="p-desc" style="color:rgba(252,165,165,.6)">Track your progress, compete with peers and forge your way to the top. A rank-based performance platform for serious students.</div>
-      <div class="p-tags">
-        <span class="p-tag" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);color:#fca5a5">Rankings</span>
-        <span class="p-tag" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);color:#fca5a5">Progress</span>
-        <span class="p-tag" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);color:#fca5a5">Compete</span>
-      </div>
-      <div class="p-link" style="color:#ef4444">Visit RankForge <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-    </a>
-  </div>
-</section>
-
-<!-- ═══ DREAMERS ELITE ═══ -->
-<section class="de-section reveal">
-  <div class="de-wrap">
-    <div>
-      <div class="de-ey">
-        <span class="de-ey-badge">✦ BCD Special Event</span>
-      </div>
-      <div class="de-title">Dreamers <em>Elite</em></div>
-      <div class="de-desc">The Festival of Books, Coffee &amp; Dreams. Three days of pure, undiluted magic — talks, workshops, performances and moments you'll carry with you forever.</div>
-      <div class="de-pills">
-        <span class="de-pill gold">✦ Exclusive</span>
-        <span class="de-pill">3 Days</span>
-        <span class="de-pill">Live Talks</span>
-        <span class="de-pill">Workshops</span>
-        <span class="de-pill">Community</span>
-      </div>
-      <a class="de-cta" href="/dreamerselite/de.html">
-        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
-        Explore Dreamers Elite
-      </a>
-    </div>
-    <div class="de-badge">
-      <img src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/dreamers-elite/logo.png?raw=true" style="width:64px;height:64px;object-fit:contain;position:relative;z-index:1;border-radius:8px"/>
-      <div class="de-badge-lbl">BCD<br/>Special</div>
-    </div>
   </div>
 </section>
 
