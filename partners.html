@@ -416,7 +416,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
 <!-- ═══ NAV ═══ -->
 <nav class="nav">
   <div class="nav-inner">
-    <a class="nav-brand" href="../index.html">
+    <a class="nav-brand" href="index.html">
       <div class="nav-logo">
         <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
       </div>
@@ -424,12 +424,12 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
     </a>
 
     <div class="nav-links">
-      <a class="nav-link" href="../index.html">Home</a>
-      <a class="nav-link" href="../content.html">Content</a>
-      <a class="nav-link" href="../courses.html">Courses</a>
-      <a class="nav-link" href="../blogs.html">Blogs</a>
-      <a class="nav-link" href="../community.html">Community</a>
-      <a class="nav-link" href="../dashboard.html">Dashboard</a>
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="content.html">Content</a>
+      <a class="nav-link" href="courses.html">Courses</a>
+      <a class="nav-link" href="blogs.html">Blogs</a>
+      <a class="nav-link" href="community.html">Community</a>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
       <a class="nav-link active" href="partners.html">Partners</a>
     </div>
 
@@ -440,12 +440,12 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
         <span id="modeLabel">Light</span>
       </button>
 
-      <div class="nav-user" id="navUser" onclick="location.href='../profile.html'">
+      <div class="nav-user" id="navUser" onclick="location.href='profile.html'">
         <img class="nav-user-av" id="navAvatar" src="" alt="avatar"/>
         <span class="nav-user-name" id="navName">Account</span>
       </div>
 
-      <a class="nav-login" id="navLogin" href="../login.html">
+      <a class="nav-login" id="navLogin" href="login.html">
         <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         Sign In
       </a>
@@ -476,21 +476,21 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
     <div class="partners-grid">
 
       <!-- Scholar Pathshala -->
-      <div class="partner-card reveal" onclick="void(0)">
+      <div class="partner-card reveal">
         <div class="partner-logo-wrap">
           <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/scholar-pathshala.png?raw=true" alt="Scholar Pathshala" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><path d=&quot;M22 10v6M2 10l10-5 10 5-10 5z&quot;/><path d=&quot;M6 12v5c3 3 9 3 12 0v-5&quot;/></svg>'"/>
         </div>
         <div class="partner-type">Education</div>
         <div class="partner-name">Scholar Pathshala</div>
         <div class="partner-desc">A learning-first platform where curiosity meets curriculum. Scholar Pathshala brings structured academic journeys to ambitious students across disciplines.</div>
-        <span class="partner-link">
-          Visit
-          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        </span>
+        <a class="partner-link" href="sp/sp.html">
+          Explore
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
       </div>
 
       <!-- Wrokoo -->
-      <div class="partner-card reveal" onclick="void(0)">
+      <div class="partner-card reveal">
         <div class="partner-logo-wrap">
           <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/wrokoo.png?raw=true" alt="Wrokoo" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><rect x=2 y=3 width=20 height=14 rx=2/><line x1=8 y1=21 x2=16 y2=21/><line x1=12 y1=17 x2=12 y2=21/></svg>'"/>
         </div>
@@ -504,7 +504,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
       </div>
 
       <!-- Zenith -->
-      <div class="partner-card reveal" onclick="void(0)">
+      <div class="partner-card reveal">
         <div class="partner-logo-wrap">
           <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/zenith.png?raw=true" alt="Zenith" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><polygon points=&quot;12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2&quot;/></svg>'"/>
         </div>
@@ -518,7 +518,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
       </div>
 
       <!-- RankForge -->
-      <div class="partner-card reveal" onclick="void(0)">
+      <div class="partner-card reveal">
         <div class="partner-logo-wrap">
           <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/rankforge.png?raw=true" alt="RankForge" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><path d=&quot;M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z&quot;/><path d=&quot;M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z&quot;/><path d=&quot;M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z&quot;/><path d=&quot;M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z&quot;/><path d=&quot;M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z&quot;/><path d=&quot;M15.5 9H17v1.5c0 .83-.67 1.5-1.5 1.5S14 11.33 14 10.5v-5c0-.83.67-1.5 1.5-1.5z&quot;/><path d=&quot;M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z&quot;/><path d=&quot;M8.5 15H7v-1.5c0-.83.67-1.5 1.5-1.5S10 12.67 10 13.5v5c0 .83-.67 1.5-1.5 1.5z&quot;/></svg>'"/>
         </div>
@@ -575,7 +575,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
                 <div class="elite-highlight-text"><strong>Community Celebration</strong> — A space where dreamers meet and bonds form.</div>
               </div>
             </div>
-            <a class="elite-cta" href="../dreamerselite/de.html">
+            <a class="elite-cta" href="dreamerselite/de.html">
               <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               Discover Dreamers Elite
             </a>
@@ -611,21 +611,21 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
     <div>
       <div class="footer-col-title">Navigate</div>
       <div class="footer-links">
-        <a class="footer-link" href="../index.html">Home</a>
-        <a class="footer-link" href="../content.html">Content</a>
-        <a class="footer-link" href="../courses.html">Courses</a>
-        <a class="footer-link" href="../blogs.html">Blogs</a>
-        <a class="footer-link" href="../community.html">Community</a>
+        <a class="footer-link" href="index.html">Home</a>
+        <a class="footer-link" href="content.html">Content</a>
+        <a class="footer-link" href="courses.html">Courses</a>
+        <a class="footer-link" href="blogs.html">Blogs</a>
+        <a class="footer-link" href="community.html">Community</a>
         <a class="footer-link" href="partners.html">Partners</a>
       </div>
     </div>
     <div>
       <div class="footer-col-title">Account</div>
       <div class="footer-links">
-        <a class="footer-link" href="../profile.html">Profile</a>
-        <a class="footer-link" href="../settings.html">Settings</a>
-        <a class="footer-link" href="../login.html">Sign In</a>
-        <a class="footer-link" href="../staff-application.html">Apply as Staff</a>
+        <a class="footer-link" href="profile.html">Profile</a>
+        <a class="footer-link" href="settings.html">Settings</a>
+        <a class="footer-link" href="login.html">Sign In</a>
+        <a class="footer-link" href="staff-application.html">Apply as Staff</a>
       </div>
     </div>
   </div>
@@ -635,7 +635,7 @@ body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;
   </div>
 </footer>
 
-<script src="../firebase-init.js" defer></script>
+<script src="firebase-init.js" defer></script>
 
 <script>
 /* ─── Dark/Light Mode ─── */
