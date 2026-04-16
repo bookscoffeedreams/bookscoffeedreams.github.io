@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Partners & Allies — Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS — same as main site
+═══════════════════════════════════════ */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --scr:rgba(217,119,6,.2);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
+img{display:block;max-width:100%}
+
+/* Grid texture */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");background-size:60px 60px}
+/* Warm ambient glow */
+body::after{content:'';position:fixed;top:-20%;left:-10%;width:70vw;height:70vh;background:radial-gradient(ellipse,rgba(217,119,6,.07) 0%,transparent 65%);z-index:0;pointer-events:none;animation:warm-drift 22s ease-in-out infinite alternate}
+@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(8vw,5vh)}}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:64px;
+  display:flex;align-items:center;
+  background:rgba(16,15,14,.88);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--bdr);transition:background .35s,border-color .35s;
+}
+[data-mode="light"] .nav{background:rgba(250,247,242,.92)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 36px;width:100%;display:flex;align-items:center;gap:20px}
+
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+.nav-logo svg{width:16px;height:16px}
+.nav-site-name{font-family:var(--serif);font-size:18px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
+.nav-site-name em{color:var(--amber);font-style:italic}
+
+.nav-links{display:flex;align-items:center;gap:2px;margin-left:28px}
+.nav-link{padding:6px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--tx3);transition:all .18s;white-space:nowrap}
+.nav-link:hover{color:var(--tx);background:var(--sur2)}
+.nav-link.active{color:var(--amber);background:rgba(217,119,6,.08)}
+
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+.nav-user{display:none;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .2s}
+.nav-user:hover{border-color:var(--bdr2)}
+.nav-user-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--amber2)}
+.nav-user-name{font-size:13px;font-weight:600;color:var(--tx2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.nav-login{display:none;align-items:center;gap:7px;padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:13px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3)}
+.nav-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
+.nav-login svg{width:14px;height:14px}
+
+.mode-toggle{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s;white-space:nowrap}
+.mode-toggle:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-toggle svg{width:14px;height:14px}
+.icon-sun,.icon-moon{transition:all .3s var(--spring)}
+[data-mode="dark"] .icon-sun{display:none}[data-mode="dark"] .icon-moon{display:block}
+[data-mode="light"] .icon-sun{display:block}[data-mode="light"] .icon-moon{display:none}
+
+/* ═══════════════════════════════════════
+   PAGE HERO
+═══════════════════════════════════════ */
+.page-hero{
+  position:relative;z-index:2;
+  padding:140px 36px 80px;
+  text-align:center;
+  overflow:hidden;
+}
+.page-hero::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:800px;height:400px;
+  background:radial-gradient(ellipse at top,rgba(217,119,6,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);
+  background:rgba(217,119,6,.1);border:1px solid var(--bdr2);
+  padding:6px 16px;border-radius:99px;margin-bottom:28px;
+  animation:fade-up .6s var(--ease) both;
+}
+.hero-eyebrow svg{width:12px;height:12px}
+.page-title{
+  font-family:var(--serif);font-size:clamp(44px,6vw,80px);
+  color:var(--tx);line-height:1.1;letter-spacing:-.02em;
+  animation:fade-up .7s var(--ease) .1s both;
+  margin-bottom:20px;
+}
+.page-title em{color:var(--amber);font-style:italic}
+.page-sub{
+  font-size:17px;color:var(--tx3);max-width:560px;margin:0 auto 40px;
+  line-height:1.7;
+  animation:fade-up .7s var(--ease) .2s both;
+}
+.hero-divider{
+  width:60px;height:1px;background:var(--bdr3);margin:0 auto;
+  animation:fade-in .8s var(--ease) .3s both;
+}
+
+/* ═══════════════════════════════════════
+   SECTION WRAPPER
+═══════════════════════════════════════ */
+.section{position:relative;z-index:2;padding:80px 36px}
+.section-inner{max-width:1200px;margin:0 auto}
+
+.section-label{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:16px;
+}
+.section-label::before{content:'';width:24px;height:1px;background:var(--amber);opacity:.5}
+.section-title{
+  font-family:var(--serif);font-size:clamp(28px,4vw,42px);
+  color:var(--tx);line-height:1.2;letter-spacing:-.015em;margin-bottom:12px;
+}
+.section-title em{color:var(--amber);font-style:italic}
+.section-desc{font-size:15px;color:var(--tx3);line-height:1.7;max-width:540px;margin-bottom:52px}
+
+/* ═══════════════════════════════════════
+   PARTNERS GRID
+═══════════════════════════════════════ */
+.partners-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:24px;
+}
+
+.partner-card{
+  position:relative;
+  background:var(--sur);
+  border:1px solid var(--bdr);
+  border-radius:20px;
+  padding:40px 32px;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+  transition:all .3s var(--ease);
+  overflow:hidden;
+  cursor:pointer;
+}
+.partner-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at top center,rgba(217,119,6,.06) 0%,transparent 65%);
+  opacity:0;transition:opacity .3s;
+  pointer-events:none;
+}
+.partner-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--amber3),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.partner-card:hover{
+  transform:translateY(-6px);
+  border-color:var(--bdr2);
+  box-shadow:0 20px 60px rgba(0,0,0,.4), 0 0 0 1px var(--bdr2);
+}
+.partner-card:hover::before{opacity:1}
+.partner-card:hover::after{opacity:1}
+.partner-card:hover .partner-logo{animation:float 3s ease-in-out infinite}
+
+.partner-logo-wrap{
+  width:100px;height:100px;
+  border-radius:18px;
+  background:var(--sur3);
+  border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:24px;
+  padding:14px;
+  transition:all .3s;
+  overflow:hidden;
+}
+.partner-card:hover .partner-logo-wrap{
+  border-color:var(--bdr2);
+  box-shadow:0 8px 32px rgba(217,119,6,.15);
+}
+.partner-logo{width:100%;height:100%;object-fit:contain;transition:all .3s}
+
+.partner-name{
+  font-family:var(--serif);font-size:22px;color:var(--tx);
+  margin-bottom:8px;letter-spacing:-.01em;
+}
+.partner-type{
+  font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:14px;
+}
+.partner-desc{font-size:13px;color:var(--tx4);line-height:1.65;margin-bottom:24px;flex:1}
+
+.partner-link{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 20px;border-radius:99px;
+  border:1px solid var(--bdr2);
+  background:var(--sur3);
+  color:var(--tx3);
+  font-size:12px;font-weight:500;font-family:var(--mono);
+  transition:all .2s;
+  letter-spacing:.04em;
+}
+.partner-link:hover{
+  border-color:var(--amber);color:var(--amber);
+  background:rgba(217,119,6,.08);
+}
+.partner-link svg{width:12px;height:12px;transition:transform .2s}
+.partner-link:hover svg{transform:translate(2px,-2px)}
+
+/* ═══════════════════════════════════════
+   DREAMERS ELITE — SPECIAL SECTION
+═══════════════════════════════════════ */
+.elite-section{
+  position:relative;z-index:2;
+  padding:0 36px 100px;
+}
+.elite-inner{max-width:1200px;margin:0 auto}
+
+.elite-card{
+  position:relative;
+  background:var(--sur);
+  border:1px solid var(--bdr2);
+  border-radius:28px;
+  overflow:hidden;
+  padding:64px;
+}
+.elite-card::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(217,119,6,.08) 0%,transparent 55%),
+    radial-gradient(ellipse at 100% 100%,rgba(217,119,6,.05) 0%,transparent 55%);
+  pointer-events:none;
+}
+.elite-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent 0%,#92400e 20%,#d97706 40%,#fbbf24 60%,#d97706 80%,transparent 100%);
+  animation:shimmer 4s linear infinite;
+  background-size:200% 100%;
+}
+
+.elite-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 18px;border-radius:99px;
+  background:rgba(217,119,6,.12);
+  border:1px solid var(--bdr3);
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber3);margin-bottom:32px;
+}
+.elite-badge svg{width:12px;height:12px}
+
+.elite-layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+
+.elite-content{}
+.elite-title{
+  font-family:var(--serif);font-size:clamp(32px,4vw,52px);
+  color:var(--tx);line-height:1.1;letter-spacing:-.02em;margin-bottom:16px;
+}
+.elite-title em{color:var(--amber);font-style:italic}
+.elite-tagline{
+  font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--amber2);margin-bottom:20px;
+}
+.elite-desc{
+  font-size:15px;color:var(--tx3);line-height:1.75;margin-bottom:36px;
+}
+.elite-highlights{
+  display:flex;flex-direction:column;gap:12px;margin-bottom:40px;
+}
+.elite-highlight{
+  display:flex;align-items:flex-start;gap:12px;
+}
+.elite-highlight-dot{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(217,119,6,.15);border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.elite-highlight-dot svg{width:10px;height:10px;color:var(--amber)}
+.elite-highlight-text{font-size:14px;color:var(--tx3);line-height:1.5}
+.elite-highlight-text strong{color:var(--tx2);font-weight:600}
+
+.elite-cta{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:14px 32px;border-radius:12px;
+  background:linear-gradient(135deg,#92400e,#d97706);
+  color:#fff;font-size:14px;font-weight:600;
+  transition:all .22s;
+  box-shadow:0 4px 20px rgba(217,119,6,.35);
+}
+.elite-cta:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(217,119,6,.5)}
+.elite-cta svg{width:15px;height:15px}
+
+.elite-visual{
+  display:flex;align-items:center;justify-content:center;
+}
+.elite-logo-frame{
+  position:relative;
+  width:280px;height:280px;
+  border-radius:28px;
+  background:var(--bg2);
+  border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+  padding:40px;
+  overflow:hidden;
+}
+.elite-logo-frame::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(217,119,6,.08) 0%,transparent 65%);
+}
+.elite-logo-frame::after{
+  content:'';position:absolute;
+  width:200%;height:200%;
+  top:-50%;left:-50%;
+  background:conic-gradient(from 0deg,transparent 0%,rgba(217,119,6,.08) 10%,transparent 20%);
+  animation:spin 20s linear infinite;
+}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.elite-logo-img{position:relative;z-index:1;width:100%;max-width:200px;object-fit:contain;animation:float 5s ease-in-out infinite}
+
+.elite-orbs{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
+}
+.elite-orb{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(217,119,6,.15),transparent);
+}
+.elite-orb-1{width:300px;height:300px;top:-100px;right:-100px}
+.elite-orb-2{width:200px;height:200px;bottom:-80px;left:-80px}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+.footer{
+  position:relative;z-index:2;
+  border-top:1px solid var(--bdr);
+  background:var(--sur);
+  padding:48px 36px 32px;
+}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.footer-logo-gem{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center}
+.footer-logo-gem svg{width:15px;height:15px}
+.footer-site-name{font-family:var(--serif);font-size:17px;color:var(--tx)}
+.footer-site-name em{color:var(--amber);font-style:italic}
+.footer-tagline{font-size:13px;color:var(--tx4);line-height:1.65;max-width:260px}
+.footer-col-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+.footer-links{display:flex;flex-direction:column;gap:8px}
+.footer-link{font-size:13px;color:var(--tx3);transition:color .18s}
+.footer-link:hover{color:var(--amber)}
+.footer-bottom{max-width:1200px;margin:32px auto 0;padding-top:20px;border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.footer-copy{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.06em}
+.footer-love{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--tx4)}
+.footer-love em{color:var(--amber)}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:900px){
+  .partners-grid{grid-template-columns:1fr 1fr}
+  .elite-layout{grid-template-columns:1fr}
+  .elite-visual{display:none}
+  .elite-card{padding:40px 32px}
+  .footer-inner{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .nav-inner,.page-hero,.section,.elite-section,.footer{padding-left:20px;padding-right:20px}
+  .partners-grid{grid-template-columns:1fr}
+  .page-hero{padding-top:110px;padding-bottom:56px}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+  .elite-card{padding:32px 24px}
+  .page-title{font-size:clamp(36px,9vw,52px)}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="../index.html">
+      <div class="nav-logo">
+        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <span class="nav-site-name">Books Coffee <em>&amp;</em> Dreams</span>
+    </a>
+
+    <div class="nav-links">
+      <a class="nav-link" href="../index.html">Home</a>
+      <a class="nav-link" href="../content.html">Content</a>
+      <a class="nav-link" href="../courses.html">Courses</a>
+      <a class="nav-link" href="../blogs.html">Blogs</a>
+      <a class="nav-link" href="../community.html">Community</a>
+      <a class="nav-link" href="../dashboard.html">Dashboard</a>
+      <a class="nav-link active" href="partners.html">Partners</a>
+    </div>
+
+    <div class="nav-right">
+      <button class="mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+        <span class="icon-moon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+        <span id="modeLabel">Light</span>
+      </button>
+
+      <div class="nav-user" id="navUser" onclick="location.href='../profile.html'">
+        <img class="nav-user-av" id="navAvatar" src="" alt="avatar"/>
+        <span class="nav-user-name" id="navName">Account</span>
+      </div>
+
+      <a class="nav-login" id="navLogin" href="../login.html">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ PAGE HERO ═══ -->
+<section class="page-hero">
+  <div class="hero-eyebrow">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Our Ecosystem
+  </div>
+  <h1 class="page-title">Partners <em>&amp;</em> Allies</h1>
+  <p class="page-sub">Organizations and initiatives that share our belief — that learning, community, and ambition can change everything.</p>
+  <div class="hero-divider"></div>
+</section>
+
+<!-- ═══ PARTNERS SECTION ═══ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Partnered Companies</div>
+      <h2 class="section-title">Built together, <em>better.</em></h2>
+      <p class="section-desc">Each partner brings something distinct to the BCD ecosystem — from coworking to coaching, from skill-building to career transformation.</p>
+    </div>
+
+    <div class="partners-grid">
+
+      <!-- Scholar Pathshala -->
+      <div class="partner-card reveal" onclick="void(0)">
+        <div class="partner-logo-wrap">
+          <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/scholar-pathshala.png?raw=true" alt="Scholar Pathshala" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><path d=&quot;M22 10v6M2 10l10-5 10 5-10 5z&quot;/><path d=&quot;M6 12v5c3 3 9 3 12 0v-5&quot;/></svg>'"/>
+        </div>
+        <div class="partner-type">Education</div>
+        <div class="partner-name">Scholar Pathshala</div>
+        <div class="partner-desc">A learning-first platform where curiosity meets curriculum. Scholar Pathshala brings structured academic journeys to ambitious students across disciplines.</div>
+        <span class="partner-link">
+          Visit
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </span>
+      </div>
+
+      <!-- Wrokoo -->
+      <div class="partner-card reveal" onclick="void(0)">
+        <div class="partner-logo-wrap">
+          <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/wrokoo.png?raw=true" alt="Wrokoo" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><rect x=2 y=3 width=20 height=14 rx=2/><line x1=8 y1=21 x2=16 y2=21/><line x1=12 y1=17 x2=12 y2=21/></svg>'"/>
+        </div>
+        <div class="partner-type">Workspace</div>
+        <div class="partner-name">Wrokoo</div>
+        <div class="partner-desc">Where work meets flow. Wrokoo redefines coworking and productivity for the modern learner — flexible, energizing, and built for deep work.</div>
+        <a class="partner-link" href="../wrokoo/wrokoo.html">
+          Explore
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <!-- Zenith -->
+      <div class="partner-card reveal" onclick="void(0)">
+        <div class="partner-logo-wrap">
+          <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/zenith.png?raw=true" alt="Zenith" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><polygon points=&quot;12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2&quot;/></svg>'"/>
+        </div>
+        <div class="partner-type">Growth</div>
+        <div class="partner-name">Zenith</div>
+        <div class="partner-desc">Reach the top. Zenith is dedicated to helping individuals and teams achieve peak performance — in academics, career, and personal development.</div>
+        <a class="partner-link" href="../zenith/zenith.html">
+          Explore
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <!-- RankForge -->
+      <div class="partner-card reveal" onclick="void(0)">
+        <div class="partner-logo-wrap">
+          <img class="partner-logo" src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/partners/rankforge.png?raw=true" alt="RankForge" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=40 height=40 fill=none stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox=&quot;0 0 24 24&quot;><path d=&quot;M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z&quot;/><path d=&quot;M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z&quot;/><path d=&quot;M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z&quot;/><path d=&quot;M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z&quot;/><path d=&quot;M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z&quot;/><path d=&quot;M15.5 9H17v1.5c0 .83-.67 1.5-1.5 1.5S14 11.33 14 10.5v-5c0-.83.67-1.5 1.5-1.5z&quot;/><path d=&quot;M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z&quot;/><path d=&quot;M8.5 15H7v-1.5c0-.83.67-1.5 1.5-1.5S10 12.67 10 13.5v5c0 .83-.67 1.5-1.5 1.5z&quot;/></svg>'"/>
+        </div>
+        <div class="partner-type">Competitive Prep</div>
+        <div class="partner-name">RankForge</div>
+        <div class="partner-desc">Forged for those who want to rank. RankForge equips competitive exam aspirants with the tools, tests, and tenacity to claim their spot at the top.</div>
+        <a class="partner-link" href="../rankforge/rankforge.html">
+          Explore
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DREAMERS ELITE SECTION ═══ -->
+<section class="elite-section">
+  <div class="elite-inner">
+    <div class="elite-card reveal">
+      <div class="elite-orbs">
+        <div class="elite-orb elite-orb-1"></div>
+        <div class="elite-orb elite-orb-2"></div>
+      </div>
+
+      <div style="position:relative;z-index:2">
+        <div class="elite-badge">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          BCD Special Event
+        </div>
+
+        <div class="elite-layout">
+          <div class="elite-content">
+            <div class="elite-tagline">The Festival of Books, Coffee &amp; Dreams</div>
+            <h2 class="elite-title">Dreamers <em>Elite</em></h2>
+            <p class="elite-desc">Dreamers Elite is the flagship event of Books Coffee and Dreams — an immersive gathering where the community comes alive. Talks, workshops, book exchanges, performances, and conversations that spark something lasting.</p>
+            <div class="elite-highlights">
+              <div class="elite-highlight">
+                <div class="elite-highlight-dot">
+                  <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="elite-highlight-text"><strong>Live Sessions &amp; Talks</strong> — Curated speakers, readers, and community voices.</div>
+              </div>
+              <div class="elite-highlight">
+                <div class="elite-highlight-dot">
+                  <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="elite-highlight-text"><strong>Workshops &amp; Deep Dives</strong> — Hands-on experiences for curious minds.</div>
+              </div>
+              <div class="elite-highlight">
+                <div class="elite-highlight-dot">
+                  <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="elite-highlight-text"><strong>Community Celebration</strong> — A space where dreamers meet and bonds form.</div>
+              </div>
+            </div>
+            <a class="elite-cta" href="../dreamerselite/de.html">
+              <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Discover Dreamers Elite
+            </a>
+          </div>
+
+          <div class="elite-visual">
+            <div class="elite-logo-frame">
+              <img class="elite-logo-img"
+                src="https://github.com/bookscoffeedreams/bookscoffeedreams.github.io/blob/main/assets/dreamers-elite/logo.png?raw=true"
+                alt="Dreamers Elite"
+                onerror="this.style.opacity='.4'"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">
+        <div class="footer-logo-gem">
+          <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <span class="footer-site-name">Books <em>&amp;</em> Dreams</span>
+      </div>
+      <div class="footer-tagline">A warm, intelligent community for readers, learners, and dreamers. Your journey to brilliance begins here.</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigate</div>
+      <div class="footer-links">
+        <a class="footer-link" href="../index.html">Home</a>
+        <a class="footer-link" href="../content.html">Content</a>
+        <a class="footer-link" href="../courses.html">Courses</a>
+        <a class="footer-link" href="../blogs.html">Blogs</a>
+        <a class="footer-link" href="../community.html">Community</a>
+        <a class="footer-link" href="partners.html">Partners</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Account</div>
+      <div class="footer-links">
+        <a class="footer-link" href="../profile.html">Profile</a>
+        <a class="footer-link" href="../settings.html">Settings</a>
+        <a class="footer-link" href="../login.html">Sign In</a>
+        <a class="footer-link" href="../staff-application.html">Apply as Staff</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Books Coffee and Dreams — All rights reserved</div>
+    <div class="footer-love">Made with <em>love</em> for curious minds</div>
+  </div>
+</footer>
+
+<script src="../firebase-init.js" defer></script>
+
+<script>
+/* ─── Dark/Light Mode ─── */
+const html = document.documentElement;
+const toggle = document.getElementById('modeToggle');
+const label = document.getElementById('modeLabel');
+
+function applyMode(m){
+  html.setAttribute('data-mode', m);
+  label.textContent = m === 'dark' ? 'Light' : 'Dark';
+  localStorage.setItem('bcd-mode', m);
+}
+toggle?.addEventListener('click', () => {
+  applyMode(html.getAttribute('data-mode') === 'dark' ? 'light' : 'dark');
+});
+const saved = localStorage.getItem('bcd-mode');
+if(saved) applyMode(saved);
+
+/* ─── Scroll Reveal ─── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('in'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.08) + 's';
+  observer.observe(el);
+});
+
+/* ─── Auth State (if Firebase loaded) ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('navLogin');
+  const userPill = document.getElementById('navUser');
+
+  if(typeof firebase !== 'undefined' && firebase.auth) {
+    firebase.auth().onAuthStateChanged(user => {
+      if(user){
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(userPill){ userPill.style.display = 'flex'; }
+        const av = document.getElementById('navAvatar');
+        const nm = document.getElementById('navName');
+        if(av && user.photoURL) av.src = user.photoURL;
+        if(nm) nm.textContent = user.displayName || user.email?.split('@')[0] || 'Me';
+      } else {
+        if(loginBtn) loginBtn.style.display = 'flex';
+        if(userPill) userPill.style.display = 'none';
+      }
+    });
+  } else {
+    if(loginBtn) loginBtn.style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
