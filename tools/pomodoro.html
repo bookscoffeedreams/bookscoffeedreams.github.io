@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Books Coffee Dreams - Advanced Pomodoro</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #07111f;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 119, 0, 0.18);
+      filter: blur(120px);
+      border-radius: 50%;
+      top: -150px;
+      right: -120px;
+      z-index: -1;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 1400px;
+      margin: auto;
+      padding: 40px 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+      min-height: 90vh;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 20px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      color: #ffb066;
+    }
+
+    .hero h1 {
+      font-size: 78px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+
+    .hero p {
+      color: #c6d0df;
+      line-height: 1.8;
+      font-size: 18px;
+      max-width: 620px;
+      margin-bottom: 32px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 16px 28px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s ease;
+      font-size: 15px;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg,#ff7a00,#ff9a3c);
+      color: white;
+      box-shadow: 0 15px 40px rgba(255,122,0,0.25);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-4px);
+    }
+
+    .secondary-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    .timer-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      border-radius: 36px;
+      padding: 35px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .focus-tag {
+      background: rgba(255,122,0,0.15);
+      color: #ffb066;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    .timer-circle {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      border: 14px solid #ff7a00;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0b1626;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    .timer-content {
+      text-align: center;
+    }
+
+    .timer-content h1 {
+      font-size: 74px;
+      letter-spacing: 3px;
+      margin: 10px 0;
+    }
+
+    .timer-content p {
+      color: #c8d2df;
+    }
+
+    .timer-controls {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 16px;
+    }
+
+    .control-btn {
+      padding: 15px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    .control-btn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg,#ff7a00,#ff9d45);
+    }
+
+    .features {
+      margin-top: 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      padding: 28px;
+      transition: 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .feature-card i {
+      font-size: 34px;
+      color: #ff9d45;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+
+    .feature-card p {
+      color: #bcc7d6;
+      line-height: 1.7;
+    }
+
+    .advanced-section {
+      margin-top: 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 32px;
+      padding: 35px;
+    }
+
+    .panel h2 {
+      margin-bottom: 30px;
+      font-size: 34px;
+    }
+
+    .logic-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .logic-item i {
+      color: #ff9d45;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      padding: 24px;
+      border-radius: 24px;
+    }
+
+    .stat-card h1 {
+      font-size: 42px;
+      margin-top: 10px;
+    }
+
+    .progress-box {
+      background: #101b2c;
+      border-radius: 24px;
+      padding: 25px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .progress {
+      width: 92%;
+      height: 100%;
+      background: linear-gradient(135deg,#ff7a00,#ffb347);
+      border-radius: 999px;
+    }
+
+    .motivation {
+      margin-top: 25px;
+      background: rgba(255,122,0,0.12);
+      border: 1px solid rgba(255,122,0,0.2);
+      padding: 24px;
+      border-radius: 24px;
+      color: #ffd2aa;
+      line-height: 1.8;
+    }
+
+    @media(max-width: 1100px) {
+      .hero,
+      .advanced-section {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 56px;
+      }
+
+      .timer-circle {
+        width: 260px;
+        height: 260px;
+      }
+
+      .timer-content h1 {
+        font-size: 58px;
+      }
+    }
+
+    @media(max-width: 700px) {
+      .hero h1 {
+        font-size: 42px;
+      }
+
+      .timer-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .timer-circle {
+        width: 220px;
+        height: 220px;
+      }
+
+      .timer-content h1 {
+        font-size: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <section class="hero">
+
+      <div>
+        <div class="badge">
+          <i class="fa-solid fa-mug-hot"></i>
+          Built for Books • Coffee • Dreams
+        </div>
+
+        <h1>
+          Focus Deep.<br>
+          Dream Bigger.
+        </h1>
+
+        <p>
+          An immersive advanced Pomodoro system designed for students,
+          developers, dreamers, readers, and creators. Calm aesthetics,
+          analytics, focus intelligence, productivity tracking, and deep work
+          experiences.
+        </p>
+
+        <div class="hero-buttons">
+          <button class="btn primary-btn">
+            <i class="fa-solid fa-play"></i>
+            Start Focusing
+          </button>
+
+          <button class="btn secondary-btn">
+            <i class="fa-solid fa-compass"></i>
+            Explore Features
+          </button>
+        </div>
+      </div>
+
+      <div class="timer-card">
+
+        <div class="top-row">
+          <div>
+            <p style="color:#aab6c5">Current Session</p>
+            <h2 style="margin-top:6px">Deep Work</h2>
+          </div>
+
+          <div class="focus-tag">
+            <i class="fa-solid fa-bolt"></i>
+            Focus Mode Active
+          </div>
+        </div>
+
+        <div class="timer-circle">
+          <div class="timer-content">
+            <p>Time Left</p>
+            <h1 id="timer">25:00</h1>
+            <p>
+              <i class="fa-solid fa-mug-hot"></i>
+              Keep Going
+            </p>
+          </div>
+        </div>
+
+        <div class="timer-controls">
+          <button class="control-btn start-btn" onclick="startTimer()">
+            <i class="fa-solid fa-play"></i>
+            Start
+          </button>
+
+          <button class="control-btn" onclick="pauseTimer()">
+            <i class="fa-solid fa-pause"></i>
+            Pause
+          </button>
+
+          <button class="control-btn" onclick="resetTimer()">
+            <i class="fa-solid fa-rotate-right"></i>
+            Reset
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+
+      <div class="feature-card">
+        <i class="fa-solid fa-brain"></i>
+        <h3>AI Focus Insights</h3>
+        <p>
+          AI analyzes your productivity patterns and gives smart focus
+          suggestions.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <i class="fa-solid fa-mug-saucer"></i>
+        <h3>Coffee Mode</h3>
+        <p>
+          Warm café ambience with rain sounds, keyboard clicks, and lofi vibes.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <i class="fa-solid fa-star"></i>
+        <h3>Dream Tracker</h3>
+        <p>
+          Track your dreams, coding goals, projects, books, and learning streaks.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <i class="fa-solid fa-book-open"></i>
+        <h3>Book Sessions</h3>
+        <p>
+          Dedicated reading sessions with highlights, notes, and quote tracking.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="advanced-section">
+
+      <div class="panel">
+        <h2>Advanced Logic System</h2>
+
+        <div class="logic-item">
+          <i class="fa-solid fa-circle-check"></i>
+          Smart auto-break detection
+        </div>
+
+        <div class="logic-item">
+          <i class="fa-solid fa-circle-check"></i>
+          Focus score algorithm
+        </div>
+
+        <div class="logic-item">
+          <i class="fa-solid fa-circle-check"></i>
+          Dynamic focus intensity system
+        </div>
+
+        <div class="logic-item">
+          <i class="fa-solid fa-circle-check"></i>
+          AI productivity reports
+        </div>
+
+        <div class="logic-item">
+          <i class="fa-solid fa-circle-check"></i>
+          XP and streak engine
+        </div>
+
+        <div class="logic-item">
+          <i class="fa-solid fa-circle-check"></i>
+          Offline sync and cloud save
+        </div>
+      </div>
+
+      <div class="panel">
+
+        <h2>The Full Experience</h2>
+
+        <div class="progress-box">
+          <div style="display:flex;justify-content:space-between">
+            <h3>Today's Progress</h3>
+            <span style="color:#ffb066">92%</span>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress"></div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <p style="color:#b5c1d1">Focus Hours</p>
+            <h1>6.2h</h1>
+          </div>
+
+          <div class="stat-card">
+            <p style="color:#b5c1d1">Current Streak</p>
+            <h1>18🔥</h1>
+          </div>
+        </div>
+
+        <div class="motivation">
+          <strong>
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            AI Motivation
+          </strong>
+          <p style="margin-top:10px">
+            You focus best during late evenings with rain ambience and
+            45-minute deep work sessions.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script>
+
+    let timeLeft = 25 * 60;
+    let timer;
+    let running = false;
+
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+
+      document.getElementById('timer').innerText =
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      if (running) return;
+
+      running = true;
+
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          updateTimer();
+        } else {
+          clearInterval(timer);
+          running = false;
+          alert('Focus Session Completed!');
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timer);
+      running = false;
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      running = false;
+      timeLeft = 25 * 60;
+      updateTimer();
+    }
+
+    updateTimer();
+
+  </script>
+
+</body>
+</html>
