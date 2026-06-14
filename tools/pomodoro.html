@@ -170,6 +170,24 @@ body.env-library::after{display:none}
 .nav-item.active .nav-kbd{border-color:var(--tomato-soft-2);color:var(--tomato-deep)}
 
 .sidebar-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.account-pill{
+  position:fixed;top:34px;right:46px;z-index:150;
+  display:flex;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:var(--radius-pill);
+  border:1px solid var(--line);background:var(--surface);transition:border-color .15s,background .15s;
+  box-shadow:var(--shadow-sm);
+}
+.account-pill:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.account-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--tomato-soft-2);flex-shrink:0;background:var(--surface-2)}
+.account-name{font-size:13px;font-weight:600;color:var(--ink);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:760px){
+  .account-pill{
+    top:11px;right:14px;left:auto;z-index:200;
+    padding:0;border:none;background:transparent;box-shadow:none;
+  }
+  .account-pill:hover{background:transparent;border:none}
+  .account-av{width:38px;height:38px}
+  .account-name{display:none}
+}
 .streak-box{background:var(--surface-2);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px}
 .streak-box .icon{width:19px;height:19px;color:var(--tomato);flex-shrink:0}
 .streak-box-text{display:flex;flex-direction:column}
@@ -859,6 +877,11 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
 
   <!-- ============ MAIN ============ -->
   <main class="main">
+
+    <a class="account-pill" id="accountPill" href="profile.html">
+      <img class="account-av" id="accountAvatar" src="" alt="">
+      <span class="account-name" id="accountName">Loading…</span>
+    </a>
 
     <!-- ================= FOCUS VIEW ================= -->
     <section class="view active" id="view-focus" data-view="focus">
@@ -4082,6 +4105,8 @@ const FIREBASE_CONFIG = {
   measurementId: "G-6Q46Z9ZF0D"
 };
 
+const DEF_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+
 let app, auth, db;
 let currentUser = null;
 let docRef = null;
@@ -4095,6 +4120,7 @@ function init(){
   try{
     if(!window.firebase || !window.firebase.initializeApp){
       console.warn('Ripen: Firebase SDK not found, running in local-only mode.');
+      setFallbackAccountPill();
       return;
     }
     if(!firebase.apps || !firebase.apps.length){
@@ -4106,6 +4132,7 @@ function init(){
     db = firebase.firestore();
   }catch(e){
     console.warn('Ripen: Firebase init failed, running in local-only mode.', e);
+    setFallbackAccountPill();
     return;
   }
 
@@ -4119,11 +4146,31 @@ function init(){
       return;
     }
     currentUser = user;
+    populateAccountPill(user);
     docRef = db.collection('users').doc(user.uid).collection('tools').doc('ripen');
     attachListener();
   });
 }
 
+/* ---------- account pill (avatar + name, links to profile.html) ---------- */
+function populateAccountPill(user){
+  const av = document.getElementById('accountAvatar');
+  const name = document.getElementById('accountName');
+  if(!av || !name) return;
+  const src = user.photoURL || DEF_AV;
+  av.src = src;
+  av.onerror = ()=>{ av.onerror=null; av.src = DEF_AV; };
+  name.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'You');
+}
+
+function setFallbackAccountPill(){
+  const av = document.getElementById('accountAvatar');
+  const name = document.getElementById('accountName');
+  if(!av || !name) return;
+  av.src = DEF_AV;
+  av.onerror = ()=>{ av.onerror=null; av.style.display='none'; };
+  name.textContent = 'Account';
+}
 /* ---------- merge a plain object into the live STATE object in place ----------
    STATE is referenced by every module as a stable object; we must mutate it
    rather than reassign, so existing `const { STATE } = window.Ripen` bindings
