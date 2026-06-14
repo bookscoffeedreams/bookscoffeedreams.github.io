@@ -5,11 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Ripen — A Focus Instrument</title>
 <meta name="description" content="A focus operating system: Pomodoro timer with multiple methods, focus environments, exam planning, syllabus tracking, distraction logging, focus journal, achievements, and analytics — all local, no account needed.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='21' r='15.5' fill='%23e0452e'/%3E%3Cpath d='M20 6 C17 3.6 13 2.4 10.5 4.2 C12.5 6.8 16.5 7.4 20 6Z M20 6 C23 3.6 27 2.4 29.5 4.2 C27.5 6.8 23.5 7.4 20 6Z' fill='%2352805a'/%3E%3C/svg%3E">
+<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" type="image/png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+
+<!-- Firebase (Books Coffee and Dreams — bcd-discord project) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
 <script>
 /*!
@@ -146,7 +151,7 @@ body.env-library::after{display:none}
 
 /* ============ SIDEBAR ============ */
 .brand{display:flex;align-items:center;gap:12px;padding:25px 22px 23px;border-bottom:1px solid var(--line)}
-.brand-mark{width:36px;height:36px;flex-shrink:0;color:var(--tomato)}
+.brand-mark{width:36px;height:36px;flex-shrink:0;color:var(--tomato);object-fit:contain;border-radius:8px}
 .brand-name{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:.01em;line-height:1.1}
 .brand-tag{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.16em;text-transform:uppercase;margin-top:3px}
 
@@ -813,7 +818,7 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <svg class="brand-mark"><use href="#icon-tomato"/></svg>
+      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="36" height="36">
       <div>
         <div class="brand-name">Ripen</div>
         <div class="brand-tag">A Focus Instrument</div>
@@ -848,7 +853,7 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
   <!-- ============ MOBILE TOPBAR ============ -->
   <div class="topbar-mobile">
     <button class="menu-btn" id="menuBtn"><svg class="icon"><use href="#icon-grid"/></svg></button>
-    <svg class="brand-mark"><use href="#icon-tomato"/></svg>
+    <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="26" height="26">
     <div class="brand-name">Ripen</div>
   </div>
 
@@ -1578,7 +1583,11 @@ function saveState(){
     console.warn('Ripen: failed to save state.', e);
     showToast('icon-alert','Storage error','Your browser blocked saving data (private mode or storage full).');
   }
+  for(let i=0;i<saveState.postHooks.length;i++){
+    try{ saveState.postHooks[i](); }catch(e){ console.warn('Ripen: saveState hook failed', e); }
+  }
 }
+saveState.postHooks = [];
 
 let STATE = loadState();
 
@@ -4046,6 +4055,272 @@ if(document.readyState==='loading'){
   boot();
 }
 
+})();
+/* ============================================================
+   BCD FIREBASE SYNC
+   Ripen runs as a tool inside Books Coffee and Dreams. This
+   module gates the page behind BCD auth (redirects to
+   login.html if signed out) and persists Ripen's state to
+   Firestore under users/{uid}/tools/ripen, per user.
+
+   localStorage remains as an instant-boot cache (so the UI
+   never flashes empty while Firestore loads) and as an
+   offline fallback if Firestore is unreachable.
+   ============================================================ */
+(function(){
+const R = window.Ripen;
+const { STATE, saveState, defaultState } = R;
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain: "bcd-discord.firebaseapp.com",
+  databaseURL: "https://bcd-discord-default-rtdb.firebaseio.com",
+  projectId: "bcd-discord",
+  storageBucket: "bcd-discord.firebasestorage.app",
+  messagingSenderId: "278895155371",
+  appId: "1:278895155371:web:177a468f5fa3f0abfe3fee",
+  measurementId: "G-6Q46Z9ZF0D"
+};
+
+let app, auth, db;
+let currentUser = null;
+let docRef = null;
+let remoteReady = false;     // true once the first Firestore snapshot has been applied
+let suppressNextWrite = false; // true while applying a remote snapshot, to avoid write-loops
+let saveTimer = null;
+const SAVE_DEBOUNCE_MS = 1200;
+
+/* ---------- init ---------- */
+function init(){
+  try{
+    if(!window.firebase || !window.firebase.initializeApp){
+      console.warn('Ripen: Firebase SDK not found, running in local-only mode.');
+      return;
+    }
+    if(!firebase.apps || !firebase.apps.length){
+      app = firebase.initializeApp(FIREBASE_CONFIG);
+    }else{
+      app = firebase.app();
+    }
+    auth = firebase.auth();
+    db = firebase.firestore();
+  }catch(e){
+    console.warn('Ripen: Firebase init failed, running in local-only mode.', e);
+    return;
+  }
+
+  showSyncStatus('connecting');
+  installSaveHook();
+
+  auth.onAuthStateChanged(user=>{
+    if(!user){
+      // not signed in to Books Coffee and Dreams — send to login
+      location.href = 'login.html';
+      return;
+    }
+    currentUser = user;
+    docRef = db.collection('users').doc(user.uid).collection('tools').doc('ripen');
+    attachListener();
+  });
+}
+
+/* ---------- merge a plain object into the live STATE object in place ----------
+   STATE is referenced by every module as a stable object; we must mutate it
+   rather than reassign, so existing `const { STATE } = window.Ripen` bindings
+   keep working everywhere. */
+function mergeStateInPlace(target, incoming){
+  const def = defaultState();
+  const merged = Object.assign({}, def, incoming || {});
+  merged.settings = Object.assign({}, def.settings, (incoming&&incoming.settings)||{});
+  merged.timer = Object.assign({}, def.timer, (incoming&&incoming.timer)||{});
+  merged.streak = Object.assign({}, def.streak, (incoming&&incoming.streak)||{});
+  merged.rooms = Object.assign({}, def.rooms, (incoming&&incoming.rooms)||{});
+  merged.subjects = (incoming&&incoming.subjects) || [];
+  merged.exams = (incoming&&incoming.exams) || [];
+  merged.sessions = (incoming&&incoming.sessions) || [];
+  merged.journal = (incoming&&incoming.journal) || [];
+  merged.achievements = (incoming&&incoming.achievements) || {};
+  merged.meta = Object.assign({}, def.meta, (incoming&&incoming.meta)||{});
+
+  // wipe enumerable keys of target, then copy merged keys in
+  Object.keys(target).forEach(k=>delete target[k]);
+  Object.keys(merged).forEach(k=>{ target[k] = merged[k]; });
+}
+
+/* ---------- pick the newer of local vs remote on first load ----------
+   Uses meta.updatedAt (ms epoch) so a user who used Ripen locally before
+   this update (or offline) doesn't lose data to an empty/older remote doc. */
+function pickInitial(localState, remoteState){
+  if(!remoteState) return localState;
+  const localTs = (localState && localState.meta && localState.meta.updatedAt) || 0;
+  const remoteTs = (remoteState && remoteState.meta && remoteState.meta.updatedAt) || 0;
+  const localHasData = localState && Array.isArray(localState.sessions) && localState.sessions.length>0;
+  const remoteHasData = remoteState && Array.isArray(remoteState.sessions) && remoteState.sessions.length>0;
+
+  if(remoteHasData && !localHasData) return remoteState;
+  if(localHasData && !remoteHasData) return localState;
+  if(remoteTs >= localTs) return remoteState;
+  return localState;
+}
+
+/* ---------- realtime listener ---------- */
+function attachListener(){
+  showSyncStatus('connecting');
+  let firstSnapshot = true;
+
+  docRef.onSnapshot({ includeMetadataChanges:true }, snap=>{
+    if(!firstSnapshot && snap.metadata.hasPendingWrites){
+      // this snapshot is the echo of our own write — ignore to avoid loops
+      showSyncStatus('synced');
+      return;
+    }
+
+    const remoteData = snap.exists ? snap.data().state : null;
+
+    if(firstSnapshot){
+      firstSnapshot = false;
+      const chosen = pickInitial(STATE, remoteData);
+      applyRemoteState(chosen);
+      remoteReady = true;
+      // ensure the doc exists / is up to date with whichever state we picked
+      pushToFirestore(true);
+      showSyncStatus('synced');
+      return;
+    }
+
+    // subsequent remote changes (e.g. same account open on another device)
+    if(remoteData){
+      applyRemoteState(remoteData);
+      showSyncStatus('synced');
+    }
+  }, err=>{
+    console.warn('Ripen: Firestore listener error, continuing in local-only mode.', err);
+    remoteReady = false;
+    showSyncStatus('offline');
+  });
+}
+
+/* ---------- apply a full state object to the live STATE and refresh UI ---------- */
+function applyRemoteState(remoteData){
+  suppressNextWrite = true;
+  mergeStateInPlace(STATE, remoteData);
+
+  // also refresh localStorage cache so next load is instant + correct
+  try{ localStorage.setItem(R.STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+
+  refreshEverything();
+  suppressNextWrite = false;
+}
+
+/* ---------- re-render whatever is visible after a remote state swap ---------- */
+function refreshEverything(){
+  if(!window.RipenTimer) return; // app not booted yet; boot() will render fresh anyway
+
+  // timer config (method/env/subject) may have changed
+  document.querySelectorAll('.method-btn').forEach(b=>b.classList.toggle('active', b.dataset.method===STATE.timer.method));
+  document.querySelectorAll('.env-btn').forEach(b=>b.classList.toggle('active', b.dataset.env===STATE.timer.environment));
+  document.getElementById('customFields').classList.toggle('show', STATE.timer.method==='custom');
+  document.getElementById('customFocus').value = STATE.timer.customFocus;
+  document.getElementById('customShort').value = STATE.timer.customShort;
+  document.getElementById('customLong').value = STATE.timer.customLong;
+  document.getElementById('envVolume').value = STATE.settings.soundVolume;
+  document.getElementById('soundToggle').classList.toggle('on', STATE.settings.soundEnabled);
+  document.body.className = document.body.className.replace(/env-\w+/g,'').trim();
+  document.body.classList.add('env-'+STATE.timer.environment);
+
+  R.applyTheme();
+  if(window.RipenChartTheme) window.RipenChartTheme();
+
+  window.RipenSettings.populateSubjectSelectors();
+  window.RipenSettings.renderSubjectsManageList();
+  window.RipenSettings.syncSwitchesFromState();
+
+  window.RipenTimer.updateLiveStats();
+  window.RipenTimer.renderFlags();
+
+  // re-render the currently active view
+  const activeView = document.querySelector('.view.active');
+  if(activeView && window.RipenViews && window.RipenViews[activeView.dataset.view]){
+    window.RipenViews[activeView.dataset.view]();
+  }
+
+  document.getElementById('sidebarStreak').textContent = STATE.streak.current;
+}
+
+/* ---------- push current STATE to Firestore (debounced) ---------- */
+function scheduleSave(){
+  if(!docRef || suppressNextWrite) return;
+  if(saveTimer) clearTimeout(saveTimer);
+  showSyncStatus('saving');
+  saveTimer = setTimeout(()=>pushToFirestore(false), SAVE_DEBOUNCE_MS);
+}
+
+function pushToFirestore(immediate){
+  if(!docRef) return;
+  STATE.meta = STATE.meta || {};
+  STATE.meta.updatedAt = Date.now();
+  // keep local cache's meta.updatedAt aligned too
+  try{ localStorage.setItem(R.STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+
+  const payload = {
+    state: JSON.parse(JSON.stringify(STATE)),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: currentUser ? currentUser.uid : null
+  };
+
+  docRef.set(payload, { merge:false }).then(()=>{
+    showSyncStatus('synced');
+  }).catch(err=>{
+    console.warn('Ripen: Firestore write failed, will retry on next change.', err);
+    showSyncStatus('offline');
+  });
+
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
+}
+
+/* ---------- wrap saveState so every existing call also syncs ----------
+   saveState.postHooks is a shared array on the saveState function object
+   itself (see app_1.js), so registering here affects every module that
+   already holds a reference to saveState — no reassignment needed. */
+function installSaveHook(){
+  saveState.postHooks.push(scheduleSave);
+}
+
+/* ---------- sync status indicator (subtle dot near streak box) ---------- */
+function showSyncStatus(state){
+  let dot = document.getElementById('syncStatusDot');
+  if(!dot){
+    const streakBox = document.querySelector('.streak-box');
+    if(!streakBox) return;
+    dot = document.createElement('span');
+    dot.id = 'syncStatusDot';
+    dot.style.cssText = 'width:7px;height:7px;border-radius:50%;display:inline-block;margin-left:auto;flex-shrink:0;transition:background-color .3s;';
+    streakBox.style.display='flex';
+    streakBox.appendChild(dot);
+  }
+  const colors = {
+    connecting:'var(--ink-faint)',
+    saving:'var(--amber)',
+    synced:'var(--vine)',
+    offline:'var(--tomato)'
+  };
+  dot.style.backgroundColor = colors[state] || 'var(--ink-faint)';
+  dot.title = {
+    connecting:'Connecting to your Books Coffee and Dreams account…',
+    saving:'Saving…',
+    synced:'Synced to your account',
+    offline:'Offline — changes saved on this device only'
+  }[state] || '';
+}
+
+/* ---------- sign out support (if a logout control exists elsewhere) ---------- */
+window.RipenFirebase = {
+  init,
+  getCurrentUser: ()=>currentUser,
+  forceSync: ()=>pushToFirestore(true)
+};
+
+init();
 })();
 
 </script>
