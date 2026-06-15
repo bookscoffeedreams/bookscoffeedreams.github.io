@@ -172,23 +172,21 @@ body.env-library::after{display:none}
 .sidebar-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .account-pill{
   position:absolute;top:38px;right:46px;z-index:10;
-  display:flex;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:var(--radius-pill);
+  display:block;width:38px;height:38px;border-radius:50%;
   border:1px solid var(--line);background:var(--surface);transition:border-color .15s,background .15s;
   box-shadow:var(--shadow-sm);
 }
 .account-pill:hover{border-color:var(--line-strong);background:var(--surface-2)}
-.account-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:var(--surface-2);border:2px solid var(--tomato-soft-2);overflow:hidden;display:block}
+.account-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--surface-2);border:2px solid var(--tomato-soft-2);overflow:hidden;display:block;margin:auto}
 .account-av img{width:100%;height:100%;object-fit:cover;display:block}
 .account-av img:not([src]),.account-av img[src=""]{display:none}
-.account-name{font-size:13px;font-weight:600;color:var(--ink);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:760px){
   .account-pill{
     position:fixed;top:11px;right:14px;left:auto;z-index:200;
-    padding:0;border:none;background:transparent;box-shadow:none;
+    width:38px;height:38px;border:none;background:transparent;box-shadow:none;
   }
   .account-pill:hover{background:transparent;border:none}
   .account-av{width:38px;height:38px}
-  .account-name{display:none}
 }
 .streak-box{background:var(--surface-2);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px}
 .streak-box .icon{width:19px;height:19px;color:var(--tomato);flex-shrink:0}
@@ -887,9 +885,8 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
   <!-- ============ MAIN ============ -->
   <main class="main">
 
-    <a class="account-pill" id="accountPill" href="profile.html">
+    <a class="account-pill" id="accountPill" href="profile.html" title="Account">
       <span class="account-av" id="accountAvatar"><img alt="" id="accountAvatarImg"></span>
-      <span class="account-name" id="accountName">Account</span>
     </a>
 
     <!-- ================= FOCUS VIEW ================= -->
@@ -4206,9 +4203,7 @@ function init(){
 /* ---------- account pill (avatar + name, links to profile.html) ---------- */
 function populateAccountPill(user){
   const img = document.getElementById('accountAvatarImg');
-  const name = document.getElementById('accountName');
-  if(!img || !name) return;
-  name.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'You');
+  if(!img) return;
 
   const tryDefault = ()=>{
     img.onerror = ()=>{ img.removeAttribute('src'); img.onerror=null; };
@@ -4225,11 +4220,9 @@ function populateAccountPill(user){
 
 function setFallbackAccountPill(){
   const img = document.getElementById('accountAvatarImg');
-  const name = document.getElementById('accountName');
-  if(!img || !name) return;
+  if(!img) return;
   img.onerror = ()=>{ img.removeAttribute('src'); img.onerror=null; };
   img.src = DEF_AV;
-  name.textContent = 'Account';
 }
 /* ---------- merge a plain object into the live STATE object in place ----------
    STATE is referenced by every module as a stable object; we must mutate it
