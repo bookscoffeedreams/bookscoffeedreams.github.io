@@ -146,7 +146,7 @@ body.env-library::after{display:none}
   position:fixed;top:0;left:0;height:100vh;z-index:200;
   transition:transform .3s var(--ease);
 }
-.main{flex:1;margin-left:var(--sidebar-w);min-width:0;padding:38px 46px 90px;max-width:1360px}
+.main{flex:1;margin-left:var(--sidebar-w);min-width:0;padding:38px 46px 90px;max-width:1360px;position:relative}
 .sidebar-scrim{display:none;position:fixed;inset:0;background:rgba(28,27,25,.35);z-index:190}
 
 /* ============ SIDEBAR ============ */
@@ -171,17 +171,19 @@ body.env-library::after{display:none}
 
 .sidebar-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .account-pill{
-  position:fixed;top:34px;right:46px;z-index:150;
+  position:absolute;top:38px;right:46px;z-index:10;
   display:flex;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:var(--radius-pill);
   border:1px solid var(--line);background:var(--surface);transition:border-color .15s,background .15s;
   box-shadow:var(--shadow-sm);
 }
 .account-pill:hover{border-color:var(--line-strong);background:var(--surface-2)}
-.account-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--tomato-soft-2);flex-shrink:0;background:var(--surface-2)}
+.account-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:var(--surface-2);border:2px solid var(--tomato-soft-2);overflow:hidden;display:block}
+.account-av img{width:100%;height:100%;object-fit:cover;display:block}
+.account-av img:not([src]),.account-av img[src=""]{display:none}
 .account-name{font-size:13px;font-weight:600;color:var(--ink);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:760px){
   .account-pill{
-    top:11px;right:14px;left:auto;z-index:200;
+    position:fixed;top:11px;right:14px;left:auto;z-index:200;
     padding:0;border:none;background:transparent;box-shadow:none;
   }
   .account-pill:hover{background:transparent;border:none}
@@ -197,7 +199,8 @@ body.env-library::after{display:none}
 
 /* ============ TOP BAR (per view) ============ */
 .topbar-mobile{display:none}
-.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap}
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap;padding-right:148px}
+@media (max-width:760px){.view-head{padding-right:0}}
 .view-title{font-size:29px;line-height:1.15}
 .view-sub{color:var(--ink-soft);font-size:13px;margin-top:6px;max-width:540px}
 .view-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
@@ -879,8 +882,8 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
   <main class="main">
 
     <a class="account-pill" id="accountPill" href="profile.html">
-      <img class="account-av" id="accountAvatar" src="" alt="">
-      <span class="account-name" id="accountName">Loading…</span>
+      <span class="account-av" id="accountAvatar"><img alt="" id="accountAvatarImg"></span>
+      <span class="account-name" id="accountName">Account</span>
     </a>
 
     <!-- ================= FOCUS VIEW ================= -->
@@ -4154,21 +4157,30 @@ function init(){
 
 /* ---------- account pill (avatar + name, links to profile.html) ---------- */
 function populateAccountPill(user){
-  const av = document.getElementById('accountAvatar');
+  const img = document.getElementById('accountAvatarImg');
   const name = document.getElementById('accountName');
-  if(!av || !name) return;
-  const src = user.photoURL || DEF_AV;
-  av.src = src;
-  av.onerror = ()=>{ av.onerror=null; av.src = DEF_AV; };
+  if(!img || !name) return;
   name.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'You');
+
+  const tryDefault = ()=>{
+    img.onerror = ()=>{ img.removeAttribute('src'); img.onerror=null; };
+    img.src = DEF_AV;
+  };
+
+  if(user.photoURL){
+    img.onerror = tryDefault;
+    img.src = user.photoURL;
+  }else{
+    tryDefault();
+  }
 }
 
 function setFallbackAccountPill(){
-  const av = document.getElementById('accountAvatar');
+  const img = document.getElementById('accountAvatarImg');
   const name = document.getElementById('accountName');
-  if(!av || !name) return;
-  av.src = DEF_AV;
-  av.onerror = ()=>{ av.onerror=null; av.style.display='none'; };
+  if(!img || !name) return;
+  img.onerror = ()=>{ img.removeAttribute('src'); img.onerror=null; };
+  img.src = DEF_AV;
   name.textContent = 'Account';
 }
 /* ---------- merge a plain object into the live STATE object in place ----------
