@@ -944,7 +944,7 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
                 <span class="si-name">Ambient sound</span>
                 <button class="switch" id="soundToggle" title="Toggle sound"></button>
               </div>
-              <div class="si-desc">Synthesised, generated on-device</div>
+              <div class="si-desc" id="ambientSoundDesc">Recorded ambience for this environment</div>
               <div class="range-wrap full"><input type="range" id="envVolume" min="0" max="100" value="35"></div>
             </div>
             <div class="sound-row">
@@ -952,7 +952,7 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
                 <span class="si-name">Lofi music</span>
                 <button class="switch" id="lofiToggle" title="Toggle lofi music"></button>
               </div>
-              <div class="si-desc">Generative chords, drums and vinyl texture — original, composed live</div>
+              <div class="si-desc">A rotating set of lofi study tracks</div>
               <div class="range-wrap full"><input type="range" id="lofiVolume" min="0" max="100" value="40"></div>
             </div>
           </div>
@@ -1852,6 +1852,10 @@ function makeNoiseBuffer(c, seconds){
 function buildAmbience(env){
   const c = getCtx();
   if(!c) return null;
+
+  // environments with real recorded audio don't need synthesized noise
+  if(R.audio.playlist && R.audio.playlist.hasRealAudio(env)) return null;
+
   const master = c.createGain();
   master.gain.value = 0;
   master.connect(c.destination);
@@ -1933,7 +1937,7 @@ function setAmbientEnvironment(env){
   if(!c) return;
   if(ambientNodes){ ambientNodes.stop(); ambientNodes=null; }
   currentEnv = env;
-  if(R.audio.lofi) R.audio.lofi.setLofiEnvironment(env);
+  if(R.audio.playlist) R.audio.playlist.setEnvironment(env);
   if(!STATE.settings.soundEnabled) return;
   if(env==='silent' && STATE.settings.soundVolume>0){
     // silent room: extremely low presence tone, mostly off
@@ -1943,23 +1947,26 @@ function setAmbientEnvironment(env){
     const target = (STATE.settings.soundVolume/100) * (env==='silent'?0.4:1);
     ambientNodes.master.gain.setTargetAtTime(target, c.currentTime, 0.6);
   }
+  if(R.audio.playlist) R.audio.playlist.setEnvVolume(STATE.settings.soundVolume/100);
 }
 
 function setAmbientVolume(vol01){
-  if(!ambientNodes) return;
   const c = getCtx();
   const target = STATE.settings.soundEnabled ? vol01 * (currentEnv==='silent'?0.4:1) : 0;
-  ambientNodes.master.gain.setTargetAtTime(target, c.currentTime, 0.25);
+  if(ambientNodes) ambientNodes.master.gain.setTargetAtTime(target, c.currentTime, 0.25);
+  if(R.audio.playlist) R.audio.playlist.setEnvVolume(vol01);
 }
 
 function toggleAmbient(on){
   const c = getCtx();
   if(!c) return;
-  if(R.audio.lofi) R.audio.lofi.toggleLofi(on && STATE.settings.lofiEnabled);
+  if(R.audio.playlist) R.audio.playlist.toggleEnv(on);
   if(on){
     if(!ambientNodes) ambientNodes = buildAmbience(currentEnv || STATE.timer.environment);
-    const target = (STATE.settings.soundVolume/100) * ((currentEnv||STATE.timer.environment)==='silent'?0.4:1);
-    ambientNodes.master.gain.setTargetAtTime(target, c.currentTime, 0.6);
+    if(ambientNodes){
+      const target = (STATE.settings.soundVolume/100) * ((currentEnv||STATE.timer.environment)==='silent'?0.4:1);
+      ambientNodes.master.gain.setTargetAtTime(target, c.currentTime, 0.6);
+    }
   }else{
     if(ambientNodes) ambientNodes.master.gain.setTargetAtTime(0, c.currentTime, 0.4);
   }
@@ -2513,6 +2520,7 @@ function initTimerUI(){
       saveState();
       R.audio.setAmbientEnvironment(env);
       if(Timer.running) R.audio.toggleAmbient(true);
+      updateAmbientSoundDesc();
     });
   });
 
@@ -2540,32 +2548,22 @@ function initTimerUI(){
     R.audio.setAmbientVolume(STATE.settings.soundVolume/100);
   });
 
-  // lofi music toggle + volume
+  // lofi music toggle + volume (independent of environment/timer state)
   const lofiToggle = document.getElementById('lofiToggle');
   lofiToggle.classList.toggle('on', STATE.settings.lofiEnabled);
   lofiToggle.addEventListener('click', ()=>{
     STATE.settings.lofiEnabled = !STATE.settings.lofiEnabled;
     lofiToggle.classList.toggle('on', STATE.settings.lofiEnabled);
     saveState();
-    if(STATE.settings.lofiEnabled){
-      R.audio.lofi.setLofiEnvironment(STATE.timer.environment);
-      if(Timer.running){
-        R.audio.lofi.toggleLofi(true);
-      }else{
-        // brief preview when toggled on while idle
-        R.audio.lofi.toggleLofi(true);
-        setTimeout(()=>R.audio.lofi.toggleLofi(false), 1800);
-      }
-    }else{
-      R.audio.lofi.toggleLofi(false);
-    }
+    R.audio.playlist.setLofiVolume(STATE.settings.lofiVolume/100);
+    R.audio.playlist.toggleLofi(STATE.settings.lofiEnabled);
   });
   const lofiVol = document.getElementById('lofiVolume');
   lofiVol.value = STATE.settings.lofiVolume;
   lofiVol.addEventListener('input', (e)=>{
     STATE.settings.lofiVolume = parseInt(e.target.value,10);
     saveState();
-    R.audio.lofi.setLofiVolume(STATE.settings.lofiVolume/100);
+    R.audio.playlist.setLofiVolume(STATE.settings.lofiVolume/100);
   });
 
   // subject select
@@ -2628,6 +2626,7 @@ function initTimerUI(){
   document.getElementById('customLong').value = STATE.timer.customLong;
   updateCustomSummary();
   document.body.classList.add('env-'+STATE.timer.environment);
+  updateAmbientSoundDesc();
 
   initFeedbackModal();
   beginPhaseFresh();
@@ -2637,6 +2636,14 @@ function initTimerUI(){
 
 function updateCustomSummary(){
   document.getElementById('customSummary').textContent = STATE.timer.customFocus+' / '+STATE.timer.customShort+' min';
+}
+
+function updateAmbientSoundDesc(){
+  const el = document.getElementById('ambientSoundDesc');
+  if(!el) return;
+  el.textContent = R.audio.playlist.hasRealAudio(STATE.timer.environment)
+    ? 'Recorded ambience for this environment'
+    : 'Synthesised, generated on-device';
 }
 
 function updateTodayDateLabel(){
@@ -4113,6 +4120,12 @@ function boot(){
   const resumeAudio = ()=>{
     const ctx = R.audio.getCtx();
     if(ctx && ctx.state==='suspended') ctx.resume();
+    // browsers block <audio> playback before user interaction too;
+    // if lofi music was left enabled, start it now that we have a gesture
+    if(STATE.settings.lofiEnabled && R.audio.playlist){
+      R.audio.playlist.setLofiVolume(STATE.settings.lofiVolume/100);
+      R.audio.playlist.toggleLofi(true);
+    }
     document.removeEventListener('click', resumeAudio);
     document.removeEventListener('keydown', resumeAudio);
   };
@@ -4423,279 +4436,197 @@ window.RipenFirebase = {
 init();
 })();
 /* ============================================================
-   LOFI ENGINE
-   A fully generative lofi-style music bed: a slow chord pad
-   (randomized key + progression per session), a sparse swung
-   drum pattern, and continuous vinyl-crackle texture. Built
-   entirely from oscillators and filtered noise — no audio
-   files, no licensing concerns, never has a loop seam.
+   PLAYLIST PLAYER
+   Plays real recorded ambience/lofi tracks via HTML5 <audio>,
+   referenced from the bookscoffeedreams.github.io repo's
+   assets/lofi folder. Two audio elements per playlist allow a
+   short crossfade between tracks so loops don't click or pop.
 
-   Mixes alongside the existing ambient-noise layer per
-   environment. Controlled by STATE.settings.lofiEnabled /
-   lofiVolume, set in Settings.
+   Tracks shuffle in a non-repeating order; when the active
+   track nears its end, the next track fades in while the
+   current fades out.
    ============================================================ */
 (function(){
 const R = window.Ripen;
 const { STATE } = R;
 
-// Curated lofi-friendly progressions, written as semitone offsets
-// from the tonic (minor-leaning, the classic "lofi" sound).
-// Each is 4 chords; chord = array of semitone offsets (intervals stacked on root).
-const PROGRESSIONS = [
-  // i - VI - III - VII  (natural minor, dreamy)
-  { roots:[0, 8, 3, 10], quality:[ [0,3,7,10], [0,4,7,11], [0,4,7,10], [0,4,7,10] ] },
-  // i - iv - VII - III
-  { roots:[0, 5, 10, 3], quality:[ [0,3,7,10], [0,3,7,10], [0,4,7,10], [0,4,7,11] ] },
-  // ii - V - i - VI  (jazzy minor turnaround)
-  { roots:[2, 7, 0, 8], quality:[ [0,3,7,10], [0,4,7,10], [0,3,7,10], [0,4,7,11] ] },
-  // i - VII - VI - VII (gentle descent)
-  { roots:[0, 10, 8, 10], quality:[ [0,3,7,10], [0,4,7,10], [0,4,7,11], [0,4,7,10] ] }
-];
+const BASE = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/main/assets/lofi/';
+const CROSSFADE_SEC = 2.5;
 
-// Root note frequencies for a small set of keys (A, C, D, E minor-ish centers),
-// chosen in a comfortable low-mid register for pads.
-const KEY_ROOTS = [110.00, 130.81, 146.83, 164.81]; // A2, C3, D3, E3
+// folder -> track filenames
+const PLAYLISTS = {
+  rain:    ['rain/1.mp3', 'rain/2.mp3'],
+  cabin:   ['mountain/1.mp3', 'mountain/2.mp3'],
+  library: ['birds/1.mp3', 'birds/2.mp3'],
+  lofi:    ['lofi-study/1.mp3', 'lofi-study/2.mp3', 'lofi-study/3.mp3', 'lofi-study/4.mp3']
+};
 
-let lofi = null; // { master, stop(), setVolume(v) }
-let scheduledTimers = [];
-
-function clearTimers(){
-  scheduledTimers.forEach(t=>clearTimeout(t));
-  scheduledTimers = [];
-}
-
-function midiToFreq(rootFreq, semitoneOffset){
-  return rootFreq * Math.pow(2, semitoneOffset/12);
-}
-
-/* ---------- chord pad voice ---------- */
-function playChord(c, dest, rootFreq, intervals, duration, gainPeak){
-  const voiceGains = [];
-  intervals.forEach((semi, i)=>{
-    const freq = midiToFreq(rootFreq, semi - 12); // drop an octave for a warm low pad
-    const osc1 = c.createOscillator();
-    const osc2 = c.createOscillator();
-    osc1.type = 'triangle';
-    osc2.type = 'sine';
-    osc1.frequency.value = freq;
-    osc2.frequency.value = freq * 1.003; // slight detune for warmth
-    const g = c.createGain();
-    g.gain.value = 0;
-    osc1.connect(g);
-    osc2.connect(g);
-    g.connect(dest);
-
-    const peak = gainPeak * (i===0 ? 1 : 0.62); // root louder than upper voices
-    const now = c.currentTime;
-    g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(peak, now + duration*0.18); // slow attack
-    g.gain.setValueAtTime(peak, now + duration*0.7);
-    g.gain.linearRampToValueAtTime(0, now + duration); // release
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + duration + 0.05);
-    osc2.stop(now + duration + 0.05);
-    voiceGains.push(g);
-  });
-}
-
-/* ---------- drum hits ---------- */
-function playKick(c, dest, time, gainPeak){
-  const osc = c.createOscillator();
-  const g = c.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(110, time);
-  osc.frequency.exponentialRampToValueAtTime(45, time + 0.18);
-  g.gain.setValueAtTime(gainPeak, time);
-  g.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
-  osc.connect(g); g.connect(dest);
-  osc.start(time);
-  osc.stop(time + 0.25);
-}
-
-function playSnare(c, dest, time, gainPeak, noiseBuffer){
-  const src = c.createBufferSource();
-  src.buffer = noiseBuffer;
-  const filter = c.createBiquadFilter();
-  filter.type = 'highpass';
-  filter.frequency.value = 1800;
-  const g = c.createGain();
-  g.gain.setValueAtTime(gainPeak, time);
-  g.gain.exponentialRampToValueAtTime(0.001, time + 0.09);
-  src.connect(filter); filter.connect(g); g.connect(dest);
-  src.start(time);
-  src.stop(time + 0.1);
-}
-
-function playHat(c, dest, time, gainPeak, noiseBuffer){
-  const src = c.createBufferSource();
-  src.buffer = noiseBuffer;
-  const filter = c.createBiquadFilter();
-  filter.type = 'highpass';
-  filter.frequency.value = 6000;
-  const g = c.createGain();
-  g.gain.setValueAtTime(gainPeak, time);
-  g.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
-  src.connect(filter); filter.connect(g); g.connect(dest);
-  src.start(time);
-  src.stop(time + 0.05);
-}
-
-/* ---------- vinyl crackle ---------- */
-function buildCrackle(c, dest, noiseBuffer, gainTarget){
-  const src = c.createBufferSource();
-  src.buffer = noiseBuffer;
-  src.loop = true;
-  const filter = c.createBiquadFilter();
-  filter.type = 'highpass';
-  filter.frequency.value = 4500;
-  const g = c.createGain();
-  g.gain.value = gainTarget * 0.35; // continuous low hiss floor
-
-  src.connect(filter); filter.connect(g); g.connect(dest);
-  src.start();
-
-  // sporadic pops: random short gain spikes on top of the hiss
-  let popTimer;
-  function schedulePop(){
-    const delay = 200 + Math.random()*900; // every 0.2-1.1s
-    popTimer = setTimeout(()=>{
-      const popG = c.createGain();
-      const popSrc = c.createBufferSource();
-      popSrc.buffer = noiseBuffer;
-      popG.gain.setValueAtTime(gainTarget * (0.5 + Math.random()*0.6), c.currentTime);
-      popG.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.02);
-      popSrc.connect(filter); // reuse highpass
-      popSrc.connect(popG); popG.connect(dest);
-      popSrc.start();
-      popSrc.stop(c.currentTime + 0.03);
-      schedulePop();
-    }, delay);
-    scheduledTimers.push(popTimer);
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
   }
-  schedulePop();
-
-  return { src, filter, g, stop(){ try{ src.stop(); src.disconnect(); filter.disconnect(); g.disconnect(); }catch(e){} } };
+  return a;
 }
 
-/* ---------- main build ---------- */
-function buildLofi(env){
-  const c = R.audio.getCtx();
-  if(!c) return null;
+/* ---------- a single crossfading playlist ---------- */
+function createPlayer(trackList){
+  const players = [new Audio(), new Audio()];
+  players.forEach(a=>{ a.preload='auto'; a.crossOrigin='anonymous'; a.volume=0; });
 
-  const master = c.createGain();
-  master.gain.value = 0;
-  master.connect(c.destination);
+  let order = shuffle(trackList);
+  let orderIdx = 0;
+  let active = 0;       // index into players[] currently playing
+  let targetVolume = 0; // 0-1, set by setVolume
+  let running = false;
+  let fading = false;
+  let monitorId = null;
 
-  // shared noise buffer for drums + crackle
-  const noiseBuffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
-  const data = noiseBuffer.getChannelData(0);
-  for(let i=0;i<data.length;i++) data[i] = Math.random()*2-1;
-
-  // pick a random progression + key for this session, slight tempo
-  // variation per environment for a sense of place.
-  const prog = PROGRESSIONS[Math.floor(Math.random()*PROGRESSIONS.length)];
-  const rootFreq = KEY_ROOTS[Math.floor(Math.random()*KEY_ROOTS.length)];
-
-  let chordSeconds = 7.5; // ~7.5s per chord -> slow, drifting
-  let drumLevel = 0.85;
-  let crackleLevel = 1.0;
-  let padLevel = 0.85;
-
-  switch(env){
-    case 'cabin':
-      chordSeconds = 9; drumLevel = 0.6; crackleLevel = 1.0; padLevel = 0.9;
-      break;
-    case 'coffee':
-      chordSeconds = 7; drumLevel = 0.9; crackleLevel = 0.7; padLevel = 0.8;
-      break;
-    case 'rain':
-      chordSeconds = 8.5; drumLevel = 0.5; crackleLevel = 0.3; padLevel = 0.75;
-      break;
-    case 'library':
-    default:
-      chordSeconds = 8; drumLevel = 0.75; crackleLevel = 1.0; padLevel = 0.85;
-      break;
+  function nextTrackUrl(){
+    if(orderIdx >= order.length){
+      order = shuffle(trackList);
+      orderIdx = 0;
+    }
+    const t = order[orderIdx];
+    orderIdx++;
+    return BASE + t;
   }
 
-  const padBus = c.createGain(); padBus.gain.value = padLevel; padBus.connect(master);
-  const drumBus = c.createGain(); drumBus.gain.value = drumLevel; drumBus.connect(master);
-  const crackleBus = c.createGain(); crackleBus.gain.value = crackleLevel; crackleBus.connect(master);
-
-  const crackle = buildCrackle(c, crackleBus, noiseBuffer, 0.06);
-
-  let chordIndex = 0;
-  let running = true;
-
-  function scheduleChord(){
-    if(!running) return;
-    const root = prog.roots[chordIndex % prog.roots.length];
-    const quality = prog.quality[chordIndex % prog.quality.length];
-    const chordRoot = rootFreq * Math.pow(2, root/12);
-    playChord(c, padBus, chordRoot, quality, chordSeconds + 0.6, 0.11);
-
-    // simple swung drum pattern within this chord's duration:
-    // beat grid of 4, kick on 1 and 3 (sparse), snare on 2 and 4 with light swing,
-    // occasional hat on the 'and' of 3.
-    const beat = chordSeconds / 4;
-    const swing = beat * 0.06;
-    const t0 = c.currentTime;
-    if(Math.random() < 0.85) playKick(c, drumBus, t0 + 0.02, 0.5);
-    if(Math.random() < 0.55) playKick(c, drumBus, t0 + beat*2 + 0.02, 0.42);
-    playSnare(c, drumBus, t0 + beat*1 + swing, 0.22, noiseBuffer);
-    playSnare(c, drumBus, t0 + beat*3 + swing, 0.22, noiseBuffer);
-    if(Math.random() < 0.4) playHat(c, drumBus, t0 + beat*2.5 + swing, 0.12, noiseBuffer);
-    if(Math.random() < 0.3) playHat(c, drumBus, t0 + beat*3.5 + swing, 0.1, noiseBuffer);
-
-    chordIndex++;
-    const next = setTimeout(scheduleChord, chordSeconds * 1000);
-    scheduledTimers.push(next);
+  function loadInto(idx, url){
+    const a = players[idx];
+    a.src = url;
+    a.currentTime = 0;
+    a.volume = 0;
   }
-  scheduleChord();
+
+  function startMonitor(){
+    stopMonitor();
+    monitorId = setInterval(()=>{
+      if(!running || fading) return;
+      const a = players[active];
+      if(!a.duration || isNaN(a.duration)) return;
+      const remaining = a.duration - a.currentTime;
+      if(remaining <= CROSSFADE_SEC && remaining > 0){
+        crossfadeToNext();
+      }
+    }, 400);
+  }
+  function stopMonitor(){
+    if(monitorId){ clearInterval(monitorId); monitorId=null; }
+  }
+
+  function crossfadeToNext(){
+    fading = true;
+    const from = active;
+    const to = 1 - active;
+    loadInto(to, nextTrackUrl());
+    const playPromise = players[to].play();
+    if(playPromise && playPromise.catch) playPromise.catch(()=>{});
+
+    const steps = 20;
+    const stepMs = (CROSSFADE_SEC*1000) / steps;
+    let i = 0;
+    const iv = setInterval(()=>{
+      i++;
+      const t = i/steps;
+      players[from].volume = Math.max(0, targetVolume * (1-t));
+      players[to].volume = Math.min(targetVolume, targetVolume * t);
+      if(i>=steps){
+        clearInterval(iv);
+        players[from].pause();
+        active = to;
+        fading = false;
+      }
+    }, stepMs);
+  }
 
   return {
-    master,
-    setVolume(v01){
-      master.gain.setTargetAtTime(v01, c.currentTime, 0.3);
+    start(){
+      if(running) return;
+      running = true;
+      const url = nextTrackUrl();
+      loadInto(active, url);
+      players[active].volume = targetVolume;
+      const p = players[active].play();
+      if(p && p.catch) p.catch(()=>{});
+      startMonitor();
     },
     stop(){
       running = false;
-      clearTimers();
-      try{
-        master.gain.cancelScheduledValues(c.currentTime);
-        master.gain.setTargetAtTime(0, c.currentTime, 0.2);
-        setTimeout(()=>{
-          crackle.stop();
-          try{ padBus.disconnect(); drumBus.disconnect(); crackleBus.disconnect(); master.disconnect(); }catch(e){}
-        }, 500);
-      }catch(e){}
-    }
+      fading = false;
+      stopMonitor();
+      players.forEach(a=>{
+        try{ a.pause(); a.removeAttribute('src'); a.load(); }catch(e){}
+        a.volume = 0;
+      });
+    },
+    setVolume(vol01){
+      targetVolume = Math.max(0, Math.min(1, vol01));
+      if(!running) return;
+      if(fading){
+        // let the crossfade interval re-derive proportions next tick
+        return;
+      }
+      players[active].volume = targetVolume;
+    },
+    isRunning(){ return running; }
   };
 }
 
-/* ---------- public API ---------- */
-function setLofiEnvironment(env){
-  if(lofi){ lofi.stop(); lofi=null; }
-  if(!STATE.settings.lofiEnabled) return;
-  lofi = buildLofi(env);
-  if(lofi) lofi.setVolume(STATE.settings.lofiVolume/100);
+/* ---------- environment ambience players (one cached per environment) ---------- */
+const envPlayers = {};
+let currentEnvPlayer = null;
+let currentEnvKey = null;
+
+function getEnvPlayer(env){
+  if(!PLAYLISTS[env]) return null;
+  if(!envPlayers[env]) envPlayers[env] = createPlayer(PLAYLISTS[env]);
+  return envPlayers[env];
+}
+
+function setEnvironment(env){
+  if(currentEnvPlayer){ currentEnvPlayer.stop(); currentEnvPlayer=null; }
+  currentEnvKey = env;
+  currentEnvPlayer = getEnvPlayer(env);
+}
+
+function setEnvVolume(vol01){
+  if(currentEnvPlayer) currentEnvPlayer.setVolume(vol01);
+}
+
+function toggleEnv(on){
+  if(!currentEnvPlayer) return;
+  if(on) currentEnvPlayer.start();
+  else currentEnvPlayer.stop();
+}
+
+function hasRealAudio(env){
+  return !!PLAYLISTS[env];
+}
+
+/* ---------- lofi music player (independent of environment) ---------- */
+let lofiPlayer = null;
+
+function getLofiPlayer(){
+  if(!lofiPlayer) lofiPlayer = createPlayer(PLAYLISTS.lofi);
+  return lofiPlayer;
 }
 
 function setLofiVolume(vol01){
-  if(lofi) lofi.setVolume(vol01);
+  getLofiPlayer().setVolume(vol01);
 }
 
 function toggleLofi(on){
-  if(on){
-    if(!lofi) lofi = buildLofi(STATE.timer.environment);
-    if(lofi) lofi.setVolume(STATE.settings.lofiVolume/100);
-  }else{
-    if(lofi){ lofi.stop(); lofi=null; }
-  }
+  const p = getLofiPlayer();
+  if(on) p.start();
+  else p.stop();
 }
 
-R.audio.lofi = { setLofiEnvironment, setLofiVolume, toggleLofi };
+R.audio.playlist = {
+  setEnvironment, setEnvVolume, toggleEnv, hasRealAudio,
+  setLofiVolume, toggleLofi
+};
 })();
 
 </script>
