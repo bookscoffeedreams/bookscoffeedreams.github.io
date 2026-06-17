@@ -2519,7 +2519,10 @@ function initTimerUI(){
       document.body.classList.add('env-'+env);
       saveState();
       R.audio.setAmbientEnvironment(env);
-      if(Timer.running) R.audio.toggleAmbient(true);
+      // audio should follow the sound toggle, not whether the timer happens
+      // to be running — otherwise switching environments while idle leaves
+      // the previous environment's audio playing with nothing to stop it
+      if(STATE.settings.soundEnabled) R.audio.toggleAmbient(true);
       updateAmbientSoundDesc();
     });
   });
@@ -4482,6 +4485,7 @@ function createPlayer(trackList){
   let running = false;
   let fading = false;
   let monitorId = null;
+  let crossfadeIntervalId = null; // tracks the in-flight crossfade timer so stop() can cancel it
 
   function nextTrackUrl(){
     if(orderIdx >= order.length){
@@ -4527,13 +4531,21 @@ function createPlayer(trackList){
     const steps = 20;
     const stepMs = (CROSSFADE_SEC*1000) / steps;
     let i = 0;
-    const iv = setInterval(()=>{
+    crossfadeIntervalId = setInterval(()=>{
+      if(!running){
+        // stop() was called mid-crossfade; abandon this interval entirely
+        // rather than let it keep writing volume onto paused/cleared players
+        clearInterval(crossfadeIntervalId);
+        crossfadeIntervalId = null;
+        return;
+      }
       i++;
       const t = i/steps;
       players[from].volume = Math.max(0, targetVolume * (1-t));
       players[to].volume = Math.min(targetVolume, targetVolume * t);
       if(i>=steps){
-        clearInterval(iv);
+        clearInterval(crossfadeIntervalId);
+        crossfadeIntervalId = null;
         players[from].pause();
         active = to;
         fading = false;
@@ -4556,6 +4568,7 @@ function createPlayer(trackList){
       running = false;
       fading = false;
       stopMonitor();
+      if(crossfadeIntervalId){ clearInterval(crossfadeIntervalId); crossfadeIntervalId=null; }
       players.forEach(a=>{
         try{ a.pause(); a.removeAttribute('src'); a.load(); }catch(e){}
         a.volume = 0;
