@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Grove — A Focus Forest</title>
+<meta name="description" content="Plant a tree, stay focused, watch it grow. A focus forest for Books Coffee and Dreams — strict or relaxed mode, your own grove, and a shared Community Grove with everyone at BCD.">
+<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+
+<!-- Firebase (Books Coffee and Dreams — bcd-discord project) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+
+<style>
+/* ============================================================
+   GROVE — A Focus Forest for Books Coffee and Dreams
+   Design tokens shared exactly with Ripen and Sprout for visual
+   continuity across BCD's productivity suite. Grove leans
+   hardest into vine-green as its primary color (growth is the
+   whole point), with tomato reserved strictly for the
+   withering/distracted state — color itself tells the story.
+   ============================================================ */
+:root{
+  --paper:#fbfaf8;
+  --surface:#ffffff;
+  --surface-2:#f5f3ee;
+  --ink:#1c1b19;
+  --ink-soft:#6f6b63;
+  --ink-faint:#aca791;
+  --line:#e7e2d8;
+  --line-strong:#d8d1c2;
+
+  --tomato:#e0452e;
+  --tomato-deep:#b6341f;
+  --tomato-soft:#fce6df;
+  --tomato-soft-2:#f6cabb;
+
+  --vine:#52805a;
+  --vine-deep:#3a5e42;
+  --vine-bright:#6fa377;
+  --vine-soft:#e3ebe2;
+  --vine-soft-2:#c9dcc8;
+
+  --amber:#cf9a3a;
+  --amber-deep:#8a5d12;
+  --amber-soft:#f7ecd6;
+
+  --bark:#8a6f4f;
+  --bark-deep:#5c4a35;
+  --sky-day:#dceae0;
+  --sky-dusk:#f3ddc8;
+  --sky-night:#1b2a23;
+
+  --shadow-sm:0 1px 2px rgba(28,27,25,.05);
+  --shadow:0 1px 2px rgba(28,27,25,.04),0 10px 26px -12px rgba(28,27,25,.14);
+  --shadow-lg:0 6px 20px rgba(28,27,25,.07),0 28px 64px -22px rgba(28,27,25,.20);
+
+  --radius:14px;--radius-sm:9px;--radius-lg:22px;--radius-pill:999px;
+
+  --display:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono','Cascadia Code','Roboto Mono',Consolas,monospace;
+
+  --sidebar-w:236px;
+}
+
+html[data-theme="dark"]{
+  --paper:#13160f;
+  --surface:#1b1f16;
+  --surface-2:#242a1d;
+  --ink:#eef1e8;
+  --ink-soft:#a3ab97;
+  --ink-faint:#646e57;
+  --line:#2e3526;
+  --line-strong:#3d4632;
+
+  --tomato:#ec5a40;
+  --tomato-deep:#ff8567;
+  --tomato-soft:#332420;
+  --tomato-soft-2:#46302a;
+
+  --vine:#6fa377;
+  --vine-deep:#9bcaa2;
+  --vine-bright:#86c08e;
+  --vine-soft:#1f2c20;
+  --vine-soft-2:#2b3e2c;
+
+  --amber:#e0ad55;
+  --amber-deep:#f0c878;
+  --amber-soft:#2e2818;
+
+  --bark:#a3855f;
+  --bark-deep:#6b5640;
+  --sky-day:#1c2b20;
+  --sky-dusk:#2a261c;
+  --sky-night:#0c1410;
+
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 26px -12px rgba(0,0,0,.6);
+  --shadow-lg:0 6px 20px rgba(0,0,0,.4),0 28px 64px -22px rgba(0,0,0,.7);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark}
+html,body{height:100%}
+body{
+  font-family:var(--body);background:var(--paper);color:var(--ink);
+  -webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden;
+  transition:background-color .25s,color .25s;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:42px 42px;opacity:.5;
+}
+html[data-theme="dark"] body::before{opacity:.3}
+
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;color:inherit;font-size:inherit}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+h1,h2,h3,h4{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
+
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon.filled{fill:currentColor;stroke:none}
+
+::selection{background:var(--vine-soft-2)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-faint)}
+:focus-visible{outline:2px solid var(--vine);outline-offset:2px;border-radius:4px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+}
+/* ============ APP SHELL ============ */
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;background:var(--paper);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;
+  height:100vh;position:fixed;left:0;top:0;overflow-y:auto;z-index:40;
+}
+.brand{display:flex;align-items:center;gap:11px;padding:22px 18px 18px}
+.brand-mark{width:36px;height:36px;flex-shrink:0;object-fit:contain;border-radius:8px}
+.brand-name{font-family:var(--display);font-size:17px;font-weight:700;line-height:1.1}
+.brand-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase;margin-top:1px}
+
+.nav{flex:0 0 auto;padding:6px 12px;display:flex;flex-direction:column;gap:1px}
+.nav-section-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding:14px 10px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:500;color:var(--ink-soft);transition:background .15s,color .15s;text-align:left;width:100%;
+}
+.nav-item:hover{background:var(--surface-2);color:var(--ink)}
+.nav-item.active{background:var(--vine-soft);color:var(--vine-deep);font-weight:600}
+.nav-item .icon{width:17px;height:17px}
+.nav-item .count{
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-left:auto;
+  background:var(--surface-2);padding:1px 6px;border-radius:var(--radius-pill);
+}
+.nav-item.active .count{background:var(--vine-soft-2);color:var(--vine-deep)}
+
+.sidebar-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.streak-box{display:flex;align-items:center;gap:9px;background:var(--surface-2);border-radius:var(--radius-sm);padding:9px 11px}
+.streak-box .icon{width:15px;height:15px;color:var(--vine)}
+.streak-box-text{display:flex;flex-direction:column;line-height:1.2}
+.streak-num{font-family:var(--mono);font-weight:700;font-size:13px}
+.streak-label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+.sidebar-version{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);text-align:center;letter-spacing:.04em}
+
+/* ============ MAIN ============ */
+.main{flex:1;margin-left:var(--sidebar-w);min-width:0;padding:38px 46px 90px;max-width:1240px;position:relative}
+
+.account-pill{
+  position:absolute;top:38px;right:46px;z-index:10;
+  display:block;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);transition:border-color .15s,background .15s;
+  box-shadow:var(--shadow-sm);
+}
+.account-pill:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.account-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--surface-2);border:2px solid var(--vine-soft-2);overflow:hidden;display:block;margin:auto}
+.account-av img{width:100%;height:100%;object-fit:cover;display:block}
+.account-av img:not([src]),.account-av img[src=""]{display:none}
+
+.view{display:none}
+.view.active{display:block;animation:viewIn .25s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap;padding-right:148px}
+@media (max-width:760px){.view-head{padding-right:0}}
+.view-title{font-size:29px;line-height:1.15}
+.view-sub{color:var(--ink-soft);font-size:13px;margin-top:6px;max-width:540px}
+.view-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.meta-chip{
+  font-family:var(--mono);font-size:11.5px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius-pill);
+  padding:7px 14px;display:flex;align-items:center;gap:6px;color:var(--ink-soft);
+}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:26px;box-shadow:var(--shadow-sm)}
+.card + .card{margin-top:20px}
+
+.topbar-mobile{display:none}
+@media (max-width:760px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--shadow-lg)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:84px 18px 90px}
+  .topbar-mobile{
+    display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;height:60px;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:0 14px;z-index:180;
+  }
+  .menu-btn{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+  .menu-btn:hover{background:var(--surface-2)}
+  .topbar-mobile .brand-mark{width:26px;height:26px}
+  .topbar-mobile .brand-name{font-size:15px}
+  .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:39}
+  .sidebar-backdrop.show{display:block}
+  .account-pill{
+    position:fixed;top:11px;right:14px;left:auto;z-index:200;
+    width:38px;height:38px;border:none;background:transparent;box-shadow:none;
+  }
+  .account-pill:hover{background:transparent;border:none}
+  .account-av{width:38px;height:38px}
+}
+/* ============================================================
+   SIGNATURE: the planting card
+   A sky-gradient backdrop that shifts with real time of day,
+   framing a generative SVG tree that grows stage by stage as
+   the session progresses. This is Grove's equivalent of
+   Ripen's dial and Sprout's torn-paper edge.
+   ============================================================ */
+.plant-card{
+  position:relative;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);
+  box-shadow:var(--shadow);min-height:420px;display:flex;flex-direction:column;
+  background:linear-gradient(180deg, var(--sky-day) 0%, var(--surface) 78%);
+  transition:background 1.2s ease;
+}
+.plant-card[data-daytime="dusk"]{background:linear-gradient(180deg, var(--sky-dusk) 0%, var(--surface) 78%)}
+.plant-card[data-daytime="night"]{background:linear-gradient(180deg, var(--sky-night) 0%, var(--surface) 78%)}
+.plant-card[data-daytime="night"] .view-title,
+.plant-card[data-daytime="night"] .plant-state-label{color:#eef1e8}
+
+.plant-ground{
+  position:absolute;left:0;right:0;bottom:0;height:120px;
+  background:linear-gradient(180deg, transparent, var(--vine-soft) 40%, var(--vine-soft-2));
+  opacity:.7;
+}
+
+.plant-stage-wrap{
+  flex:1;display:flex;align-items:flex-end;justify-content:center;position:relative;padding:30px 30px 0;
+}
+.plant-svg{width:260px;height:260px;position:relative;z-index:2;transition:filter 1.5s ease}
+.plant-svg.withering{filter:saturate(.35) brightness(.85)}
+.plant-svg.dead{filter:saturate(.15) brightness(.7) sepia(.3)}
+
+.plant-stars{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;pointer-events:none}
+.plant-card[data-daytime="night"] .plant-stars{opacity:1}
+.plant-star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.7}
+
+.plant-info{padding:22px 30px 28px;position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:14px}
+.plant-state-label{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--vine-deep);display:flex;align-items:center;gap:7px}
+.plant-state-label .dot{width:6px;height:6px;border-radius:50%;background:var(--vine);animation:plantPulse 2s ease infinite}
+.plant-state-label.warning{color:var(--tomato-deep)}
+.plant-state-label.warning .dot{background:var(--tomato);animation:plantPulseFast .6s ease infinite}
+@keyframes plantPulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes plantPulseFast{0%,100%{opacity:1}50%{opacity:.15}}
+
+.plant-timer{font-family:var(--mono);font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.plant-species-name{font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink-soft)}
+
+.plant-controls{display:flex;align-items:center;gap:12px}
+.duration-picker{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.duration-opt{
+  padding:9px 16px;border-radius:var(--radius-pill);border:1px solid var(--line);font-size:12.5px;font-weight:600;
+  color:var(--ink-soft);background:var(--surface);transition:background .15s,border-color .15s,color .15s;
+}
+.duration-opt:hover{border-color:var(--line-strong)}
+.duration-opt.active{background:var(--vine);border-color:var(--vine);color:#fff}
+
+.plant-btn{
+  display:flex;align-items:center;gap:9px;padding:13px 28px;border-radius:var(--radius-pill);
+  background:var(--vine);color:#fff;font-size:14px;font-weight:700;box-shadow:var(--shadow-sm);
+  transition:background .15s,transform .1s;
+}
+.plant-btn:hover{background:var(--vine-deep)}
+.plant-btn:active{transform:scale(.98)}
+.plant-btn.danger{background:var(--tomato)}
+.plant-btn.danger:hover{background:var(--tomato-deep)}
+.plant-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.mode-toggle-row{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-faint)}
+.mode-toggle-row .switch{transform:scale(.85)}
+/* ============ STAT STRIP ============ */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.stat-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.stat-tile .icon{width:15px;height:15px;color:var(--ink-faint);margin-bottom:8px}
+.stat-num{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.stat-label{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:5px}
+@media (max-width:900px){.stat-strip{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ MY GROVE — history grid ============ */
+.grove-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:14px}
+.grove-tree-tile{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:border-color .15s,transform .15s;cursor:pointer;
+}
+.grove-tree-tile:hover{border-color:var(--vine-soft-2);transform:translateY(-2px)}
+.grove-tree-tile.withered{opacity:.55}
+.grove-tree-tile-svg{width:54px;height:54px}
+.grove-tree-tile-date{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint)}
+.grove-tree-tile-dur{font-family:var(--mono);font-size:10px;color:var(--ink-soft);font-weight:600}
+
+/* ============ COMMUNITY GROVE — shared canvas ============ */
+.community-canvas-wrap{
+  position:relative;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);
+  background:linear-gradient(180deg, var(--sky-day) 0%, var(--vine-soft) 85%, var(--vine-soft-2));
+  min-height:480px;box-shadow:var(--shadow);
+}
+.community-canvas{position:relative;width:100%;height:480px;overflow:hidden}
+.community-tree{position:absolute;bottom:0;transition:transform .2s ease;cursor:default}
+.community-tree.mine{filter:drop-shadow(0 0 10px var(--vine-bright))}
+.community-tree-tooltip{
+  position:absolute;background:var(--ink);color:var(--paper);font-size:11px;padding:6px 10px;border-radius:7px;
+  white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;transform:translate(-50%,-110%);font-family:var(--mono);
+  z-index:20;
+}
+html[data-theme="dark"] .community-tree-tooltip{background:#eef1e8;color:#13160f}
+.community-tree:hover .community-tree-tooltip{opacity:1}
+
+.community-stats-bar{
+  display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+  background:var(--surface);border-top:1px solid var(--line);flex-wrap:wrap;gap:10px;
+}
+.community-stats-bar .stat-inline{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+.community-stats-bar .stat-inline strong{font-family:var(--mono);color:var(--ink);font-size:13.5px}
+
+/* ============ BUTTONS / FORMS (shared) ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;
+}
+.btn .icon{width:15px;height:15px}
+.btn-primary{background:var(--vine);color:#fff}
+.btn-primary:hover{background:var(--vine-deep)}
+.btn-secondary{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.btn-secondary:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.btn-ghost{color:var(--ink-soft)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn-danger{color:var(--tomato)}
+.btn-danger:hover{background:var(--tomato-soft)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.input,.select,.textarea{
+  font-family:inherit;font-size:13.5px;padding:10px 13px;border:1px solid var(--line-strong);
+  border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);
+  transition:border-color .15s,box-shadow .15s;width:100%;color-scheme:light;
+}
+html[data-theme="dark"] .input,html[data-theme="dark"] .select,html[data-theme="dark"] .textarea{color-scheme:dark}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--vine);box-shadow:0 0 0 3px var(--vine-soft)}
+.select{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236f6b63' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:32px;
+}
+html[data-theme="dark"] .select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a3ab97' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.switch{width:38px;height:22px;border-radius:var(--radius-pill);background:var(--line-strong);position:relative;transition:background .15s;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:var(--shadow-sm)}
+.switch.on{background:var(--vine)}
+.switch.on::after{transform:translateX(16px)}
+
+.sound-row{padding:12px 0}
+.sound-row + .sound-row{border-top:1px solid var(--line)}
+.sound-row-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:3px}
+.si-name{font-weight:600;font-size:13.5px}
+.si-desc{font-size:11.5px;color:var(--ink-soft);line-height:1.45}
+.tab{transition:background .15s,color .15s}
+.tab:not(:last-child){border-right:1px solid var(--line)}
+
+.divider{height:1px;background:var(--line);margin:20px 0}
+
+.empty-state{padding:60px 20px;text-align:center}
+.empty-state .icon{width:38px;height:38px;color:var(--line-strong);margin:0 auto 14px}
+.empty-state-title{font-family:var(--display);font-weight:700;font-size:15px;margin-bottom:5px}
+.empty-state-desc{font-size:12.5px;color:var(--ink-soft);max-width:280px;margin:0 auto}
+
+.species-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:var(--radius-pill);
+  background:var(--vine-soft);color:var(--vine-deep);font-size:11px;font-weight:600;
+}
+.species-badge.locked{background:var(--surface-2);color:var(--ink-faint)}
+/* ============ MODALS ============ */
+.modal-backdrop{position:fixed;inset:0;background:rgba(20,18,14,.32);z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:420px;max-width:100%;max-height:86vh;overflow-y:auto;transform:scale(.96);transition:transform .18s}
+.modal-backdrop.show .modal{transform:scale(1)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:16.5px}
+.modal-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink-faint)}
+.modal-close:hover{background:var(--surface-2);color:var(--ink)}
+.modal-body{padding:22px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--line)}
+.modal-danger-box{background:var(--tomato-soft);border-radius:var(--radius-sm);padding:14px 16px;margin-top:4px}
+.modal-danger-box p{font-size:12.5px;color:var(--tomato-deep);line-height:1.5}
+.modal-success-box{background:var(--vine-soft);border-radius:var(--radius-sm);padding:18px 16px;text-align:center}
+
+.wither-modal-tree{width:120px;height:120px;margin:0 auto 14px;display:block;filter:saturate(.3) brightness(.85)}
+
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:160;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:var(--radius-pill);
+  font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);
+  animation:toastIn .2s ease;
+}
+html[data-theme="dark"] .toast{background:#eef1e8;color:#13160f}
+.toast .icon{width:15px;height:15px;color:var(--vine-deep)}
+.toast-undo{font-weight:700;color:var(--amber-deep);margin-left:4px}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+html[data-theme="dark"] .switch::after{background:#13160f}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:var(--line-strong)}
+html[data-theme="dark"] .toast .icon{color:var(--vine)}
+
+</style>
+</head>
+<body>
+
+<!-- ============ ICON SPRITE ============ -->
+<svg style="display:none">
+  <symbol id="icon-sprout" viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 12 4 11 4 4c7 0 8 6 8 8M12 12c0-2 1-8 8-8 0 7-8 8-8 8z"/></symbol>
+  <symbol id="icon-tree" viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9a3 3 0 1 1 6 0c1.5 0 3 1.5 3 3.5S16.5 16 15 16H9c-1.5 0-3-1.5-3-3.5S7.5 9 9 9z"/></symbol>
+  <symbol id="icon-grove" viewBox="0 0 24 24"><path d="M7 21v-5M7 16a2.5 2.5 0 1 1 5 0c1 0 2 1 2 2.3S13 21 12 21H7"/><path d="M16 21v-3M16 18a2 2 0 1 1 4 0c.8 0 1.6.8 1.6 1.8S20.8 21 20 21h-4"/><path d="M7 16V8a3 3 0 1 1 0-6 3 3 0 1 1 6 0c0 1.7-1.3 3-3 3"/></symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="icon-grid" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="icon-flame" viewBox="0 0 24 24"><path d="M12 2s5 5 5 11a5 5 0 0 1-10 0c0-2 1-3 1-3s.5 2 2 2c-1-2-1-5 1-7 0 2 1 3 2 3 0-2-1-4-1-6z"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="icon-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13c0-7 9-12 17-12 0 8-5 17-12 17a4.5 4.5 0 0 1-4.5-4.5C4.5 9 9 7 12 7"/></symbol>
+  <symbol id="icon-skull" viewBox="0 0 24 24"><circle cx="9" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="11" r="1.4" fill="currentColor" stroke="none"/><path d="M12 2a8 8 0 0 0-8 8v5l2 2v2h3v-2h2v2h2v-2h3v-2l2-2v-5a8 8 0 0 0-8-8z"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/><path d="M10 11v6M14 11v6"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+</svg>
+
+<div class="topbar-mobile">
+  <button class="menu-btn" id="menuBtn"><svg class="icon"><use href="#icon-grid"/></svg></button>
+  <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="26" height="26">
+  <div class="brand-name">Grove</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="36" height="36">
+      <div>
+        <div class="brand-name">Grove</div>
+        <div class="brand-tag">A Focus Forest</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section-label">Grow</div>
+      <button class="nav-item active" data-view="plant">
+        <svg class="icon"><use href="#icon-sprout"/></svg><span>Plant</span>
+      </button>
+      <button class="nav-item" data-view="mygrove">
+        <svg class="icon"><use href="#icon-tree"/></svg><span>My Grove</span>
+        <span class="count" id="countMyTrees">0</span>
+      </button>
+      <button class="nav-item" data-view="community">
+        <svg class="icon"><use href="#icon-globe"/></svg><span>Community Grove</span>
+      </button>
+    </nav>
+
+    <nav class="nav">
+      <div class="nav-section-label">&nbsp;</div>
+      <button class="nav-item" data-view="settings">
+        <svg class="icon"><use href="#icon-settings"/></svg><span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="streak-box">
+        <svg class="icon"><use href="#icon-flame"/></svg>
+        <div class="streak-box-text">
+          <span class="streak-num" id="sidebarStreak">0</span>
+          <span class="streak-label">Day streak</span>
+        </div>
+      </div>
+      <div class="sidebar-version">GROVE · BCD FOCUS FOREST</div>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="main">
+
+    <a class="account-pill" id="accountPill" href="profile.html" title="Account">
+      <span class="account-av" id="accountAvatar"><img alt="" id="accountAvatarImg"></span>
+    </a>
+    <!-- ============ PLANT ============ -->
+    <div class="view active" id="view-plant" data-view="plant">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Plant</h1>
+          <p class="view-sub">Choose a duration, plant a seed, and stay with it. Leave a strict session and your tree withers.</p>
+        </div>
+        <div class="view-meta">
+          <span class="meta-chip" id="modeChip"><svg class="icon" style="width:13px;height:13px"><use href="#icon-shield"/></svg><span id="modeChipLabel">Strict mode</span></span>
+        </div>
+      </div>
+
+      <div class="plant-card" id="plantCard" data-daytime="day">
+        <div class="plant-stars" id="plantStars"></div>
+        <div class="plant-ground"></div>
+        <div class="plant-stage-wrap">
+          <svg class="plant-svg" id="plantSvg" viewBox="0 0 200 200"></svg>
+        </div>
+        <div class="plant-info">
+          <div class="plant-state-label" id="plantStateLabel">
+            <span class="dot"></span><span id="plantStateText">Choose a duration to begin</span>
+          </div>
+          <div class="plant-timer" id="plantTimer">25:00</div>
+          <div class="plant-species-name" id="plantSpeciesName" style="display:none"></div>
+
+          <div class="plant-controls" id="plantControlsIdle">
+            <div class="duration-picker" id="durationPicker">
+              <button class="duration-opt" data-min="10">10 min</button>
+              <button class="duration-opt active" data-min="25">25 min</button>
+              <button class="duration-opt" data-min="50">50 min</button>
+              <button class="duration-opt" data-min="90">90 min</button>
+            </div>
+          </div>
+          <button class="plant-btn" id="btnPlant">
+            <svg class="icon"><use href="#icon-sprout"/></svg><span>Plant a seed</span>
+          </button>
+          <button class="plant-btn danger" id="btnGiveUp" style="display:none">
+            <svg class="icon"><use href="#icon-x"/></svg><span>Give up</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat-tile">
+          <svg class="icon"><use href="#icon-tree"/></svg>
+          <div class="stat-num" id="statTreesGrown">0</div>
+          <div class="stat-label">Trees grown</div>
+        </div>
+        <div class="stat-tile">
+          <svg class="icon"><use href="#icon-skull"/></svg>
+          <div class="stat-num" id="statTreesWithered">0</div>
+          <div class="stat-label">Withered</div>
+        </div>
+        <div class="stat-tile">
+          <svg class="icon"><use href="#icon-clock"/></svg>
+          <div class="stat-num" id="statFocusHours">0h</div>
+          <div class="stat-label">Focus time</div>
+        </div>
+        <div class="stat-tile">
+          <svg class="icon"><use href="#icon-flame"/></svg>
+          <div class="stat-num" id="statStreakPlant">0</div>
+          <div class="stat-label">Day streak</div>
+        </div>
+      </div>
+    </div>
+    <!-- ============ MY GROVE ============ -->
+    <div class="view" id="view-mygrove" data-view="mygrove">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">My Grove</h1>
+          <p class="view-sub">Every tree you've grown — and every one you've lost — stays here.</p>
+        </div>
+        <div class="view-meta">
+          <span class="meta-chip" id="myGroveCountChip">0 trees</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="grove-grid" id="myGroveGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ COMMUNITY GROVE ============ -->
+    <div class="view" id="view-community" data-view="community">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Community Grove</h1>
+          <p class="view-sub">Every tree, planted by everyone at Books Coffee and Dreams, growing in one shared place. Yours glows.</p>
+        </div>
+      </div>
+
+      <div class="community-canvas-wrap">
+        <div class="community-canvas" id="communityCanvas"></div>
+        <div class="community-stats-bar">
+          <div class="stat-inline"><svg class="icon" style="width:14px;height:14px"><use href="#icon-tree"/></svg><strong id="communityTotalTrees">0</strong> trees planted</div>
+          <div class="stat-inline"><svg class="icon" style="width:14px;height:14px"><use href="#icon-clock"/></svg><strong id="communityTotalHours">0h</strong> total focus</div>
+          <div class="stat-inline"><svg class="icon" style="width:14px;height:14px"><use href="#icon-sprout"/></svg>Yours <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--vine-bright);box-shadow:0 0 6px var(--vine-bright);margin-left:4px"></span></div>
+        </div>
+      </div>
+    </div>
+    <!-- ============ SETTINGS ============ -->
+    <div class="view" id="view-settings" data-view="settings">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Settings</h1>
+          <p class="view-sub">Grove syncs to your Books Coffee and Dreams account.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-shield"/></svg>
+          <h3 style="font-size:14.5px">Focus mode</h3>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:16px">
+          Strict mode: leaving this tab while a tree is growing kills it, permanently. Relaxed mode: your tree
+          visibly struggles if you leave, but recovers if you come back — no permanent loss.
+        </p>
+        <div class="sound-row-head">
+          <span class="si-name">Strict mode</span>
+          <button class="switch" id="strictModeToggle" title="Toggle strict mode"></button>
+        </div>
+        <div class="si-desc">When off, trees can't be permanently killed by leaving the tab</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-globe"/></svg>
+          <h3 style="font-size:14.5px">Community Grove</h3>
+        </div>
+        <div class="sound-row-head">
+          <span class="si-name">Share my trees publicly</span>
+          <button class="switch" id="communityShareToggle" title="Toggle community sharing"></button>
+        </div>
+        <div class="si-desc">When on, your grown trees appear in the shared Community Grove for everyone at BCD to see (no name shown, just the tree)</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-sun"/></svg>
+          <h3 style="font-size:14.5px">Appearance</h3>
+        </div>
+        <div class="sound-row-head">
+          <span class="si-name">Theme</span>
+          <div class="tab-group" id="themeTabs" style="display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden">
+            <button class="tab" data-theme="light" style="padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--ink-soft)">Light</button>
+            <button class="tab" data-theme="dark" style="padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--ink-soft)">Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-download"/></svg>
+          <h3 style="font-size:14.5px">Your data</h3>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">All data syncs to your Books Coffee and Dreams account.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary" id="btnExportData"><svg class="icon"><use href="#icon-download"/></svg>Export data (.json)</button>
+          <button class="btn btn-secondary" id="btnImportData"><svg class="icon"><use href="#icon-upload"/></svg>Import data</button>
+          <input type="file" id="importFileInput" accept="application/json" style="display:none">
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--tomato-soft-2);background:var(--tomato-soft)">
+        <h3 style="font-size:14.5px;color:var(--tomato-deep);margin-bottom:6px">Reset all data</h3>
+        <p style="font-size:12.5px;color:var(--ink)">Permanently deletes your whole grove — every tree, grown or withered. This cannot be undone.</p>
+        <button class="btn btn-danger" style="margin-top:14px;background:var(--surface);border:1px solid var(--tomato-soft-2)" id="btnResetAll">
+          <svg class="icon"><use href="#icon-trash"/></svg>Reset everything
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+<!-- ============ WITHER WARNING MODAL (strict mode, tab left) ============ -->
+<div class="modal-backdrop" id="modalWither">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">You left the tree</span>
+      <button class="modal-close" data-close="modalWither"><svg class="icon"><use href="#icon-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <svg class="wither-modal-tree" id="witherModalSvg" viewBox="0 0 200 200"></svg>
+      <div class="modal-danger-box">
+        <p id="witherDesc">In strict mode, leaving the tab while a tree is growing kills it. This one didn't make it — but the next one will.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-close="modalWither" style="background:var(--vine)">Plant again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CELEBRATION MODAL (tree fully grown) ============ -->
+<div class="modal-backdrop" id="modalCelebrate">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Fully grown</span>
+      <button class="modal-close" data-close="modalCelebrate"><svg class="icon"><use href="#icon-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <svg class="wither-modal-tree" id="celebrateModalSvg" viewBox="0 0 200 200" style="filter:none"></svg>
+      <div class="modal-success-box">
+        <p style="font-size:14px;font-weight:700;color:var(--vine-deep);margin-bottom:4px" id="celebrateSpecies">—</p>
+        <p style="font-size:12px;color:var(--ink-soft)" id="celebrateDesc">Planted in My Grove and the Community Grove.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-close="modalCelebrate" style="background:var(--vine)">Nice</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM MODAL ============ -->
+<div class="modal-backdrop" id="modalConfirm">
+  <div class="modal" style="width:380px">
+    <div class="modal-head">
+      <span class="modal-title" id="confirmTitle">Are you sure?</span>
+      <button class="modal-close" data-close="modalConfirm"><svg class="icon"><use href="#icon-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-danger-box">
+        <p id="confirmDesc">This action cannot be undone.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modalConfirm">Cancel</button>
+      <button class="btn btn-danger" id="btnConfirmAction" style="background:var(--tomato);color:#fff">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+
+<script>
+/* ============================================================
+   GROVE — state, defaults, species system
+   Architecture mirrors Ripen/Sprout: a single STATE object,
+   saveState() with a postHooks array for Firebase sync to
+   register into.
+   ============================================================ */
+(function(){
+
+const STORAGE_KEY = 'grove_state_v1';
+const DAY_MS = 86400000;
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+function todayKey(){ return dateKey(new Date()); }
+function dateKey(d){
+  const dt = new Date(d);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
+
+/* ---------- species: unlocked by duration, original names/forms ---------- */
+const SPECIES = [
+  { id:'sprig',    name:'Sprig Pine',      minDuration:10, hue:'green'  },
+  { id:'paper',    name:'Paper Birch',     minDuration:25, hue:'green'  },
+  { id:'lantern',  name:'Lantern Maple',   minDuration:50, hue:'amber'  },
+  { id:'deeproot', name:'Deeproot Oak',    minDuration:90, hue:'green'  }
+];
+
+function speciesForDuration(minutes){
+  let chosen = SPECIES[0];
+  for(const s of SPECIES){ if(minutes >= s.minDuration) chosen = s; }
+  return chosen;
+}
+function speciesById(id){ return SPECIES.find(s=>s.id===id) || SPECIES[0]; }
+
+function defaultState(){
+  return {
+    version: 1,
+    settings: {
+      theme: 'light',
+      strictMode: true,
+      shareToCommunity: true,
+      defaultDuration: 25
+    },
+    trees: [],        // { id, speciesId, durationMin, plantedAt, completedAt, status: 'grown'|'withered', shared }
+    streak: { current:0, best:0, lastActiveDate:null },
+    meta: { createdAt: Date.now(), updatedAt: Date.now() }
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    const def = defaultState();
+    return {
+      ...def, ...parsed,
+      settings: { ...def.settings, ...(parsed.settings||{}) },
+      streak: { ...def.streak, ...(parsed.streak||{}) },
+      meta: { ...def.meta, ...(parsed.meta||{}) },
+      trees: parsed.trees || []
+    };
+  }catch(e){
+    console.warn('Grove: failed to load state, starting fresh.', e);
+    return defaultState();
+  }
+}
+
+function saveState(){
+  try{
+    STATE.meta.updatedAt = Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  }catch(e){
+    console.warn('Grove: failed to save state.', e);
+    showToast('icon-alert','Storage error','Your browser blocked saving data.');
+  }
+  for(let i=0;i<saveState.postHooks.length;i++){
+    try{ saveState.postHooks[i](); }catch(e){ console.warn('Grove: saveState hook failed', e); }
+  }
+}
+saveState.postHooks = [];
+
+let STATE = loadState();
+
+/* ---------- queries ---------- */
+function grownTrees(){ return STATE.trees.filter(t=>t.status==='grown'); }
+function witheredTrees(){ return STATE.trees.filter(t=>t.status==='withered'); }
+function totalFocusMinutes(){ return grownTrees().reduce((sum,t)=>sum+t.durationMin,0); }
+
+function registerActivity(){
+  const today = todayKey();
+  if(STATE.streak.lastActiveDate === today) return;
+  const yesterday = dateKey(new Date(Date.now() - DAY_MS));
+  if(STATE.streak.lastActiveDate === yesterday) STATE.streak.current += 1;
+  else STATE.streak.current = 1;
+  STATE.streak.lastActiveDate = today;
+  if(STATE.streak.current > STATE.streak.best) STATE.streak.best = STATE.streak.current;
+}
+
+function showToast(icon, title, desc, opts){
+  opts = opts || {};
+  const wrap = document.getElementById('toastWrap');
+  if(!wrap) return;
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<svg class="icon"><use href="#${icon}"/></svg><span>${title}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(), 200); }, opts.duration || 3200);
+}
+
+window.Grove = {
+  STATE, STORAGE_KEY, DAY_MS, SPECIES,
+  defaultState, loadState, saveState,
+  uid, todayKey, dateKey,
+  speciesForDuration, speciesById,
+  grownTrees, witheredTrees, totalFocusMinutes,
+  registerActivity, showToast
+};
+})();
+/* ============================================================
+   TREE RENDERER
+   Generates an original SVG tree at one of 6 growth stages
+   (seed -> sprout -> sapling -> young -> mature -> flowering),
+   built entirely from layered paths/shapes — no images, no
+   external assets. Each species gets a slightly different
+   canopy shape and palette so the grove reads as varied.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+
+const STAGE_NAMES = ['seed','sprout','sapling','young','mature','flowering'];
+
+function colorsFor(hue, withered, theme){
+  if(withered){
+    return { trunk:'#8a7a5f', canopy:'#b6a888', canopyDeep:'#9c8e70', accent:'#c2b596' };
+  }
+  if(hue==='amber'){
+    return { trunk:'#8a6f4f', canopy:'#cf9a3a', canopyDeep:'#8a5d12', accent:'#f0c878' };
+  }
+  return { trunk:'#8a6f4f', canopy:'#52805a', canopyDeep:'#3a5e42', accent:'#6fa377' };
+}
+
+function stageSeed(c){
+  return `
+    <ellipse cx="100" cy="178" rx="14" ry="6" fill="${c.trunk}" opacity=".25"/>
+    <path d="M100 178 C 96 168, 96 160, 100 154 C 104 160, 104 168, 100 178 Z" fill="${c.canopyDeep}"/>
+  `;
+}
+function stageSprout(c){
+  return `
+    <ellipse cx="100" cy="180" rx="18" ry="6" fill="${c.trunk}" opacity=".2"/>
+    <path d="M100 180 L100 150" stroke="${c.trunk}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M100 156 C 88 150, 82 138, 86 128 C 96 132, 102 144, 100 156 Z" fill="${c.canopy}"/>
+    <path d="M100 156 C 112 150, 118 140, 115 130 C 105 134, 99 144, 100 156 Z" fill="${c.canopyDeep}"/>
+  `;
+}
+function stageSapling(c){
+  return `
+    <ellipse cx="100" cy="182" rx="22" ry="7" fill="${c.trunk}" opacity=".2"/>
+    <path d="M100 182 L99 130" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M99 138 C 78 132, 66 112, 72 92 C 92 96, 104 116, 99 138 Z" fill="${c.canopy}"/>
+    <path d="M99 138 C 120 130, 130 110, 124 90 C 106 96, 96 116, 99 138 Z" fill="${c.canopyDeep}"/>
+    <circle cx="86" cy="108" r="4" fill="${c.accent}" opacity=".8"/>
+  `;
+}
+function stageYoung(c){
+  return `
+    <ellipse cx="100" cy="184" rx="28" ry="8" fill="${c.trunk}" opacity=".2"/>
+    <path d="M100 184 L98 108" stroke="${c.trunk}" stroke-width="7" stroke-linecap="round"/>
+    <path d="M88 130 C 70 124, 64 134, 60 124" stroke="${c.trunk}" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M98 116 C 68 110, 50 80, 58 52 C 92 58, 110 92, 98 116 Z" fill="${c.canopy}"/>
+    <path d="M98 116 C 128 106, 144 78, 136 50 C 104 58, 88 90, 98 116 Z" fill="${c.canopyDeep}"/>
+    <path d="M98 116 C 96 96, 100 76, 110 60" stroke="${c.canopy}" stroke-width="2" opacity=".4" fill="none"/>
+    <circle cx="74" cy="78" r="5" fill="${c.accent}" opacity=".85"/>
+    <circle cx="118" cy="70" r="4" fill="${c.accent}" opacity=".7"/>
+  `;
+}
+function stageMature(c){
+  return `
+    <ellipse cx="100" cy="186" rx="34" ry="9" fill="${c.trunk}" opacity=".22"/>
+    <path d="M100 186 L97 92" stroke="${c.trunk}" stroke-width="9" stroke-linecap="round"/>
+    <path d="M97 140 C 76 130, 64 142, 56 130" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M97 116 C 110 106, 126 112, 134 100" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M97 100 C 60 92, 36 56, 48 22 C 92 30, 116 70, 97 100 Z" fill="${c.canopy}"/>
+    <path d="M97 100 C 138 88, 158 52, 148 18 C 106 28, 84 66, 97 100 Z" fill="${c.canopyDeep}"/>
+    <path d="M70 60 C 60 50, 62 36, 74 28" stroke="${c.canopy}" stroke-width="2" opacity=".35" fill="none"/>
+    <circle cx="60" cy="56" r="6" fill="${c.accent}" opacity=".85"/>
+    <circle cx="128" cy="46" r="5" fill="${c.accent}" opacity=".7"/>
+    <circle cx="92" cy="36" r="4" fill="${c.accent}" opacity=".6"/>
+  `;
+}
+function stageFlowering(c){
+  return `
+    <ellipse cx="100" cy="188" rx="38" ry="10" fill="${c.trunk}" opacity=".22"/>
+    <path d="M100 188 L96 86" stroke="${c.trunk}" stroke-width="10" stroke-linecap="round"/>
+    <path d="M96 142 C 72 130, 58 144, 48 130" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M96 112 C 112 100, 130 108, 140 94" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M96 94 C 56 84, 28 44, 42 8 C 90 18, 118 62, 96 94 Z" fill="${c.canopy}"/>
+    <path d="M96 94 C 142 80, 164 40, 152 4 C 106 16, 80 58, 96 94 Z" fill="${c.canopyDeep}"/>
+    <g opacity=".9">
+      <circle cx="50" cy="46" r="5" fill="${c.accent}"/>
+      <circle cx="62" cy="30" r="4" fill="#fff" opacity=".8"/>
+      <circle cx="84" cy="18" r="4.5" fill="#fff" opacity=".85"/>
+      <circle cx="112" cy="24" r="4" fill="#fff" opacity=".75"/>
+      <circle cx="134" cy="40" r="5" fill="${c.accent}"/>
+      <circle cx="100" cy="50" r="3.5" fill="#fff" opacity=".7"/>
+    </g>
+  `;
+}
+
+const STAGE_BUILDERS = [stageSeed, stageSprout, stageSapling, stageYoung, stageMature, stageFlowering];
+
+function renderTree(svgEl, opts){
+  opts = opts || {};
+  const stageIdx = Math.max(0, Math.min(5, opts.stage!==undefined?opts.stage:5));
+  const speciesHue = opts.hue || 'green';
+  const withered = !!opts.withered;
+  const c = colorsFor(speciesHue, withered);
+  const builder = STAGE_BUILDERS[stageIdx];
+  svgEl.innerHTML = builder(c);
+  svgEl.classList.toggle('withering', withered && opts.partial);
+  svgEl.classList.toggle('dead', withered && !opts.partial);
+}
+
+function stageForProgress(progress01){
+  if(progress01 >= 0.999) return 5;
+  return Math.min(4, Math.floor(progress01 * 5));
+}
+
+window.GroveTree = { renderTree, stageForProgress, STAGE_NAMES };
+})();
+/* ============================================================
+   NAVIGATION, MODALS, THEME
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+
+function switchView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const target = document.getElementById('view-'+view);
+  if(target) target.classList.add('active');
+  const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+  if(navItem) navItem.classList.add('active');
+
+  if(window.GroveViews && window.GroveViews[view]) window.GroveViews[view]();
+
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+  window.scrollTo(0,0);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', STATE.settings.theme);
+  document.querySelectorAll('#themeTabs .tab').forEach(t=>{
+    t.style.background = t.dataset.theme===STATE.settings.theme ? 'var(--surface-2)' : 'transparent';
+    t.style.color = t.dataset.theme===STATE.settings.theme ? 'var(--ink)' : 'var(--ink-soft)';
+  });
+}
+function setTheme(theme){
+  STATE.settings.theme = theme;
+  saveState();
+  applyTheme();
+}
+
+function initSidebarNav(){
+  document.querySelectorAll('.nav-item[data-view]').forEach(btn=>{
+    btn.addEventListener('click', ()=> switchView(btn.dataset.view));
+  });
+  document.getElementById('menuBtn').addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarBackdrop').classList.add('show');
+  });
+  document.getElementById('sidebarBackdrop').addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('show');
+  });
+  document.querySelectorAll('.modal-backdrop').forEach(bd=>{
+    bd.addEventListener('click', (e)=>{ if(e.target===bd) closeModal(bd.id); });
+  });
+  document.querySelectorAll('[data-close]').forEach(btn=>{
+    btn.addEventListener('click', ()=> closeModal(btn.dataset.close));
+  });
+  document.querySelectorAll('#themeTabs .tab').forEach(tab=>{
+    tab.addEventListener('click', ()=> setTheme(tab.dataset.theme));
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape') document.querySelectorAll('.modal-backdrop.show').forEach(m=>closeModal(m.id));
+  });
+}
+
+window.GroveNav = { switchView, openModal, closeModal, applyTheme, setTheme, initSidebarNav };
+})();
+/* ============================================================
+   PLANTING ENGINE
+   The core loop: pick a duration, plant, grow in real time.
+   Visibility changes are watched; in strict mode, leaving the
+   tab permanently withers the tree. In relaxed mode, the tree
+   visibly struggles while away but recovers on return.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+const T = window.GroveTree;
+
+let session = null;
+let selectedDuration = 25;
+
+function getDaytime(){
+  const h = new Date().getHours();
+  if(h>=6 && h<18) return 'day';
+  if(h>=18 && h<21) return 'dusk';
+  return 'night';
+}
+
+function renderSky(){
+  const card = document.getElementById('plantCard');
+  const daytime = getDaytime();
+  card.setAttribute('data-daytime', daytime);
+  const starsWrap = document.getElementById('plantStars');
+  if(daytime==='night' && !starsWrap.children.length){
+    for(let i=0;i<40;i++){
+      const star = document.createElement('div');
+      star.className = 'plant-star';
+      star.style.left = Math.random()*100+'%';
+      star.style.top = Math.random()*55+'%';
+      star.style.opacity = (0.4+Math.random()*0.6).toFixed(2);
+      starsWrap.appendChild(star);
+    }
+  }else if(daytime!=='night'){
+    starsWrap.innerHTML = '';
+  }
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60), s = Math.floor(sec%60);
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function selectDuration(min){
+  selectedDuration = min;
+  document.querySelectorAll('.duration-opt').forEach(b=>b.classList.toggle('active', parseInt(b.dataset.min,10)===min));
+  document.getElementById('plantTimer').textContent = formatTime(min*60);
+}
+
+function setStateLabel(text, warning){
+  const label = document.getElementById('plantStateLabel');
+  label.classList.toggle('warning', !!warning);
+  document.getElementById('plantStateText').textContent = text;
+}
+
+function plant(){
+  const species = G.speciesForDuration(selectedDuration);
+  session = {
+    durationMin: selectedDuration,
+    startedAt: Date.now(),
+    species,
+    awayStartedAt: null,
+    struggling: false,
+    withered: false
+  };
+
+  document.getElementById('plantControlsIdle').style.display = 'none';
+  document.getElementById('btnPlant').style.display = 'none';
+  document.getElementById('btnGiveUp').style.display = 'flex';
+  document.getElementById('plantSpeciesName').style.display = 'block';
+  document.getElementById('plantSpeciesName').textContent = species.name;
+  setStateLabel('Growing…');
+
+  tick();
+  session.tickId = setInterval(tick, 1000);
+}
+
+function tick(){
+  if(!session) return;
+  const elapsed = (Date.now() - session.startedAt)/1000;
+  const total = session.durationMin*60;
+  const remaining = Math.max(0, total - elapsed);
+  document.getElementById('plantTimer').textContent = formatTime(remaining);
+
+  const progress = Math.min(1, elapsed/total);
+  const stage = T.stageForProgress(progress);
+  const svg = document.getElementById('plantSvg');
+  T.renderTree(svg, { stage, hue: session.species.hue, withered: session.struggling, partial: session.struggling });
+
+  if(remaining <= 0){
+    completeSession();
+  }
+}
+
+function completeSession(){
+  clearInterval(session.tickId);
+  const tree = {
+    id: G.uid(),
+    speciesId: session.species.id,
+    durationMin: session.durationMin,
+    plantedAt: session.startedAt,
+    completedAt: Date.now(),
+    status: 'grown',
+    shared: STATE.settings.shareToCommunity
+  };
+  STATE.trees.push(tree);
+  G.registerActivity();
+  saveState();
+
+  const svg = document.getElementById('plantSvg');
+  T.renderTree(svg, { stage:5, hue: session.species.hue, withered:false });
+
+  document.getElementById('celebrateModalSvg').innerHTML = svg.innerHTML;
+  document.getElementById('celebrateSpecies').textContent = session.species.name + ' — fully grown';
+  document.getElementById('celebrateDesc').textContent =
+    (tree.shared ? 'Planted in My Grove and the Community Grove.' : 'Planted in My Grove.');
+  window.GroveNav.openModal('modalCelebrate');
+
+  resetToIdle();
+  if(window.GroveViews) window.GroveViews.refreshStats();
+}
+
+function witherTree(reason){
+  if(!session || session.withered) return;
+  session.withered = true;
+  clearInterval(session.tickId);
+
+  const tree = {
+    id: G.uid(),
+    speciesId: session.species.id,
+    durationMin: session.durationMin,
+    plantedAt: session.startedAt,
+    completedAt: Date.now(),
+    status: 'withered',
+    shared: false
+  };
+  STATE.trees.push(tree);
+  saveState();
+
+  const svg = document.getElementById('plantSvg');
+  const stage = T.stageForProgress((Date.now()-session.startedAt)/1000/(session.durationMin*60));
+  T.renderTree(svg, { stage, hue: session.species.hue, withered:true, partial:false });
+  document.getElementById('witherModalSvg').innerHTML = svg.innerHTML;
+  window.GroveNav.openModal('modalWither');
+
+  resetToIdle();
+  if(window.GroveViews) window.GroveViews.refreshStats();
+}
+
+function giveUp(){
+  if(!session) return;
+  if(STATE.settings.strictMode){
+    witherTree('gave-up');
+  }else{
+    clearInterval(session.tickId);
+    resetToIdle();
+    G.showToast('icon-sprout','Session ended — nothing lost in relaxed mode', null);
+  }
+}
+
+function resetToIdle(){
+  session = null;
+  document.getElementById('plantControlsIdle').style.display = 'flex';
+  document.getElementById('btnPlant').style.display = 'flex';
+  document.getElementById('btnGiveUp').style.display = 'none';
+  document.getElementById('plantSpeciesName').style.display = 'none';
+  setStateLabel('Choose a duration to begin');
+  selectDuration(selectedDuration);
+  const svg = document.getElementById('plantSvg');
+  svg.innerHTML = '';
+  svg.classList.remove('withering','dead');
+}
+
+function handleVisibilityChange(){
+  if(!session) return;
+  if(document.hidden){
+    session.awayStartedAt = Date.now();
+    if(STATE.settings.strictMode){
+      witherTree('left-tab-strict');
+    }else{
+      session.struggling = true;
+      setStateLabel('Your tree is struggling without you…', true);
+    }
+  }else{
+    if(session && session.struggling){
+      session.struggling = false;
+      setStateLabel('Growing…');
+    }
+  }
+}
+
+function initPlanting(){
+  document.querySelectorAll('.duration-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=> selectDuration(parseInt(btn.dataset.min,10)));
+  });
+  document.getElementById('btnPlant').addEventListener('click', plant);
+  document.getElementById('btnGiveUp').addEventListener('click', giveUp);
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  selectDuration(STATE.settings.defaultDuration || 25);
+  renderSky();
+  setInterval(renderSky, 60000);
+}
+
+window.GrovePlant = { initPlanting, isSessionActive: ()=>!!session, renderSky };
+})();
+/* ============================================================
+   VIEWS
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+const T = window.GroveTree;
+
+function refreshStats(){
+  document.getElementById('statTreesGrown').textContent = G.grownTrees().length;
+  document.getElementById('statTreesWithered').textContent = G.witheredTrees().length;
+  const hours = G.totalFocusMinutes()/60;
+  document.getElementById('statFocusHours').textContent = (hours>=10?Math.round(hours):hours.toFixed(1))+'h';
+  document.getElementById('statStreakPlant').textContent = STATE.streak.current;
+  document.getElementById('sidebarStreak').textContent = STATE.streak.current;
+  document.getElementById('countMyTrees').textContent = STATE.trees.length;
+}
+
+function plant(){
+  refreshStats();
+  if(window.GrovePlant) window.GrovePlant.renderSky();
+}
+
+function mygrove(){
+  refreshStats();
+  const grid = document.getElementById('myGroveGrid');
+  document.getElementById('myGroveCountChip').textContent = STATE.trees.length+' trees';
+  grid.innerHTML = '';
+  if(!STATE.trees.length){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <svg class="icon"><use href="#icon-tree"/></svg>
+      <div class="empty-state-title">Your grove is empty</div>
+      <div class="empty-state-desc">Plant your first seed to begin.</div>
+    </div>`;
+    return;
+  }
+  const sorted = STATE.trees.slice().sort((a,b)=>b.completedAt-a.completedAt);
+  sorted.forEach(tree=>{
+    const species = G.speciesById(tree.speciesId);
+    const tile = document.createElement('div');
+    tile.className = 'grove-tree-tile' + (tree.status==='withered' ? ' withered' : '');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 200 200');
+    svg.classList.add('grove-tree-tile-svg');
+    tile.appendChild(svg);
+    T.renderTree(svg, {
+      stage: tree.status==='withered' ? T.stageForProgress(0.6) : 5,
+      hue: species.hue,
+      withered: tree.status==='withered'
+    });
+    const date = document.createElement('div');
+    date.className = 'grove-tree-tile-date';
+    date.textContent = new Date(tree.completedAt).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    tile.appendChild(date);
+    const dur = document.createElement('div');
+    dur.className = 'grove-tree-tile-dur';
+    dur.textContent = tree.status==='withered' ? 'Withered' : tree.durationMin+' min · '+species.name;
+    tile.appendChild(dur);
+    grid.appendChild(tile);
+  });
+}
+
+function community(){
+  refreshStats();
+  if(window.GroveCommunity) window.GroveCommunity.render();
+}
+
+function settings(){
+  const strictToggle = document.getElementById('strictModeToggle');
+  strictToggle.classList.toggle('on', STATE.settings.strictMode);
+  const shareToggle = document.getElementById('communityShareToggle');
+  shareToggle.classList.toggle('on', STATE.settings.shareToCommunity);
+  window.GroveNav.applyTheme();
+  updateModeChip();
+}
+
+function updateModeChip(){
+  const label = document.getElementById('modeChipLabel');
+  const chip = document.getElementById('modeChip');
+  if(STATE.settings.strictMode){
+    label.textContent = 'Strict mode';
+    chip.querySelector('svg use').setAttribute('href','#icon-shield');
+  }else{
+    label.textContent = 'Relaxed mode';
+    chip.querySelector('svg use').setAttribute('href','#icon-leaf');
+  }
+}
+
+function refreshActive(){
+  const active = document.querySelector('.view.active');
+  if(!active) return;
+  const view = active.dataset.view;
+  if(window.GroveViews[view]) window.GroveViews[view]();
+}
+
+window.GroveViews = { plant, mygrove, community, settings, refreshStats, refreshActive, updateModeChip };
+})();
+/* ============================================================
+   SETTINGS HANDLERS
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+
+function initSettings(){
+  document.getElementById('strictModeToggle').addEventListener('click', ()=>{
+    if(window.GrovePlant.isSessionActive()){
+      G.showToast('icon-alert','Finish or give up on your current tree first', null);
+      return;
+    }
+    STATE.settings.strictMode = !STATE.settings.strictMode;
+    document.getElementById('strictModeToggle').classList.toggle('on', STATE.settings.strictMode);
+    saveState();
+    window.GroveViews.updateModeChip();
+  });
+
+  document.getElementById('communityShareToggle').addEventListener('click', ()=>{
+    STATE.settings.shareToCommunity = !STATE.settings.shareToCommunity;
+    document.getElementById('communityShareToggle').classList.toggle('on', STATE.settings.shareToCommunity);
+    saveState();
+  });
+
+  document.getElementById('btnExportData').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(STATE, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'grove-backup-'+G.todayKey()+'.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btnImportData').addEventListener('click', ()=>{
+    document.getElementById('importFileInput').click();
+  });
+  document.getElementById('importFileInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const imported = JSON.parse(reader.result);
+        if(!imported.trees){ throw new Error('Not a valid Grove backup'); }
+        Object.assign(STATE, imported);
+        saveState();
+        window.GroveViews.refreshActive();
+        G.showToast('icon-check','Data imported', null);
+      }catch(err){
+        G.showToast('icon-alert','Could not read that file', null);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('btnResetAll').addEventListener('click', ()=>{
+    document.getElementById('confirmTitle').textContent = 'Reset everything?';
+    document.getElementById('confirmDesc').textContent = 'Your whole grove — every grown and withered tree — will be permanently deleted.';
+    const btn = document.getElementById('btnConfirmAction');
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', ()=>{
+      Object.assign(STATE, G.defaultState());
+      saveState();
+      window.GroveNav.switchView('plant');
+      window.GroveNav.closeModal('modalConfirm');
+      G.showToast('icon-check','Grove reset', null);
+    });
+    window.GroveNav.openModal('modalConfirm');
+  });
+}
+
+window.GroveSettings = { initSettings };
+})();
+/* ============================================================
+   COMMUNITY GROVE CANVAS
+   Renders every shared tree (from this user + others, once
+   Firebase populates the community collection) as small trees
+   scattered across a shared horizon. Position is deterministic
+   per tree id so the layout doesn't reshuffle on every render.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const T = window.GroveTree;
+
+let communityTrees = [];
+
+function hashToUnit(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) >>> 0; }
+  return (h % 10000) / 10000;
+}
+
+function render(){
+  const canvas = document.getElementById('communityCanvas');
+  canvas.innerHTML = '';
+
+  const myTreeIds = new Set(G.STATE.trees.filter(t=>t.status==='grown' && t.shared).map(t=>t.id));
+
+  const localShared = G.STATE.trees.filter(t=>t.status==='grown' && t.shared).map(t=>({
+    ...t, ownerIsMe:true
+  }));
+  const remoteOnly = communityTrees.filter(t=>!myTreeIds.has(t.id));
+  const display = [...localShared, ...remoteOnly];
+
+  document.getElementById('communityTotalTrees').textContent = display.length;
+  const totalMin = display.reduce((s,t)=>s+(t.durationMin||0),0);
+  document.getElementById('communityTotalHours').textContent = Math.round(totalMin/60)+'h';
+
+  if(!display.length){
+    canvas.innerHTML = `<div class="empty-state" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <svg class="icon"><use href="#icon-globe"/></svg>
+      <div class="empty-state-title">The grove is waiting</div>
+      <div class="empty-state-desc">Be the first to plant a tree here today.</div>
+    </div>`;
+    return;
+  }
+
+  display.forEach(tree=>{
+    const species = G.speciesById(tree.speciesId);
+    const u = hashToUnit(tree.id);
+    const x = 4 + u*92;
+    const sizeJitter = 0.7 + hashToUnit(tree.id+'size')*0.6;
+    const size = 50 * sizeJitter;
+    const bottomJitter = hashToUnit(tree.id+'y')*30;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'community-tree' + (tree.ownerIsMe ? ' mine' : '');
+    wrap.style.left = x+'%';
+    wrap.style.bottom = bottomJitter+'px';
+    wrap.style.width = size+'px';
+    wrap.style.height = size+'px';
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 200 200');
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    T.renderTree(svg, { stage:5, hue: species.hue, withered:false });
+    wrap.appendChild(svg);
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'community-tree-tooltip';
+    tooltip.style.left = '50%';
+    tooltip.style.top = '0';
+    tooltip.textContent = species.name + ' · ' + tree.durationMin + 'min' + (tree.ownerIsMe?' · yours':'');
+    wrap.appendChild(tooltip);
+
+    canvas.appendChild(wrap);
+  });
+}
+
+function setRemoteTrees(trees){
+  communityTrees = trees || [];
+  if(document.getElementById('view-community').classList.contains('active')) render();
+}
+
+window.GroveCommunity = { render, setRemoteTrees };
+})();
+/* ============================================================
+   BOOT
+   ============================================================ */
+(function(){
+function boot(){
+  window.GroveNav.initSidebarNav();
+  window.GrovePlant.initPlanting();
+  window.GroveSettings.initSettings();
+  window.GroveNav.applyTheme();
+  window.GroveViews.updateModeChip();
+  window.GroveViews.refreshStats();
+  window.GroveViews.plant();
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', boot);
+}else{
+  boot();
+}
+})();
+/* ============================================================
+   BCD FIREBASE SYNC
+   Mirrors Ripen/Sprout's pattern for personal data. Adds a new
+   piece: a top-level shared collection, community-grove/{treeId},
+   where every signed-in user can read all entries but can only
+   write/delete their own — this is what makes the Community
+   Grove genuinely shared rather than per-user.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState, defaultState } = G;
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain: "bcd-discord.firebaseapp.com",
+  databaseURL: "https://bcd-discord-default-rtdb.firebaseio.com",
+  projectId: "bcd-discord",
+  storageBucket: "bcd-discord.firebasestorage.app",
+  messagingSenderId: "278895155371",
+  appId: "1:278895155371:web:177a468f5fa3f0abfe3fee",
+  measurementId: "G-6Q46Z9ZF0D"
+};
+
+const DEF_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+
+let app, auth, db;
+let currentUser = null;
+let docRef = null;
+let saveTimer = null;
+let suppressNextWrite = false;
+let syncedTreeIds = new Set();
+const SAVE_DEBOUNCE_MS = 1200;
+
+function init(){
+  try{
+    if(!window.firebase || !window.firebase.initializeApp){
+      console.warn('Grove: Firebase SDK not found, running in local-only mode.');
+      setFallbackAccountPill();
+      return;
+    }
+    app = (!firebase.apps || !firebase.apps.length) ? firebase.initializeApp(FIREBASE_CONFIG) : firebase.app();
+    auth = firebase.auth();
+    db = firebase.firestore();
+  }catch(e){
+    console.warn('Grove: Firebase init failed, running in local-only mode.', e);
+    setFallbackAccountPill();
+    return;
+  }
+
+  showSyncStatus('connecting');
+  installSaveHook();
+
+  auth.onAuthStateChanged(user=>{
+    if(!user){
+      location.href = 'login.html';
+      return;
+    }
+    currentUser = user;
+    populateAccountPill(user);
+    docRef = db.collection('users').doc(user.uid).collection('tools').doc('grove');
+    attachListener();
+    attachCommunityListener();
+  });
+}
+
+function populateAccountPill(user){
+  const img = document.getElementById('accountAvatarImg');
+  if(!img) return;
+  const tryDefault = ()=>{ img.onerror=()=>{ img.removeAttribute('src'); img.onerror=null; }; img.src=DEF_AV; };
+  if(user.photoURL){ img.onerror=tryDefault; img.src=user.photoURL; }
+  else tryDefault();
+}
+function setFallbackAccountPill(){
+  const img = document.getElementById('accountAvatarImg');
+  if(!img) return;
+  img.onerror = ()=>{ img.removeAttribute('src'); img.onerror=null; };
+  img.src = DEF_AV;
+}
+
+function mergeStateInPlace(target, incoming){
+  const def = defaultState();
+  const merged = Object.assign({}, def, incoming || {});
+  merged.settings = Object.assign({}, def.settings, (incoming&&incoming.settings)||{});
+  merged.streak = Object.assign({}, def.streak, (incoming&&incoming.streak)||{});
+  merged.meta = Object.assign({}, def.meta, (incoming&&incoming.meta)||{});
+  merged.trees = (incoming&&incoming.trees) || [];
+
+  Object.keys(target).forEach(k=>delete target[k]);
+  Object.keys(merged).forEach(k=>{ target[k] = merged[k]; });
+}
+
+function pickInitial(localState, remoteState){
+  if(!remoteState) return localState;
+  const localTs = (localState && localState.meta && localState.meta.updatedAt) || 0;
+  const remoteTs = (remoteState && remoteState.meta && remoteState.meta.updatedAt) || 0;
+  const localHasData = localState && Array.isArray(localState.trees) && localState.trees.length>0;
+  const remoteHasData = remoteState && Array.isArray(remoteState.trees) && remoteState.trees.length>0;
+  if(remoteHasData && !localHasData) return remoteState;
+  if(localHasData && !remoteHasData) return localState;
+  return remoteTs >= localTs ? remoteState : localState;
+}
+
+function attachListener(){
+  let firstSnapshot = true;
+  docRef.onSnapshot({ includeMetadataChanges:true }, snap=>{
+    if(!firstSnapshot && snap.metadata.hasPendingWrites){ showSyncStatus('synced'); return; }
+    const remoteData = snap.exists ? snap.data().state : null;
+    if(firstSnapshot){
+      firstSnapshot = false;
+      const chosen = pickInitial(STATE, remoteData);
+      applyRemoteState(chosen);
+      pushToFirestore();
+      pushAnyUnsharedTrees();
+      showSyncStatus('synced');
+      return;
+    }
+    if(remoteData){ applyRemoteState(remoteData); showSyncStatus('synced'); }
+  }, err=>{
+    console.warn('Grove: Firestore listener error, continuing in local-only mode.', err);
+    showSyncStatus('offline');
+  });
+}
+
+function attachCommunityListener(){
+  db.collection('community-grove').limit(300).onSnapshot(snap=>{
+    const trees = [];
+    snap.forEach(doc=>{
+      const data = doc.data();
+      trees.push({
+        id: doc.id,
+        speciesId: data.speciesId,
+        durationMin: data.durationMin,
+        completedAt: data.completedAt,
+        ownerId: data.ownerId
+      });
+    });
+    if(window.GroveCommunity) window.GroveCommunity.setRemoteTrees(trees);
+  }, err=>{
+    console.warn('Grove: community-grove listener error (shared grove unavailable).', err);
+  });
+}
+
+function pushAnyUnsharedTrees(){
+  if(!currentUser) return;
+  const toShare = STATE.trees.filter(t=>t.status==='grown' && t.shared && !syncedTreeIds.has(t.id));
+  toShare.forEach(tree=>{
+    db.collection('community-grove').doc(tree.id).set({
+      speciesId: tree.speciesId,
+      durationMin: tree.durationMin,
+      completedAt: tree.completedAt,
+      ownerId: currentUser.uid
+    }).then(()=>{
+      syncedTreeIds.add(tree.id);
+    }).catch(e=>console.warn('Grove: failed to share tree to community grove', e));
+  });
+}
+
+function applyRemoteState(remoteData){
+  suppressNextWrite = true;
+  mergeStateInPlace(STATE, remoteData);
+  try{ localStorage.setItem(G.STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+  refreshEverything();
+  suppressNextWrite = false;
+}
+
+function refreshEverything(){
+  if(!window.GroveViews) return;
+  window.GroveNav.applyTheme();
+  window.GroveViews.updateModeChip();
+  window.GroveViews.refreshActive();
+  document.getElementById('sidebarStreak').textContent = STATE.streak.current;
+}
+
+function scheduleSave(){
+  if(!docRef || suppressNextWrite) return;
+  if(saveTimer) clearTimeout(saveTimer);
+  showSyncStatus('saving');
+  saveTimer = setTimeout(()=>{ pushToFirestore(); pushAnyUnsharedTrees(); }, SAVE_DEBOUNCE_MS);
+}
+
+function pushToFirestore(){
+  if(!docRef) return;
+  STATE.meta = STATE.meta || {};
+  STATE.meta.updatedAt = Date.now();
+  try{ localStorage.setItem(G.STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+  const payload = {
+    state: JSON.parse(JSON.stringify(STATE)),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: currentUser ? currentUser.uid : null
+  };
+  docRef.set(payload, { merge:false }).then(()=>showSyncStatus('synced')).catch(err=>{
+    console.warn('Grove: Firestore write failed, will retry on next change.', err);
+    showSyncStatus('offline');
+  });
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
+}
+
+function installSaveHook(){
+  saveState.postHooks.push(scheduleSave);
+}
+
+function showSyncStatus(state){
+  let dot = document.getElementById('syncStatusDot');
+  if(!dot){
+    const streakBox = document.querySelector('.streak-box');
+    if(!streakBox) return;
+    dot = document.createElement('span');
+    dot.id = 'syncStatusDot';
+    dot.style.cssText = 'width:7px;height:7px;border-radius:50%;display:inline-block;margin-left:auto;flex-shrink:0;transition:background-color .3s;';
+    streakBox.style.display = 'flex';
+    streakBox.appendChild(dot);
+  }
+  const colors = { connecting:'var(--ink-faint)', saving:'var(--amber)', synced:'var(--vine)', offline:'var(--tomato)' };
+  dot.style.backgroundColor = colors[state] || 'var(--ink-faint)';
+  dot.title = {
+    connecting:'Connecting to your Books Coffee and Dreams account…',
+    saving:'Saving…', synced:'Synced to your account',
+    offline:'Offline — changes saved on this device only'
+  }[state] || '';
+}
+
+window.GroveFirebase = { init, getCurrentUser: ()=>currentUser };
+init();
+})();
+
+</script>
+</body>
+</html>
