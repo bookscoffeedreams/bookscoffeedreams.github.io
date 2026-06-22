@@ -39,62 +39,109 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .4s var(--ease),color .4s var(--ease);-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
 a{text-decoration:none;color:inherit}
 button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
 img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--amber2);outline-offset:3px;border-radius:4px}
 
+/* fine grain + two soft warm light sources, one slowly orbiting — the page
+   should feel like late-afternoon light through a café window, not a flat dark theme */
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
   background-size:60px 60px}
-body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh;
-  background:radial-gradient(ellipse,rgba(217,119,6,.06) 0%,transparent 65%);
-  z-index:0;pointer-events:none;animation:warm-drift 22s ease-in-out infinite alternate}
-@keyframes warm-drift{0%{transform:translate(0,0)}100%{transform:translate(-6vw,5vh)}}
-@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
+.amb{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.amb-orb{position:absolute;border-radius:50%;filter:blur(90px)}
+.amb-orb.o1{width:46vw;height:46vw;top:-18%;right:-8%;background:radial-gradient(circle,rgba(217,119,6,.10),transparent 70%);animation:drift-1 26s ease-in-out infinite}
+.amb-orb.o2{width:34vw;height:34vw;bottom:-10%;left:-6%;background:radial-gradient(circle,rgba(251,191,36,.07),transparent 70%);animation:drift-2 32s ease-in-out infinite}
+[data-mode="light"] .amb-orb.o1{background:radial-gradient(circle,rgba(217,119,6,.14),transparent 70%)}
+[data-mode="light"] .amb-orb.o2{background:radial-gradient(circle,rgba(251,191,36,.1),transparent 70%)}
+@keyframes drift-1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-5vw,6vh) scale(1.08)}}
+@keyframes drift-2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(4vw,-5vh) scale(1.05)}}
+
+@keyframes rise-in{from{opacity:0;transform:translateY(26px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 9px rgba(217,119,6,0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shimmer-sweep{0%{background-position:-150% 0}100%{background-position:250% 0}}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.35)}50%{box-shadow:0 0 0 6px rgba(217,119,6,0)}}
+@keyframes badge-shine{0%{transform:translateX(-120%) skewX(-15deg)}100%{transform:translateX(220%) skewX(-15deg)}}
+@keyframes underline-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
-/* ── NAV (identical structure to dashboard.html) ── */
-.nav{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--bdr)}
+.reveal{opacity:0;animation:rise-in .7s var(--spring) both}
+.r1{animation-delay:.03s}.r2{animation-delay:.1s}.r3{animation-delay:.17s}.r4{animation-delay:.24s}.r5{animation-delay:.31s}.r6{animation-delay:.38s}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--bdr);backdrop-filter:blur(14px);background:color-mix(in srgb, var(--sur) 92%, transparent)}
 .nav-inner{max-width:1320px;margin:0 auto;height:64px;display:flex;align-items:center;gap:18px;padding:0 28px}
-.nav-brand{display:flex;align-items:center;gap:10px}
-.nav-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--amber),var(--amber3));display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite}
+.nav-brand{display:flex;align-items:center;gap:10px;transition:opacity .2s}
+.nav-brand:hover{opacity:.82}
+.nav-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--amber),var(--amber3));display:flex;align-items:center;justify-content:center;animation:logo-pulse 3.2s ease-in-out infinite;transition:transform .3s var(--spring)}
+.nav-brand:hover .nav-logo{transform:rotate(-8deg) scale(1.06)}
 .nav-logo svg{width:15px;height:15px}
 .nav-site-name{font-family:var(--serif);font-size:16.5px;color:var(--tx)}
 .nav-site-name em{font-style:italic;color:var(--amber)}
 .nav-divider{width:1px;height:22px;background:var(--bdr2)}
 .nav-page-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
 .nav-links{display:flex;align-items:center;gap:22px;margin-left:18px}
-.nav-link{font-size:13.5px;color:var(--tx3);transition:color .15s}
-.nav-link:hover,.nav-link.active{color:var(--amber)}
+.nav-link{font-size:13.5px;color:var(--tx3);transition:color .15s;position:relative;padding-bottom:3px}
+.nav-link::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease)}
+.nav-link:hover{color:var(--amber)}
+.nav-link:hover::after,.nav-link.active::after{transform:scaleX(1)}
+.nav-link.active{color:var(--amber)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
-.mode-toggle{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);font-size:12px;color:var(--tx3)}
-.mode-toggle svg{width:13px;height:13px}
+.mode-toggle{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);font-size:12px;color:var(--tx3);transition:all .2s var(--ease)}
+.mode-toggle:hover{border-color:var(--bdr3);color:var(--amber);transform:translateY(-1px)}
+.mode-toggle svg{width:13px;height:13px;transition:transform .4s var(--spring)}
+.mode-toggle:active svg{transform:rotate(50deg)}
 .icon-sun,.icon-moon{display:flex}
 [data-mode="dark"] .icon-sun,[data-mode="light"] .icon-moon{display:none}
-.nav-user{display:flex;align-items:center;gap:9px;cursor:pointer}
-.nav-user-av{width:32px;height:32px;border-radius:50%;border:2px solid var(--amber2);object-fit:cover;background:var(--sur3)}
+.nav-user{display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 10px 4px 4px;border-radius:99px;transition:background .2s}
+.nav-user:hover{background:var(--sur3)}
+.nav-user-av{width:32px;height:32px;border-radius:50%;border:2px solid var(--amber2);object-fit:cover;background:var(--sur3);transition:transform .25s var(--spring)}
+.nav-user:hover .nav-user-av{transform:scale(1.07)}
 .nav-user-name{font-size:13px;color:var(--tx2)}
 @media(max-width:860px){.nav-links{display:none}}
 
 /* ── PAGE ── */
-.page{max-width:1320px;margin:0 auto;padding:40px 28px 90px;position:relative;z-index:1}
+.page{max-width:1320px;margin:0 auto;padding:44px 28px 96px;position:relative;z-index:1}
 
-.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;gap:14px;flex-wrap:wrap}
-.section-title{font-family:var(--serif);font-size:27px;color:var(--tx);font-weight:400}
-.section-link{font-size:13px;color:var(--amber);display:flex;align-items:center;gap:4px;white-space:nowrap}
-.section-link svg{width:13px;height:13px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px;gap:14px;flex-wrap:wrap;position:relative}
+.section-title{font-family:var(--serif);font-size:28px;color:var(--tx);font-weight:400;position:relative;display:inline-block}
+.section-title::after{content:'';position:absolute;left:1px;right:auto;bottom:-7px;width:30px;height:2.5px;background:linear-gradient(90deg,var(--amber),var(--amber3));border-radius:99px;transform-origin:left;animation:underline-grow .6s var(--ease) .25s both}
+.section-link{font-size:13px;color:var(--amber);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:gap .2s var(--ease),opacity .2s}
+.section-link:hover{gap:8px;opacity:.85}
+.section-link svg{width:13px;height:13px;transition:transform .2s var(--ease)}
 
-/* ── QUICK ACTIONS ── */
-.qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:48px;animation:fade-up .5s var(--spring) .05s both}
-.qa-card{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:22px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:13px;transition:all .22s var(--ease);cursor:pointer;position:relative;overflow:hidden}
-.qa-card:hover{border-color:var(--bdr3);transform:translateY(-3px);box-shadow:var(--sh2)}
-.qa-badge{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;padding:3px 7px;border-radius:99px;background:var(--amber);color:#1a0f02;font-weight:700}
-.qa-icon-wrap{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.qa-icon-wrap svg{width:24px;height:24px;color:#fff;stroke-width:1.8}
+/* ── QUICK ACTIONS — signature moment: cards tilt toward the cursor like
+   a held object catching light, with a soft glow that tracks the pointer ── */
+.qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:54px}
+.qa-card{
+  --mx:50%;--my:50%;
+  background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:24px 16px 22px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
+  cursor:pointer;position:relative;overflow:hidden;perspective:600px;
+  transition:transform .45s var(--spring),border-color .3s var(--ease),box-shadow .4s var(--ease);
+  transform-style:preserve-3d;
+}
+.qa-card::before{
+  content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;opacity:0;
+  background:radial-gradient(circle 140px at var(--mx) var(--my),rgba(217,119,6,.16),transparent 70%);
+  transition:opacity .3s var(--ease);
+}
+.qa-card:hover{border-color:var(--bdr3);box-shadow:var(--sh2)}
+.qa-card:hover::before{opacity:1}
+.qa-card:active{transform:scale(.97) translateY(0)!important}
+.qa-badge{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;padding:3px 7px;border-radius:99px;background:var(--amber);color:#1a0f02;font-weight:700;overflow:hidden}
+.qa-badge::after{content:'';position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.55),transparent);animation:badge-shine 2.8s ease-in-out infinite}
+.qa-icon-wrap{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .4s var(--spring),box-shadow .3s var(--ease);box-shadow:0 6px 18px -6px rgba(0,0,0,.4)}
+.qa-card:hover .qa-icon-wrap{transform:translateY(-3px) scale(1.07)}
+.qa-icon-wrap svg{width:24px;height:24px;color:#fff;stroke-width:1.8;transition:transform .35s var(--ease)}
+.qa-card:hover .qa-icon-wrap svg{transform:scale(1.08)}
 .qa-icon-wrap.tone-violet{background:linear-gradient(150deg,#7c3aed,#a78bfa)}
 .qa-icon-wrap.tone-teal{background:linear-gradient(150deg,#0d9488,#2dd4bf)}
 .qa-icon-wrap.tone-amber{background:linear-gradient(150deg,#d97706,#fbbf24)}
@@ -104,42 +151,54 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
    the lucide glyph with a custom illustrated icon. Keep the wrapper div + tone
    class; just swap the inner <svg> for an <img src="../assets/icons/NAME.svg">
    sized to 24x24–28x28 to match. */
-.qa-label{font-size:13.5px;font-weight:600;color:var(--tx2);line-height:1.3}
+.qa-label{font-size:13.5px;font-weight:600;color:var(--tx2);line-height:1.3;transition:color .2s}
+.qa-card:hover .qa-label{color:var(--tx)}
 @media(max-width:980px){.qa-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:620px){.qa-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ── SCHEDULE ── */
-.sched-tabs{display:flex;gap:8px;margin-bottom:18px}
-.sched-tab{padding:8px 16px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--tx3);background:var(--sur3);border:1px solid var(--bdr);transition:all .18s}
-.sched-tab.on{background:var(--tx);color:var(--bg)}
-[data-mode="dark"] .sched-tab.on{background:var(--tx);color:#100f0e}
-.sched-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:6px;margin-bottom:48px;animation:fade-up .5s var(--spring) .1s both}
+.sched-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--sur3);border:1px solid var(--bdr);border-radius:99px;padding:4px;width:max-content}
+.sched-tab{padding:7px 16px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--tx3);transition:color .25s var(--ease);position:relative;z-index:1}
+.sched-tab.on{color:var(--bg)}
+[data-mode="dark"] .sched-tab.on{color:#100f0e}
+.sched-tabs{position:relative}
+.sched-tab-indicator{position:absolute;top:4px;left:4px;height:calc(100% - 8px);border-radius:99px;background:var(--tx);transition:transform .35s var(--spring),width .35s var(--spring);z-index:0}
+.sched-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;margin-bottom:54px;scroll-snap-type:x proximity}
+.sched-row>*{scroll-snap-align:start}
 .sched-nav{display:flex;gap:8px}
-.sched-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .18s}
-.sched-nav-btn:hover{border-color:var(--bdr3);color:var(--amber)}
+.sched-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .22s var(--spring)}
+.sched-nav-btn:hover{border-color:var(--bdr3);color:var(--amber);transform:translateY(-2px)}
+.sched-nav-btn:active{transform:scale(.92)}
 .sched-nav-btn svg{width:14px;height:14px}
-.cal-btn{width:32px;height:32px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3)}
+.cal-btn{width:32px;height:32px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .2s}
+.cal-btn:hover{color:var(--amber);border-color:var(--bdr3)}
 .cal-btn svg{width:15px;height:15px}
 
-.sched-card{flex-shrink:0;width:280px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;transition:all .22s;cursor:pointer}
-.sched-card:hover{border-color:var(--bdr3);transform:translateY(-2px);box-shadow:var(--sh2)}
-.sched-thumb{height:140px;display:flex;align-items:center;justify-content:center;position:relative}
+.sched-card{flex-shrink:0;width:280px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;transition:transform .35s var(--spring),border-color .25s,box-shadow .35s var(--ease);cursor:pointer}
+.sched-card:hover{border-color:var(--bdr3);transform:translateY(-5px);box-shadow:var(--sh2)}
+.sched-thumb{height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.sched-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.25));opacity:0;transition:opacity .3s}
+.sched-card:hover .sched-thumb::after{opacity:1}
 .sched-thumb.subj-chem{background:linear-gradient(160deg,#1c3a2e,#0e1f17)}
 .sched-thumb.subj-phys{background:linear-gradient(160deg,#1c2a44,#0e1626)}
 .sched-thumb.subj-math{background:linear-gradient(160deg,#3a1c2e,#1f0e17)}
 .sched-thumb.subj-bio{background:linear-gradient(160deg,#2e3a1c,#171f0e)}
-.sched-thumb svg{width:34px;height:34px;color:rgba(255,255,255,.85);stroke-width:1.6}
+.sched-thumb svg{width:34px;height:34px;color:rgba(255,255,255,.85);stroke-width:1.6;transition:transform .4s var(--spring);position:relative;z-index:1}
+.sched-card:hover .sched-thumb svg{transform:scale(1.15) rotate(-4deg)}
 /* PREMIUM ICON SLOT — for a richer look, replace .sched-thumb's svg with a
    full illustration: <img src="../assets/subjects/chemistry.svg" style="width:64px;height:64px"/> */
-.sched-live-tag{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:4px 9px;border-radius:99px;background:rgba(0,0,0,.4);color:#fff;backdrop-filter:blur(6px)}
+.sched-live-tag{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:4px 9px;border-radius:99px;background:rgba(0,0,0,.45);color:#fff;backdrop-filter:blur(6px);z-index:2}
+.sched-live-tag .dot{width:5px;height:5px;border-radius:50%;background:#ef4444;animation:pulse-ring 1.6s ease-in-out infinite}
 .sched-body{padding:16px 18px}
 .sched-subject{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:3px}
 .sched-time{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx3)}
 .sched-time svg{width:12px;height:12px}
 
 /* ── TESTS ── */
-.test-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;animation:fade-up .5s var(--spring) .15s both}
-.test-card{flex-shrink:0;width:300px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.test-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;scroll-snap-type:x proximity}
+.test-row>*{scroll-snap-align:start}
+.test-card{flex-shrink:0;width:300px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:transform .35s var(--spring),border-color .25s,box-shadow .35s var(--ease)}
+.test-card:hover{border-color:var(--bdr3);transform:translateY(-5px);box-shadow:var(--sh2)}
 .test-status{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:99px}
 .test-status.upcoming{background:rgba(59,130,246,.12);color:var(--blue)}
 .test-status.over{background:rgba(217,119,6,.15);color:var(--amber)}
@@ -150,24 +209,28 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 .test-meta-item svg{width:12px;height:12px;color:var(--tx4)}
 .test-window{font-size:12px;color:var(--tx4)}
 .test-actions{display:flex;gap:8px;margin-top:auto}
-.test-btn{flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:12.5px;font-weight:600;transition:all .18s}
+.test-btn{flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:12.5px;font-weight:600;transition:all .22s var(--ease)}
 .test-btn.ghost{border:1.5px solid var(--bdr3);color:var(--tx2)}
-.test-btn.ghost:hover{background:var(--sur3)}
-.test-btn.solid{background:var(--amber);color:#1a0f02}
-.test-btn.solid:hover{background:var(--amber2)}
+.test-btn.ghost:hover{background:var(--sur3);transform:translateY(-1px)}
+.test-btn.solid{background:var(--amber);color:#1a0f02;position:relative;overflow:hidden}
+.test-btn.solid:hover{background:var(--amber2);transform:translateY(-1px);box-shadow:0 6px 16px -4px rgba(217,119,6,.5)}
+.test-btn:active{transform:scale(.96)!important}
 
 /* ── IMPROVEMENT BOOK strip ── */
-.imp-card{display:flex;align-items:center;gap:16px;background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:16px 20px;margin-bottom:14px;transition:all .2s;cursor:pointer}
-.imp-card:hover{border-color:var(--bdr3)}
-.imp-tag{width:6px;height:38px;border-radius:99px;flex-shrink:0}
+.imp-card{display:flex;align-items:center;gap:16px;background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:16px 20px;margin-bottom:12px;transition:transform .3s var(--spring),border-color .25s,box-shadow .3s;cursor:pointer}
+.imp-card:hover{border-color:var(--bdr3);transform:translateX(4px);box-shadow:var(--sh)}
+.imp-tag{width:6px;height:38px;border-radius:99px;flex-shrink:0;transition:height .25s var(--spring)}
+.imp-card:hover .imp-tag{height:44px}
 .imp-tag.weak{background:var(--red)}
 .imp-tag.mid{background:var(--amber)}
 .imp-tag.strong{background:var(--green)}
 .imp-body{flex:1;min-width:0}
 .imp-title{font-size:14.5px;font-weight:600;color:var(--tx)}
 .imp-sub{font-size:12px;color:var(--tx4);margin-top:2px}
-.imp-arrow{width:30px;height:30px;border-radius:50%;background:var(--sur3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.imp-arrow svg{width:13px;height:13px;color:var(--tx3)}
+.imp-arrow{width:30px;height:30px;border-radius:50%;background:var(--sur3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s var(--spring),background .25s}
+.imp-card:hover .imp-arrow{transform:translateX(3px);background:var(--amber)}
+.imp-arrow svg{width:13px;height:13px;color:var(--tx3);transition:color .25s}
+.imp-card:hover .imp-arrow svg{color:#1a0f02}
 
 /* ── EMPTY STATES ── */
 .empty-note{font-size:12.5px;color:var(--tx4);padding:14px 0}
@@ -178,6 +241,8 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 </style>
 </head>
 <body>
+
+<div class="amb"><div class="amb-orb o1"></div><div class="amb-orb o2"></div></div>
 
 <!-- NAV -->
 <nav class="nav">
@@ -213,10 +278,10 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 <div class="page">
 
   <!-- QUICK ACTIONS -->
-  <div class="section-head">
+  <div class="section-head reveal r1">
     <div class="section-title">Quick Actions</div>
   </div>
-  <div class="qa-grid" id="qaGrid">
+  <div class="qa-grid reveal r2" id="qaGrid">
     <div class="qa-card" onclick="location.href='ai-planner.html'">
       <div class="qa-badge">New</div>
       <div class="qa-icon-wrap tone-violet"><svg data-lucide="sparkles"></svg></div>
@@ -241,7 +306,7 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
   </div>
 
   <!-- SCHEDULE -->
-  <div class="section-head">
+  <div class="section-head reveal r3">
     <div class="section-title">Schedule</div>
     <div class="sched-nav">
       <button class="cal-btn"><svg data-lucide="calendar"></svg></button>
@@ -249,35 +314,37 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
       <button class="sched-nav-btn" id="schedNext"><svg data-lucide="chevron-right"></svg></button>
     </div>
   </div>
-  <div class="sched-tabs">
+  <div class="sched-tabs reveal r3">
+    <div class="sched-tab-indicator" id="schedIndicator1"></div>
     <div class="sched-tab on" data-day="today">Today</div>
     <div class="sched-tab" data-day="tomorrow">Tomorrow</div>
     <div class="sched-tab" data-day="week">This Week</div>
   </div>
-  <div class="sched-row" id="schedRow">
+  <div class="sched-row reveal r4" id="schedRow">
     <!-- populated by JS from `liveClasses` collection if present, else shows empty note -->
   </div>
 
   <!-- TESTS -->
-  <div class="section-head">
+  <div class="section-head reveal r4">
     <div class="section-title">Your Tests</div>
     <a class="section-link" href="tests.html">View all <svg data-lucide="arrow-right"></svg></a>
   </div>
-  <div class="sched-tabs">
+  <div class="sched-tabs reveal r4">
+    <div class="sched-tab-indicator" id="schedIndicator2"></div>
     <div class="sched-tab on" data-test="upcoming">Upcoming</div>
     <div class="sched-tab" data-test="past">Past Tests</div>
     <div class="sched-tab" data-test="missed">Missed Tests</div>
   </div>
-  <div class="test-row" id="testRow">
+  <div class="test-row reveal r5" id="testRow">
     <!-- populated by JS from `testSchedule` collection if present, else shows empty note -->
   </div>
 
   <!-- IMPROVEMENT BOOK -->
-  <div class="section-head">
+  <div class="section-head reveal r5">
     <div class="section-title">Improvement Book</div>
     <a class="section-link" href="#">View all <svg data-lucide="arrow-right"></svg></a>
   </div>
-  <div id="impList">
+  <div id="impList" class="reveal r6">
     <!-- populated by JS from `userCourseProgress` weak-topic flags if present -->
   </div>
 
@@ -285,6 +352,48 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 
 <script>
 lucide.createIcons();
+
+/* ═══════════ SIGNATURE MOTION: magnetic tilt on Quick Action cards ═══════════
+   Each card tilts gently toward the cursor and the glow (.qa-card::before)
+   follows the pointer — like picking up a card and catching the light. */
+document.querySelectorAll('.qa-card').forEach(card=>{
+  card.addEventListener('pointermove', e=>{
+    const r=card.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    card.style.setProperty('--mx', (px*100)+'%');
+    card.style.setProperty('--my', (py*100)+'%');
+    const tiltX=(py-0.5)*-10, tiltY=(px-0.5)*10;
+    card.style.transform = `translateY(-6px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+  });
+  card.addEventListener('pointerleave', ()=>{ card.style.transform=''; });
+});
+
+/* ═══════════ SLIDING TAB INDICATOR ═══════════ */
+function fitIndicator(group, indicator, activeTab){
+  indicator.style.width = activeTab.offsetWidth+'px';
+  indicator.style.transform = `translateX(${activeTab.offsetLeft-4}px)`;
+}
+[['#schedIndicator1'],['#schedIndicator2']].forEach(([sel])=>{
+  const indicator=document.querySelector(sel);
+  if(!indicator) return;
+  const group=indicator.parentElement;
+  const active=group.querySelector('.sched-tab.on');
+  requestAnimationFrame(()=>fitIndicator(group,indicator,active));
+  group.querySelectorAll('.sched-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      group.querySelectorAll('.sched-tab').forEach(t=>t.classList.remove('on'));
+      tab.classList.add('on');
+      fitIndicator(group,indicator,tab);
+    });
+  });
+});
+window.addEventListener('resize', ()=>{
+  document.querySelectorAll('.sched-tabs').forEach(group=>{
+    const indicator=group.querySelector('.sched-tab-indicator');
+    const active=group.querySelector('.sched-tab.on');
+    if(indicator&&active) fitIndicator(group,indicator,active);
+  });
+});
 
 /* ═══════════ MODE TOGGLE ═══════════ */
 const html=document.documentElement;
@@ -331,7 +440,7 @@ async function loadSchedule(user){
       const icon = subj.includes('chem')?'flask-conical' : subj.includes('phys')?'atom' : subj.includes('bio')?'leaf' : 'sigma';
       return `<div class="sched-card">
         <div class="sched-thumb ${toneClass}">
-          ${c.live?'<div class="sched-live-tag"><svg data-lucide="radio" style="width:9px;height:9px"></svg> LIVE</div>':''}
+          ${c.live?'<div class="sched-live-tag"><span class="dot"></span> LIVE</div>':''}
           <svg data-lucide="${icon}"></svg>
         </div>
         <div class="sched-body">
@@ -418,16 +527,6 @@ async function loadImprovement(user){
 
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
 
-/* ═══════════ TAB SWITCHING (visual only — wire to real filtering once
-   liveClasses / testSchedule collections exist with enough data to filter) ═══════════ */
-document.querySelectorAll('.sched-tabs').forEach(group=>{
-  group.querySelectorAll('.sched-tab').forEach(tab=>{
-    tab.onclick=()=>{
-      group.querySelectorAll('.sched-tab').forEach(t=>t.classList.remove('on'));
-      tab.classList.add('on');
-    };
-  });
-});
 </script>
 </body>
 </html>
