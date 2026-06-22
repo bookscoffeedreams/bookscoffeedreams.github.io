@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Study Planner · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&family=Caveat:wght@600;700&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+/* ═══════════════════════════════
+   TOKENS — identical to ai-study.html, do not drift
+═══════════════════════════════ */
+:root{
+  --p1:#2d0a6e;--p2:#4a1d96;--p3:#6d28d9;--p4:#7c3aed;
+  --p5:#8b5cf6;--p6:#a78bfa;--p7:#c4b5fd;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --hand:'Caveat',cursive;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#07040f;--bg2:#0b0718;
+  --sur:#120d22;--sur2:#18122e;--sur3:#201839;--sur4:#2a2047;
+  --bdr:rgba(109,40,217,.15);--bdr2:rgba(109,40,217,.3);--bdr3:rgba(109,40,217,.58);
+  --tx:#f0ecff;--tx2:#ddd6fe;--tx3:#a89fd4;--tx4:#6b5fa0;
+  --sh:0 4px 24px rgba(0,0,0,.65);--sh2:0 16px 56px rgba(0,0,0,.82);
+  --glow:0 0 36px rgba(109,40,217,.22);--scr:rgba(109,40,217,.28);
+  --good:#4ade80;--warn:#fbbf24;--bad:#f87171;
+}
+[data-mode="light"]{
+  --bg:#f4f1ff;--bg2:#ede8ff;
+  --sur:#fff;--sur2:#f9f7ff;--sur3:#f0ebff;--sur4:#e5dcff;
+  --bdr:rgba(109,40,217,.1);--bdr2:rgba(109,40,217,.22);--bdr3:rgba(109,40,217,.5);
+  --tx:#150836;--tx2:#2a1060;--tx3:#6b4fa0;--tx4:#9d80cc;
+  --sh:0 4px 16px rgba(109,40,217,.09);--sh2:0 16px 48px rgba(109,40,217,.16);
+  --glow:0 0 28px rgba(109,40,217,.1);--scr:rgba(109,40,217,.18);
+  --good:#16a34a;--warn:#d97706;--bad:#dc2626;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans);color:inherit}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(109,40,217,.055) 1px,transparent 1px);
+  background-size:26px 26px}
+.amb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;
+  width:600px;height:600px;background:rgba(74,29,150,.07);top:-8%;right:0}
+
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes fade-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bar-grow{from{width:0}to{width:var(--to,100%)}}
+@keyframes ring{0%,100%{box-shadow:0 0 0 0 rgba(109,40,217,.4)}50%{box-shadow:0 0 0 8px rgba(109,40,217,0)}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+@keyframes check-pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+/* ── NAV (identical pattern to ai-study.html) ── */
+.nav{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--bdr);height:64px;display:flex;align-items:center;padding:0 36px;position:relative}
+.nav::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--p4),var(--p6),var(--p7),var(--p6),var(--p4),transparent);background-size:300% 100%;animation:shimmer 7s linear infinite}
+.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--p2),var(--p5));display:flex;align-items:center;justify-content:center;animation:ring 3s ease-in-out infinite}
+.nav-logo svg{width:16px;height:16px}
+.nav-name{font-family:var(--serif);font-size:17px;color:var(--tx)}
+.nav-name em{color:var(--p6);font-style:italic}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-pill{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:5px 12px;border-radius:99px;background:rgba(109,40,217,.12);border:1px solid var(--bdr2);color:var(--p6)}
+.nav-ib{width:34px;height:34px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);cursor:pointer;transition:all .2s}
+.nav-ib:hover{border-color:var(--bdr2);color:var(--p6)}
+.nav-ib svg{width:15px;height:15px}
+.nav-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--p2),var(--p5));border:2px solid var(--p6);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:15px;color:#fff}
+.nav-av img{width:100%;height:100%;object-fit:cover}
+.icon-sun,.icon-moon{display:none}
+[data-mode="dark"] .icon-moon{display:block}[data-mode="light"] .icon-sun{display:block}
+
+/* ── PAGE ── */
+.page{max-width:1100px;margin:0 auto;padding:40px 28px 80px;position:relative;z-index:1}
+
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:40px;animation:fade-up .5s var(--spring) .05s both}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--p6);margin-bottom:14px}
+.hero-tag::before,.hero-tag::after{content:'';display:block;width:20px;height:1px;background:var(--p6)}
+.hero-h{font-family:var(--serif);font-size:clamp(36px,5vw,58px);color:var(--tx);font-weight:400;letter-spacing:-.03em;line-height:.97;margin-bottom:10px}
+.hero-h em{font-style:italic;color:var(--p6)}
+.hero-sub{font-size:15px;color:var(--tx3);max-width:520px;margin:0 auto;line-height:1.7}
+.hero-hand{font-family:var(--hand);font-size:18px;color:var(--tx4);font-weight:600;margin-top:6px;display:block}
+
+/* ── ENGINE BAR (same component as ai-study.html) ── */
+.engine-bar{display:flex;align-items:center;gap:10px;background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:10px 18px;margin-bottom:28px;animation:fade-up .45s var(--spring) .1s both;flex-wrap:wrap}
+.engine-item{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--tx4);letter-spacing:.06em}
+.engine-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.engine-dot.active{background:#4ade80;box-shadow:0 0 6px #4ade80;animation:pulse-dot 2s ease-in-out infinite}
+.engine-dot.standby{background:var(--p5);box-shadow:0 0 6px var(--p5);animation:pulse-dot 2.5s ease-in-out infinite}
+.engine-dot.off{background:var(--tx4)}
+.engine-sep{width:1px;height:16px;background:var(--bdr)}
+.engine-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.keys-btn{font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:8px;background:rgba(109,40,217,.1);border:1px solid var(--bdr2);color:var(--p6);cursor:pointer;transition:all .18s;letter-spacing:.06em}
+.keys-btn:hover{border-color:var(--bdr3);background:rgba(109,40,217,.18)}
+
+/* ── KEYS PANEL ── */
+.keys-panel{background:var(--sur);border:1px solid var(--bdr2);border-radius:16px;padding:22px 24px;margin-bottom:28px;display:none;animation:fade-up .3s var(--spring) both}
+.keys-panel.open{display:block}
+.keys-panel-title{font-family:var(--serif);font-size:18px;color:var(--tx);margin-bottom:4px}
+.keys-panel-sub{font-size:12px;color:var(--tx4);margin-bottom:18px;line-height:1.6}
+.keys-panel-sub a{color:var(--p6)}
+.keys-panel-sub strong{color:var(--tx2)}
+.key-row{display:flex;align-items:center;gap:8px;background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;padding:9px 14px;margin-bottom:10px}
+.key-inp{flex:1;background:none;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--tx);min-width:0}
+.key-inp::placeholder{color:var(--tx4)}
+.grok-row{display:flex;gap:8px}
+.grok-inp{flex:1;background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;padding:9px 14px;font-family:var(--mono);font-size:12px;color:var(--tx);outline:none}
+.grok-inp:focus{border-color:var(--bdr3)}
+.save-btn{padding:9px 20px;border-radius:10px;background:linear-gradient(135deg,var(--p3),var(--p5));color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.08em;cursor:pointer;transition:all .2s;white-space:nowrap}
+.save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,.4)}
+.demo-note{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;border-radius:10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);font-size:11.5px;color:var(--warn);line-height:1.5}
+
+/* ── ONBOARD CARD (first run, no profile yet) ── */
+.onboard{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;padding:32px;margin-bottom:28px;animation:fade-up .45s var(--spring) .15s both}
+.onboard-h{font-family:var(--serif);font-size:22px;margin-bottom:4px}
+.onboard-sub{font-size:13px;color:var(--tx3);margin-bottom:22px}
+.onboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4)}
+.field select,.field input{background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--tx);outline:none;font-family:var(--sans)}
+.field select:focus,.field input:focus{border-color:var(--bdr3)}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border-radius:99px;border:1px solid var(--bdr);background:var(--sur3);font-size:12px;color:var(--tx3);cursor:pointer;transition:all .15s;user-select:none}
+.chip.on{background:rgba(109,40,217,.18);border-color:var(--bdr3);color:var(--p6)}
+.gen-btn{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;border-radius:12px;background:linear-gradient(135deg,var(--p3),var(--p5));color:#fff;font-size:13.5px;font-weight:600;transition:all .2s;margin-top:8px}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(109,40,217,.4)}
+.gen-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.gen-btn svg{width:15px;height:15px}
+.spin{animation:spin .8s linear infinite}
+
+/* ── TODAY PLAN ── */
+.plan-wrap{display:none}
+.plan-wrap.show{display:block;animation:fade-up .4s var(--spring) both}
+.plan-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.plan-date{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--p6);margin-bottom:6px}
+.plan-title{font-family:var(--serif);font-size:30px;color:var(--tx);font-weight:400}
+.plan-meta{display:flex;gap:18px;flex-wrap:wrap}
+.plan-stat{text-align:right}
+.plan-stat-n{font-family:var(--serif);font-size:22px;color:var(--p6)}
+.plan-stat-l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx4)}
+
+.weak-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:22px}
+.weak-chip{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);font-size:11.5px;color:#fca5a5;white-space:nowrap}
+.weak-chip svg{width:12px;height:12px;flex-shrink:0}
+
+.task-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.task{display:flex;align-items:flex-start;gap:14px;background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:18px 20px;transition:all .2s}
+.task:hover{border-color:var(--bdr2)}
+.task.done{opacity:.55}
+.task.done .task-title{text-decoration:line-through}
+.task-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--bdr3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.task-check:hover{border-color:var(--p5)}
+.task-check.checked{background:var(--good);border-color:var(--good)}
+.task-check.checked svg{animation:check-pop .25s var(--spring) both}
+.task-check svg{width:13px;height:13px;color:#06210f;display:none}
+.task-check.checked svg{display:block}
+.task-body{flex:1;min-width:0}
+.task-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.task-tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;flex-shrink:0}
+.task-tag.weak{background:rgba(248,113,113,.15);color:#fca5a5}
+.task-tag.review{background:rgba(167,139,250,.15);color:var(--p6)}
+.task-tag.new{background:rgba(74,222,128,.12);color:var(--good)}
+.task-tag.practice{background:rgba(251,191,36,.12);color:var(--warn)}
+.task-title{font-size:14.5px;color:var(--tx);font-weight:500;line-height:1.4}
+.task-sub{font-size:12px;color:var(--tx4);margin-top:3px;line-height:1.5}
+.task-why{font-size:11.5px;color:var(--tx3);margin-top:7px;padding-top:7px;border-top:1px solid var(--bdr);line-height:1.5;font-style:italic}
+.task-time{font-family:var(--mono);font-size:11px;color:var(--p6);flex-shrink:0;white-space:nowrap;margin-top:2px}
+
+.plan-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:11px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx2);font-size:13px;transition:all .18s}
+.btn-ghost:hover{border-color:var(--bdr2);background:var(--sur4)}
+.btn-ghost svg{width:14px;height:14px}
+
+/* ── PROGRESS NOTE ── */
+.engine-note{display:flex;gap:12px;align-items:flex-start;background:var(--sur2);border:1px solid var(--bdr);border-radius:14px;padding:16px 18px;margin-bottom:26px}
+.engine-note svg{width:16px;height:16px;color:var(--p6);flex-shrink:0;margin-top:1px}
+.engine-note-t{font-size:12.5px;color:var(--tx3);line-height:1.6}
+.engine-note-t strong{color:var(--tx2);font-weight:600}
+
+/* ── STREAK / LOG STRIP ── */
+.log-strip{display:flex;gap:6px;margin-bottom:30px;flex-wrap:wrap}
+.log-day{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx4)}
+.log-day.hit{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.4);color:var(--good)}
+.log-day.partial{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:var(--warn)}
+.log-day.miss{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.25);color:#fca5a5}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sur);border:1px solid var(--bdr2);border-radius:12px;padding:12px 22px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);opacity:0;transition:all .3s var(--spring);z-index:999;white-space:nowrap;display:flex;align-items:center;gap:9px;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toast-dot.ok{background:#4ade80}
+.toast-dot.err{background:#f87171}
+.toast-dot.info{background:var(--p5)}
+
+@media(max-width:700px){
+  .onboard-grid{grid-template-columns:1fr}
+  .plan-head{flex-direction:column;align-items:flex-start}
+  .task{flex-direction:row}
+  .weak-strip{flex-wrap:wrap;overflow-x:visible}
+}
+</style>
+</head>
+<body>
+<div class="amb"></div>
+
+<div class="toast" id="toast"><div class="toast-dot ok" id="toastDot"></div><span id="toastMsg"></span></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand" onclick="location.href='../index.html'">
+    <div class="nav-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <span class="nav-name">Books Coffee <em>&amp;</em> Dreams</span>
+  </div>
+  <div class="nav-right">
+    <div class="nav-pill">AI Study Planner</div>
+    <button class="nav-ib" id="modeBtn">
+      <span class="icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+      <span class="icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+    </button>
+    <div class="nav-av" id="navAv" onclick="location.href='../profile.html'">A</div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Powered by Gemini</div>
+    <h1 class="hero-h">Today's <em>plan,</em><br>built for you.</h1>
+    <p class="hero-sub">Every morning the engine looks at what you've covered, what you're still shaky on, and how much time you actually have — then builds today's plan from scratch.</p>
+    <span class="hero-hand">Not a syllabus. A plan that knows where you are.</span>
+  </div>
+
+  <!-- ENGINE STATUS BAR -->
+  <div class="engine-bar">
+    <div class="engine-item"><div class="engine-dot active" id="keyDot"></div><span id="engineModeLabel">Demo mode</span></div>
+    <div class="engine-sep"></div>
+    <div class="engine-item"><div class="engine-dot standby" id="grokDot"></div>Grok fallback</div>
+    <div class="engine-sep"></div>
+    <div class="engine-item" id="currentKeyLabel" style="color:var(--p6)">No key active</div>
+    <div class="engine-right">
+      <div class="keys-btn" onclick="toggleKeysPanel()">Manage Keys</div>
+    </div>
+  </div>
+
+  <!-- KEYS PANEL -->
+  <div class="keys-panel" id="keysPanel">
+    <div class="keys-panel-title">Connect the engine</div>
+    <div class="keys-panel-sub">
+      Add a free <strong>Gemini key</strong> from <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> to generate real plans. A <strong>Grok (xAI)</strong> key is used automatically if Gemini is rate-limited. Without a key, the planner runs in demo mode with a realistic sample plan so you can see the full flow.
+    </div>
+    <div class="key-row"><input class="key-inp" id="geminiKeyInp" type="password" placeholder="AIza… (Gemini key)"/></div>
+    <div class="grok-row">
+      <input class="grok-inp" id="grokKeyInp" type="password" placeholder="xai-… (Grok key, optional)"/>
+      <div class="save-btn" onclick="saveKeys()">Save</div>
+    </div>
+    <div class="demo-note">
+      <span>⚠</span>
+      <span>Demo mode is for previewing the product only. It is not connected to a live AI call and should not be used as AI-operation evidence for the submission — only plans generated with a real key write to the production log below.</span>
+    </div>
+  </div>
+
+  <!-- ONBOARD -->
+  <div class="onboard" id="onboardCard">
+    <div class="onboard-h">Set up your plan</div>
+    <div class="onboard-sub">Takes 30 seconds. The engine re-asks nothing after this — it learns from what you finish.</div>
+    <div class="onboard-grid">
+      <div class="field">
+        <label>Exam</label>
+        <select id="examSel">
+          <option value="JEE">JEE (Main + Advanced)</option>
+          <option value="NEET">NEET</option>
+          <option value="UPSC">UPSC</option>
+          <option value="CAT">CAT</option>
+          <option value="CBSE12">CBSE Class 12</option>
+          <option value="CUET">CUET</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Hours available today</label>
+        <input id="hoursInp" type="number" min="1" max="14" value="4" step="0.5"/>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:18px">
+      <label>Topics you find hardest right now (pick a few)</label>
+      <div class="chip-row" id="weakChips"></div>
+    </div>
+    <button class="gen-btn" id="genBtn" onclick="generatePlan()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      <span id="genBtnLabel">Build today's plan</span>
+    </button>
+  </div>
+
+  <!-- TODAY'S PLAN -->
+  <div class="plan-wrap" id="planWrap">
+
+    <div class="plan-head">
+      <div>
+        <div class="plan-date" id="planDate">TODAY</div>
+        <div class="plan-title">Your plan for today</div>
+      </div>
+      <div class="plan-meta">
+        <div class="plan-stat"><div class="plan-stat-n" id="statHours">—</div><div class="plan-stat-l">hours</div></div>
+        <div class="plan-stat"><div class="plan-stat-n" id="statTasks">—</div><div class="plan-stat-l">tasks</div></div>
+        <div class="plan-stat"><div class="plan-stat-n" id="statStreak">—</div><div class="plan-stat-l">day streak</div></div>
+      </div>
+    </div>
+
+    <div class="weak-strip" id="weakStrip"></div>
+
+    <div class="engine-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div class="engine-note-t" id="engineReason">—</div>
+    </div>
+
+    <div class="task-list" id="taskList"></div>
+
+    <div class="plan-actions">
+      <button class="btn-ghost" onclick="markAllAndAdapt()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Finish day &amp; adapt tomorrow
+      </button>
+      <button class="btn-ghost" onclick="regenerate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Regenerate
+      </button>
+    </div>
+
+    <div class="plan-date" style="margin-bottom:10px">LAST 14 DAYS</div>
+    <div class="log-strip" id="logStrip"></div>
+
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   FIREBASE — same project as the rest of the site
+═══════════════════════════════════════════════ */
+const firebaseConfig={apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",authDomain:"bcd-discord.firebaseapp.com",projectId:"bcd-discord",storageBucket:"bcd-discord.firebasestorage.app",messagingSenderId:"278895155371",appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.firestore();
+let currentUser=null;
+auth.onAuthStateChanged(u=>{
+  currentUser=u;
+  if(u){
+    const el=document.getElementById('navAv');
+    const inits=(u.displayName||'D').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    if(u.photoURL) el.innerHTML=`<img src="${u.photoURL}" alt=""/>`;
+    else el.textContent=inits;
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   MODE TOGGLE
+═══════════════════════════════════════════════ */
+const html=document.documentElement;
+html.setAttribute('data-mode',localStorage.getItem('bcd-mode')||'dark');
+document.getElementById('modeBtn').onclick=()=>{const n=html.getAttribute('data-mode')==='dark'?'light':'dark';html.setAttribute('data-mode',n);localStorage.setItem('bcd-mode',n)};
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast'),d=document.getElementById('toastDot'),m=document.getElementById('toastMsg');
+  d.className='toast-dot '+type; m.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+/* ═══════════════════════════════════════════════
+   KEYS — single Gemini key + optional Grok fallback.
+   NOTE: this mirrors ai-study.html's pattern for consistency,
+   but for production this call should move server-side
+   (Cloud Function) so the business — not each visitor —
+   controls and pays for the key. See README note at bottom
+   of this file for the swap.
+═══════════════════════════════════════════════ */
+let geminiKey = '';
+let grokKey = '';
+function loadKeys(){
+  geminiKey = localStorage.getItem('bcd_planner_gemini_key') || '';
+  grokKey = localStorage.getItem('bcd_planner_grok_key') || '';
+  document.getElementById('geminiKeyInp').value = geminiKey;
+  document.getElementById('grokKeyInp').value = grokKey;
+  updateEngineBar();
+}
+function saveKeys(){
+  geminiKey = document.getElementById('geminiKeyInp').value.trim();
+  grokKey = document.getElementById('grokKeyInp').value.trim();
+  localStorage.setItem('bcd_planner_gemini_key', geminiKey);
+  localStorage.setItem('bcd_planner_grok_key', grokKey);
+  updateEngineBar();
+  toast(geminiKey ? 'Key saved — engine is live' : 'No key set — running in demo mode','ok');
+  toggleKeysPanel();
+}
+function updateEngineBar(){
+  const dot=document.getElementById('keyDot'), label=document.getElementById('engineModeLabel'), cur=document.getElementById('currentKeyLabel'), grokDot=document.getElementById('grokDot');
+  if(geminiKey){
+    dot.className='engine-dot active'; label.textContent='Gemini live';
+    cur.textContent = `Key · ${geminiKey.slice(0,8)}…`;
+  }else{
+    dot.className='engine-dot off'; label.textContent='Demo mode';
+    cur.textContent='No key active';
+  }
+  grokDot.className='engine-dot '+(grokKey?'active':'standby');
+}
+function toggleKeysPanel(){ document.getElementById('keysPanel').classList.toggle('open'); }
+loadKeys();
+
+/* ═══════════════════════════════════════════════
+   WEAK TOPIC CHIPS (per exam)
+═══════════════════════════════════════════════ */
+const TOPIC_BANK = {
+  JEE:['Rotational Motion','Organic Chemistry','Coordinate Geometry','Thermodynamics','Permutations & Combinations','Electrostatics','Chemical Bonding','Calculus'],
+  NEET:['Genetics','Human Physiology','Organic Chemistry','Plant Kingdom','Thermodynamics','Cell Biology','Reproduction','Ecology'],
+  UPSC:['Modern History','Polity','Economy','Ethics','Geography','Current Affairs','Environment','Governance'],
+  CAT:['Quant — Geometry','Verbal — RC','DILR','Quant — Algebra','Para Jumbles','Quant — Number System'],
+  CBSE12:['Organic Chemistry','Calculus','Electrostatics','Biology — Genetics','Accountancy','Economics'],
+  CUET:['General Test','Domain Subject','English Comprehension','Quantitative Reasoning']
+};
+function renderWeakChips(){
+  const exam=document.getElementById('examSel').value;
+  const wrap=document.getElementById('weakChips');
+  wrap.innerHTML='';
+  (TOPIC_BANK[exam]||[]).forEach(t=>{
+    const c=document.createElement('div');
+    c.className='chip'; c.textContent=t; c.dataset.topic=t;
+    c.onclick=()=>c.classList.toggle('on');
+    wrap.appendChild(c);
+  });
+}
+document.getElementById('examSel').addEventListener('change', renderWeakChips);
+renderWeakChips();
+
+/* ═══════════════════════════════════════════════
+   GEMINI CALL — same engine pattern as ai-study.html's
+   key rotation, simplified to a single primary key plus
+   a Grok fallback (no multi-key evasion — one real key,
+   used honestly, is the point).
+═══════════════════════════════════════════════ */
+const GEMINI_MODEL='gemini-2.5-flash-preview-04-17';
+
+async function callGemini(promptText){
+  if(!geminiKey) throw new Error('NO_KEY');
+  const res=await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(geminiKey)}`,
+    {method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({contents:[{parts:[{text:promptText}]}],generationConfig:{temperature:0.4,maxOutputTokens:2048,responseMimeType:'application/json'}})}
+  );
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    const msg=err?.error?.message||`HTTP ${res.status}`;
+    if(/quota|rate.?limit|429/i.test(msg) && grokKey) return callGrok(promptText);
+    throw new Error(msg);
+  }
+  const data=await res.json();
+  const text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
+  return text;
+}
+
+async function callGrok(promptText){
+  if(!grokKey) throw new Error('NO_GROK_KEY');
+  const res=await fetch('https://api.x.ai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${grokKey}`},
+    body:JSON.stringify({
+      model:'grok-3-mini',
+      messages:[{role:'system',content:'You output ONLY valid JSON, no markdown fences, matching the exact schema requested by the user message.'},{role:'user',content:promptText}],
+      temperature:0.4,max_tokens:2048
+    })
+  });
+  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e?.error?.message||`Grok HTTP ${res.status}`); }
+  const data=await res.json();
+  return data.choices?.[0]?.message?.content||'';
+}
+
+function buildPlannerPrompt({exam,hours,weakTopics,history}){
+  return `You are the study-planning engine for an exam-prep platform. Build ONE day's study plan.
+
+Exam: ${exam}
+Hours available today: ${hours}
+Topics the student says are hardest right now: ${weakTopics.length?weakTopics.join(', '):'none specified'}
+Recent history (most recent last, "hit"=finished full plan, "partial"=finished some, "miss"=finished none): ${JSON.stringify(history)}
+
+Rules:
+- If recent history shows misses, reduce total task count and total time below ${hours} hours — do not overload a student who is falling behind.
+- If weak topics are given, at least half the tasks must target them directly, tagged "weak".
+- Mix in exactly one lighter review task (tagged "review") and, if hours allow, one practice/test task (tagged "practice").
+- Each task needs a short, concrete title (not generic — name the actual sub-topic), a one-line "sub" description of exactly what to do, a "why" sentence explaining the reasoning tied to their weak topics or history, an estimated "minutes", and a "tag" from [weak, review, new, practice].
+- Tasks must sum to within 15 minutes of ${hours*60} total minutes.
+- Return STRICT JSON only, no markdown, matching exactly:
+{"reason":"one sentence explaining today's overall plan logic","tasks":[{"title":"","sub":"","why":"","minutes":0,"tag":"weak"}]}`;
+}
+
+function demoPlan({exam,hours,weakTopics}){
+  const topics = weakTopics.length?weakTopics:(TOPIC_BANK[exam]||['Core Topic']).slice(0,2);
+  const perTask = Math.round((hours*60)/4);
+  return {
+    reason:`Demo plan — you flagged ${topics.length} weak area${topics.length>1?'s':''}, so today leans into those first while keeping one review and one practice block.`,
+    tasks:[
+      {title:`Deep work: ${topics[0]}`, sub:'Work through 2 worked examples, then attempt 5 problems unaided.', why:`You marked ${topics[0]} as hardest right now — tackling it while you're fresh.`, minutes:perTask, tag:'weak'},
+      {title:topics[1]?`Deep work: ${topics[1]}`:'Concept review: yesterday\'s topic', sub:'Re-derive the core formula from scratch, no notes.', why:'Second weak area, placed before fatigue sets in.', minutes:perTask, tag:'weak'},
+      {title:'Quick review: last week\'s notes', sub:'Skim and self-quiz on 3 random flashcards.', why:'Spaced repetition — this is due for review based on timing.', minutes:Math.round(perTask*0.6), tag:'review'},
+      {title:'Timed practice set (10 Qs)', sub:'Mixed questions, strict timer, no pausing.', why:'Builds exam-pace stamina — added since you have enough hours today.', minutes:Math.round(perTask*1.4), tag:'practice'}
+    ]
+  };
+}
+
+/* ═══════════════════════════════════════════════
+   PLAN GENERATION + PERSISTENCE
+   Every generated plan is written to Firestore under
+   studyPlans/{uid}/days/{date} — this is the durable,
+   timestamped log of the AI making a real daily decision
+   for a real student. Use this collection as evidence.
+═══════════════════════════════════════════════ */
+let activePlan=null;
+
+async function getHistory(){
+  if(!currentUser) return [];
+  try{
+    const snap=await db.collection('studyPlans').doc(currentUser.uid).collection('days')
+      .orderBy('date','desc').limit(14).get();
+    return snap.docs.map(d=>({date:d.id,status:d.data().status||'miss'})).reverse();
+  }catch(e){ return []; }
+}
+
+async function generatePlan(){
+  const btn=document.getElementById('genBtn'), lbl=document.getElementById('genBtnLabel');
+  const exam=document.getElementById('examSel').value;
+  const hours=parseFloat(document.getElementById('hoursInp').value)||4;
+  const weakTopics=[...document.querySelectorAll('#weakChips .chip.on')].map(c=>c.dataset.topic);
+
+  btn.disabled=true; lbl.innerHTML='Thinking…';
+  try{
+    const history=await getHistory();
+    let plan;
+    if(geminiKey){
+      const raw=await callGemini(buildPlannerPrompt({exam,hours,weakTopics,history}));
+      plan=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    }else{
+      await new Promise(r=>setTimeout(r,900)); // feels like a real call, isn't billed as one
+      plan=demoPlan({exam,hours,weakTopics});
+    }
+    activePlan={exam,hours,weakTopics,plan,date:todayKey(),source:geminiKey?'gemini':'demo'};
+    renderPlan();
+    if(currentUser && geminiKey){
+      await db.collection('studyPlans').doc(currentUser.uid).collection('days').doc(todayKey()).set({
+        date:todayKey(), exam, hours, weakTopics, plan, status:'pending',
+        source:'gemini', createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    await renderLogStrip();
+    toast(geminiKey?'Plan generated':'Demo plan ready — add a key for real generation','ok');
+  }catch(e){
+    console.error(e);
+    toast('Could not generate plan: '+e.message,'err');
+  }finally{
+    btn.disabled=false; lbl.textContent='Build today\'s plan';
+  }
+}
+
+function regenerate(){ generatePlan(); }
+
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+
+function renderPlan(){
+  document.getElementById('onboardCard').style.display='none';
+  document.getElementById('planWrap').classList.add('show');
+  document.getElementById('planDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',month:'short',day:'numeric'}).toUpperCase();
+  document.getElementById('engineReason').innerHTML = `<strong>Why this plan:</strong> ${escapeHtml(activePlan.plan.reason)}`;
+  document.getElementById('statHours').textContent = activePlan.hours;
+  document.getElementById('statTasks').textContent = activePlan.plan.tasks.length;
+  document.getElementById('statStreak').textContent = '—';
+
+  const weakStrip=document.getElementById('weakStrip');
+  weakStrip.innerHTML = activePlan.weakTopics.map(t=>`<div class="weak-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escapeHtml(t)}</div>`).join('') || '<div class="weak-chip" style="opacity:.6">No weak topics flagged — plan is balanced across new material</div>';
+
+  const list=document.getElementById('taskList');
+  list.innerHTML='';
+  activePlan.plan.tasks.forEach((t,i)=>{
+    const el=document.createElement('div');
+    el.className='task'; el.id='task-'+i;
+    el.innerHTML=`
+      <div class="task-check" onclick="toggleTask(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="task-body">
+        <div class="task-top"><span class="task-tag ${t.tag}">${t.tag}</span></div>
+        <div class="task-title">${escapeHtml(t.title)}</div>
+        <div class="task-sub">${escapeHtml(t.sub)}</div>
+        <div class="task-why">${escapeHtml(t.why)}</div>
+      </div>
+      <div class="task-time">${t.minutes}m</div>`;
+    list.appendChild(el);
+  });
+}
+
+function toggleTask(i){
+  const el=document.getElementById('task-'+i);
+  const chk=el.querySelector('.task-check');
+  const isDone=chk.classList.toggle('checked');
+  el.classList.toggle('done',isDone);
+}
+
+async function markAllAndAdapt(){
+  const total=activePlan.plan.tasks.length;
+  const done=document.querySelectorAll('.task-check.checked').length;
+  const status = done===total?'hit':(done===0?'miss':'partial');
+  if(currentUser && geminiKey){
+    try{
+      await db.collection('studyPlans').doc(currentUser.uid).collection('days').doc(activePlan.date).set({status},{merge:true});
+    }catch(e){}
+  }
+  toast(`Logged: ${done}/${total} tasks done — tomorrow's plan will adjust`,'info');
+  await renderLogStrip();
+}
+
+async function renderLogStrip(){
+  const strip=document.getElementById('logStrip');
+  const history=await getHistory();
+  const days=[...history];
+  while(days.length<14) days.unshift({date:'',status:'none'});
+  strip.innerHTML = days.slice(-14).map(d=>{
+    const cls = d.status==='hit'?'hit':d.status==='partial'?'partial':d.status==='miss'?'miss':'';
+    const label = d.date ? d.date.slice(8,10) : '·';
+    return `<div class="log-day ${cls}">${label}</div>`;
+  }).join('');
+}
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
+
+/* init log strip on load (will be empty until signed in / first plan) */
+renderLogStrip();
+</script>
+</body>
+</html>
+<!--
+PRODUCTION NOTE FOR THE TEAM (not user-facing):
+
+1. Right now callGemini() runs from the browser with a key typed into
+   localStorage. That's fine for a demo, but for the hackathon's
+   "AI-Native Operations" criterion you want the AI decision-making
+   to be something YOUR business runs continuously, not something
+   that only works if a visitor pastes in their own key.
+
+   Swap path: move buildPlannerPrompt() + the fetch() call into a
+   Firebase Cloud Function (or Cloud Run service, which also satisfies
+   the "must use one Google Cloud product" requirement on its own).
+   The client calls your function with {exam, hours, weakTopics, history};
+   the function holds the real Gemini key as a server-side secret and
+   writes the result to Firestore itself. Nothing in this file's UI
+   needs to change — only where callGemini() actually executes.
+
+2. Firestore security rules: studyPlans/{uid}/days/{date} should only
+   be readable/writable by that uid (and your admin role for judging).
+   Check your current rules before going live with real users —
+   this matters a lot once real customer data is in here.
+
+3. This collection (studyPlans) IS your evidence trail for "AI live in
+   production, executing key decisions." Every doc has a timestamp,
+   the reasoning the model gave, and the student's actual completion
+   status feeding the next day's plan. Keep it running for the full
+   90 days — don't let it go quiet after the demo video is recorded.
+-->
