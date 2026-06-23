@@ -10,22 +10,22 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
-/* ═══════════ TOKENS — pulled 1:1 from dashboard.html, the real BCD brand ═══════════ */
 :root{
   --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
-  --red:#dc2626;--green:#16a34a;--blue:#3b82f6;
+  --red:#dc2626;--green:#16a34a;--blue:#3b82f6;--violet:#7c3aed;
   --serif:'Instrument Serif',serif;
   --sans:'DM Sans',sans-serif;
   --mono:'IBM Plex Mono',monospace;
   --ease:cubic-bezier(.4,0,.2,1);
   --spring:cubic-bezier(.34,1.56,.64,1);
+  --springy:cubic-bezier(.22,1.2,.36,1);
 }
 [data-mode="dark"]{
   --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
   --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
   --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
   --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
-  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 16px 56px rgba(0,0,0,.9);
   --scr:rgba(217,119,6,.25);
 }
 [data-mode="light"]{
@@ -33,136 +33,219 @@
   --sur:#ffffff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
   --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
   --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
-  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 16px 48px rgba(120,83,32,.14);
   --scr:rgba(217,119,6,.2);
 }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;transition:background .4s var(--ease),color .4s var(--ease);-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
 a{text-decoration:none;color:inherit}
 button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
 img{display:block;max-width:100%}
 :focus-visible{outline:2px solid var(--amber2);outline-offset:3px;border-radius:4px}
+input{font-family:var(--sans)}
 
-/* fine grain + two soft warm light sources, one slowly orbiting — the page
-   should feel like late-afternoon light through a café window, not a flat dark theme */
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
   background-size:60px 60px}
 .amb{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.amb-orb{position:absolute;border-radius:50%;filter:blur(90px)}
+.amb-orb{position:absolute;border-radius:50%;filter:blur(95px)}
 .amb-orb.o1{width:46vw;height:46vw;top:-18%;right:-8%;background:radial-gradient(circle,rgba(217,119,6,.10),transparent 70%);animation:drift-1 26s ease-in-out infinite}
 .amb-orb.o2{width:34vw;height:34vw;bottom:-10%;left:-6%;background:radial-gradient(circle,rgba(251,191,36,.07),transparent 70%);animation:drift-2 32s ease-in-out infinite}
+.amb-orb.o3{width:24vw;height:24vw;top:40%;left:50%;background:radial-gradient(circle,rgba(124,58,237,.045),transparent 70%);animation:drift-3 38s ease-in-out infinite}
 [data-mode="light"] .amb-orb.o1{background:radial-gradient(circle,rgba(217,119,6,.14),transparent 70%)}
 [data-mode="light"] .amb-orb.o2{background:radial-gradient(circle,rgba(251,191,36,.1),transparent 70%)}
 @keyframes drift-1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-5vw,6vh) scale(1.08)}}
 @keyframes drift-2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(4vw,-5vh) scale(1.05)}}
-
+@keyframes drift-3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3vw,4vh) scale(1.12)}}
 @keyframes rise-in{from{opacity:0;transform:translateY(26px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 9px rgba(217,119,6,0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer-sweep{0%{background-position:-150% 0}100%{background-position:250% 0}}
 @keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.35)}50%{box-shadow:0 0 0 6px rgba(217,119,6,0)}}
 @keyframes badge-shine{0%{transform:translateX(-120%) skewX(-15deg)}100%{transform:translateX(220%) skewX(-15deg)}}
 @keyframes underline-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes flame-flicker{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.06) rotate(1deg)}}
+@keyframes notif-dot-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+@keyframes online-blink{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes toast-in{from{opacity:0;transform:translateY(16px) translateX(-50%)}to{opacity:1;transform:translateY(0) translateX(-50%)}}
+@keyframes skeleton-sweep{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.reveal{opacity:0;animation:rise-in .7s var(--springy) both}
+.r1{animation-delay:.02s}.r2{animation-delay:.08s}.r3{animation-delay:.14s}.r4{animation-delay:.2s}
+.r5{animation-delay:.26s}.r6{animation-delay:.32s}.r7{animation-delay:.38s}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 
-.reveal{opacity:0;animation:rise-in .7s var(--spring) both}
-.r1{animation-delay:.03s}.r2{animation-delay:.1s}.r3{animation-delay:.17s}.r4{animation-delay:.24s}.r5{animation-delay:.31s}.r6{animation-delay:.38s}
-
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
-}
-
-/* ── NAV ── */
-.nav{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--bdr);backdrop-filter:blur(14px);background:color-mix(in srgb, var(--sur) 92%, transparent)}
-.nav-inner{max-width:1320px;margin:0 auto;height:64px;display:flex;align-items:center;gap:18px;padding:0 28px}
-.nav-brand{display:flex;align-items:center;gap:10px;transition:opacity .2s}
-.nav-brand:hover{opacity:.82}
-.nav-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--amber),var(--amber3));display:flex;align-items:center;justify-content:center;animation:logo-pulse 3.2s ease-in-out infinite;transition:transform .3s var(--spring)}
-.nav-brand:hover .nav-logo{transform:rotate(-8deg) scale(1.06)}
-.nav-logo svg{width:15px;height:15px}
-.nav-site-name{font-family:var(--serif);font-size:16.5px;color:var(--tx)}
+/* HEADER — logo + brand + theme + profile only */
+.nav{position:sticky;top:0;z-index:200;background:color-mix(in srgb, var(--sur) 90%, transparent);border-bottom:1px solid var(--bdr);backdrop-filter:blur(16px) saturate(1.4)}
+.nav-inner{max-width:1320px;margin:0 auto;height:68px;display:flex;align-items:center;padding:0 28px;gap:16px}
+.nav-brand{display:flex;align-items:center;gap:11px;transition:opacity .2s}
+.nav-brand:hover{opacity:.85}
+.nav-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--amber),var(--amber3));display:flex;align-items:center;justify-content:center;animation:logo-pulse 3.2s ease-in-out infinite;transition:transform .35s var(--spring)}
+.nav-brand:hover .nav-logo{transform:rotate(-10deg) scale(1.07)}
+.nav-logo svg{width:16px;height:16px}
+.nav-site-name{font-family:var(--serif);font-size:18px;color:var(--tx)}
 .nav-site-name em{font-style:italic;color:var(--amber)}
-.nav-divider{width:1px;height:22px;background:var(--bdr2)}
-.nav-page-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
-.nav-links{display:flex;align-items:center;gap:22px;margin-left:18px}
-.nav-link{font-size:13.5px;color:var(--tx3);transition:color .15s;position:relative;padding-bottom:3px}
-.nav-link::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease)}
-.nav-link:hover{color:var(--amber)}
-.nav-link:hover::after,.nav-link.active::after{transform:scaleX(1)}
-.nav-link.active{color:var(--amber)}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
-.mode-toggle{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);font-size:12px;color:var(--tx3);transition:all .2s var(--ease)}
-.mode-toggle:hover{border-color:var(--bdr3);color:var(--amber);transform:translateY(-1px)}
-.mode-toggle svg{width:13px;height:13px;transition:transform .4s var(--spring)}
-.mode-toggle:active svg{transform:rotate(50deg)}
+.nav-search-trigger{margin-left:auto;display:flex;align-items:center;gap:10px;padding:9px 16px 9px 14px;border-radius:12px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx4);font-size:13px;width:280px;max-width:38vw;transition:all .25s var(--ease);cursor:pointer}
+.nav-search-trigger:hover{border-color:var(--bdr3);background:var(--sur4)}
+.nav-search-trigger svg{width:15px;height:15px;flex-shrink:0}
+.nav-search-kbd{margin-left:auto;font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:5px;background:var(--sur4);border:1px solid var(--bdr2);color:var(--tx4)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.icon-btn{position:relative;width:38px;height:38px;border-radius:11px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .22s var(--ease)}
+.icon-btn:hover{border-color:var(--bdr3);color:var(--amber);transform:translateY(-1px)}
+.icon-btn:active{transform:scale(.93)}
+.icon-btn svg{width:16px;height:16px}
+.notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--sur);animation:notif-dot-pulse 2s ease-in-out infinite}
+.mode-toggle svg{transition:transform .45s var(--spring)}
+.mode-toggle:active svg{transform:rotate(55deg)}
 .icon-sun,.icon-moon{display:flex}
 [data-mode="dark"] .icon-sun,[data-mode="light"] .icon-moon{display:none}
-.nav-user{display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 10px 4px 4px;border-radius:99px;transition:background .2s}
+.nav-user{display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 12px 4px 4px;border-radius:99px;transition:background .22s;position:relative}
 .nav-user:hover{background:var(--sur3)}
-.nav-user-av{width:32px;height:32px;border-radius:50%;border:2px solid var(--amber2);object-fit:cover;background:var(--sur3);transition:transform .25s var(--spring)}
-.nav-user:hover .nav-user-av{transform:scale(1.07)}
-.nav-user-name{font-size:13px;color:var(--tx2)}
-@media(max-width:860px){.nav-links{display:none}}
+.nav-user-av-wrap{position:relative;width:36px;height:36px;flex-shrink:0}
+.nav-user-av{width:36px;height:36px;border-radius:50%;border:2px solid var(--amber2);object-fit:cover;background:var(--sur3);transition:transform .25s var(--spring)}
+.nav-user:hover .nav-user-av{transform:scale(1.08)}
+.nav-user-level{position:absolute;bottom:-3px;right:-3px;width:17px;height:17px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--amber3));border:2px solid var(--sur);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;font-weight:700;color:#1a0f02}
+.nav-user-meta{display:flex;flex-direction:column;line-height:1.25}
+.nav-user-name{font-size:13px;color:var(--tx2);font-weight:600}
+.nav-user-xp{font-family:var(--mono);font-size:10px;color:var(--tx4)}
+@media(max-width:760px){.nav-search-trigger{display:none}.nav-user-meta{display:none}}
 
-/* ── PAGE ── */
-.page{max-width:1320px;margin:0 auto;padding:44px 28px 96px;position:relative;z-index:1}
+.notif-panel{position:absolute;top:54px;right:0;width:360px;max-height:440px;overflow-y:auto;background:var(--sur);border:1px solid var(--bdr2);border-radius:18px;box-shadow:var(--sh2);opacity:0;visibility:hidden;transform:translateY(-8px) scale(.97);transition:all .25s var(--springy);z-index:300}
+.notif-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.notif-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--bdr)}
+.notif-title{font-family:var(--serif);font-size:17px}
+.notif-mark{font-size:11.5px;color:var(--amber);cursor:pointer}
+.notif-mark:hover{text-decoration:underline}
+.notif-item{display:flex;gap:12px;padding:13px 18px;border-bottom:1px solid var(--bdr);transition:background .18s;cursor:pointer}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--sur3)}
+.notif-item.unread{background:rgba(217,119,6,.05)}
+.notif-icon{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.notif-icon svg{width:15px;height:15px;color:#fff}
+.notif-icon.t-plan{background:linear-gradient(150deg,#7c3aed,#a78bfa)}
+.notif-icon.t-test{background:linear-gradient(150deg,#1d4ed8,#60a5fa)}
+.notif-icon.t-badge{background:linear-gradient(150deg,#d97706,#fbbf24)}
+.notif-icon.t-system{background:linear-gradient(150deg,#475569,#94a3b8)}
+.notif-body{flex:1;min-width:0}
+.notif-text{font-size:12.5px;color:var(--tx2);line-height:1.45}
+.notif-text strong{color:var(--tx);font-weight:600}
+.notif-time{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:3px}
+.notif-empty{padding:40px 20px;text-align:center;color:var(--tx4);font-size:13px}
+.notif-empty svg{width:30px;height:30px;margin:0 auto 10px;opacity:.4}
 
+.cmdk-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:400;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;display:flex;align-items:flex-start;justify-content:center;padding-top:12vh}
+.cmdk-overlay.open{opacity:1;visibility:visible}
+.cmdk-box{width:560px;max-width:90vw;background:var(--sur);border:1px solid var(--bdr2);border-radius:18px;box-shadow:var(--sh2);overflow:hidden;transform:translateY(-14px) scale(.97);transition:transform .25s var(--springy)}
+.cmdk-overlay.open .cmdk-box{transform:none}
+.cmdk-input-row{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--bdr)}
+.cmdk-input-row svg{width:18px;height:18px;color:var(--tx4);flex-shrink:0}
+.cmdk-input{flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--tx)}
+.cmdk-input::placeholder{color:var(--tx4)}
+.cmdk-esc{font-family:var(--mono);font-size:10px;padding:3px 7px;border-radius:6px;background:var(--sur3);border:1px solid var(--bdr2);color:var(--tx4)}
+.cmdk-results{max-height:360px;overflow-y:auto;padding:8px}
+.cmdk-group-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx4);padding:10px 12px 6px}
+.cmdk-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
+.cmdk-item:hover,.cmdk-item.active{background:var(--sur3)}
+.cmdk-item-icon{width:30px;height:30px;border-radius:9px;background:var(--sur4);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--amber)}
+.cmdk-item-icon svg{width:14px;height:14px}
+.cmdk-item-text{flex:1;font-size:13.5px;color:var(--tx2)}
+.cmdk-item-text mark{background:rgba(217,119,6,.25);color:var(--amber);border-radius:3px;padding:0 1px}
+.cmdk-item-sub{font-size:11px;color:var(--tx4)}
+.cmdk-empty{padding:50px 20px;text-align:center;color:var(--tx4);font-size:13px}
+
+.page{max-width:1320px;margin:0 auto;padding:36px 28px 100px;position:relative;z-index:1}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px;gap:14px;flex-wrap:wrap;position:relative}
 .section-title{font-family:var(--serif);font-size:28px;color:var(--tx);font-weight:400;position:relative;display:inline-block}
-.section-title::after{content:'';position:absolute;left:1px;right:auto;bottom:-7px;width:30px;height:2.5px;background:linear-gradient(90deg,var(--amber),var(--amber3));border-radius:99px;transform-origin:left;animation:underline-grow .6s var(--ease) .25s both}
+.section-title::after{content:'';position:absolute;left:1px;bottom:-7px;width:30px;height:2.5px;background:linear-gradient(90deg,var(--amber),var(--amber3));border-radius:99px;transform-origin:left;animation:underline-grow .6s var(--ease) .25s both}
 .section-link{font-size:13px;color:var(--amber);display:flex;align-items:center;gap:4px;white-space:nowrap;transition:gap .2s var(--ease),opacity .2s}
 .section-link:hover{gap:8px;opacity:.85}
-.section-link svg{width:13px;height:13px;transition:transform .2s var(--ease)}
+.section-link svg{width:13px;height:13px}
 
-/* ── QUICK ACTIONS — signature moment: cards tilt toward the cursor like
-   a held object catching light, with a soft glow that tracks the pointer ── */
-.qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:54px}
-.qa-card{
-  --mx:50%;--my:50%;
-  background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:24px 16px 22px;
-  display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
-  cursor:pointer;position:relative;overflow:hidden;perspective:600px;
-  transition:transform .45s var(--spring),border-color .3s var(--ease),box-shadow .4s var(--ease);
-  transform-style:preserve-3d;
-}
-.qa-card::before{
-  content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;opacity:0;
-  background:radial-gradient(circle 140px at var(--mx) var(--my),rgba(217,119,6,.16),transparent 70%);
-  transition:opacity .3s var(--ease);
-}
+.greet-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:30px;flex-wrap:wrap}
+.greet-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.greet-eyebrow .live-pip{width:6px;height:6px;border-radius:50%;background:var(--green);animation:online-blink 1.8s ease-in-out infinite}
+.greet-h{font-family:var(--serif);font-size:clamp(28px,4vw,40px);color:var(--tx);line-height:1.05}
+.greet-h em{font-style:italic;color:var(--amber)}
+.stat-strip{display:flex;gap:10px;flex-wrap:wrap}
+.stat-pill{display:flex;align-items:center;gap:10px;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:10px 16px;transition:all .25s var(--ease)}
+.stat-pill:hover{border-color:var(--bdr3);transform:translateY(-2px);box-shadow:var(--sh)}
+.stat-pill-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-pill-icon svg{width:14px;height:14px;color:#fff}
+.stat-pill-icon.fire{background:linear-gradient(150deg,#ea580c,#fbbf24)}
+.stat-pill-icon.xp{background:linear-gradient(150deg,#7c3aed,#c4b5fd)}
+.stat-pill-icon.online{background:linear-gradient(150deg,#16a34a,#4ade80)}
+.stat-pill-n{font-family:var(--serif);font-size:18px;color:var(--tx);line-height:1}
+.stat-pill-l{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4)}
+
+.dash-row{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;margin-bottom:48px}
+.dash-card{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .3s}
+.dash-card:hover{border-color:var(--bdr2);box-shadow:var(--sh)}
+.dash-card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.dash-card-title{font-family:var(--serif);font-size:17px;color:var(--tx)}
+.dash-card-icon{width:30px;height:30px;border-radius:9px;background:var(--sur3);display:flex;align-items:center;justify-content:center;color:var(--amber)}
+.dash-card-icon svg{width:15px;height:15px}
+.streak-flame{display:flex;align-items:baseline;gap:8px;margin-bottom:16px}
+.streak-n{font-family:var(--serif);font-size:42px;color:var(--amber);font-style:italic;line-height:1}
+.streak-n-icon{width:30px;height:30px;animation:flame-flicker 1.8s ease-in-out infinite;transform-origin:bottom center}
+.streak-label{font-family:var(--mono);font-size:10.5px;color:var(--tx4);letter-spacing:.08em;text-transform:uppercase}
+.streak-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.streak-day{aspect-ratio:1;border-radius:8px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px;color:var(--tx4);transition:transform .2s var(--spring)}
+.streak-day:hover{transform:scale(1.12)}
+.streak-day.active{background:linear-gradient(150deg,var(--amber),var(--amber3));color:#1a0f02;border-color:transparent;font-weight:700}
+.streak-day.today{box-shadow:0 0 0 2px var(--amber) inset}
+.xp-ring-row{display:flex;align-items:center;gap:18px}
+.xp-ring-wrap{position:relative;width:96px;height:96px;flex-shrink:0}
+.xp-ring-wrap svg{width:96px;height:96px;transform:rotate(-90deg)}
+.xp-ring-track{fill:none;stroke:var(--sur3);stroke-width:8}
+.xp-ring-fill{fill:none;stroke:url(#xpGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:251;stroke-dashoffset:251;transition:stroke-dashoffset 1.1s var(--springy)}
+.xp-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.xp-ring-level{font-family:var(--serif);font-size:22px;color:var(--tx);font-style:italic}
+.xp-ring-label{font-family:var(--mono);font-size:8px;color:var(--tx4);letter-spacing:.1em}
+.xp-detail{flex:1}
+.xp-detail-n{font-family:var(--mono);font-size:13px;color:var(--tx2);margin-bottom:6px}
+.xp-detail-n strong{color:var(--amber);font-size:15px}
+.xp-badges-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.xp-badge-chip{font-size:15px;width:26px;height:26px;border-radius:50%;background:var(--sur3);border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;transition:transform .2s var(--spring)}
+.xp-badge-chip:hover{transform:scale(1.2) rotate(8deg)}
+.online-list{display:flex;flex-direction:column;gap:11px}
+.online-row{display:flex;align-items:center;gap:10px}
+.online-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--amber3));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:12px;color:#1a0f02;flex-shrink:0;position:relative}
+.online-av .pip{position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;border-radius:50%;background:var(--green);border:2px solid var(--sur)}
+.online-name{font-size:12.5px;color:var(--tx2);flex:1}
+.online-action{font-size:11px;color:var(--tx4)}
+.online-total{margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr);font-family:var(--mono);font-size:11px;color:var(--tx4);display:flex;align-items:center;gap:6px}
+.online-total b{color:var(--green)}
+@media(max-width:980px){.dash-row{grid-template-columns:1fr}}
+
+.qa-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:54px}
+.qa-card{--mx:50%;--my:50%;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:22px 14px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:13px;cursor:pointer;position:relative;overflow:hidden;perspective:600px;transition:transform .45s var(--spring),border-color .3s var(--ease),box-shadow .4s var(--ease);transform-style:preserve-3d}
+.qa-card::before{content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;opacity:0;background:radial-gradient(circle 140px at var(--mx) var(--my),rgba(217,119,6,.16),transparent 70%);transition:opacity .3s var(--ease)}
 .qa-card:hover{border-color:var(--bdr3);box-shadow:var(--sh2)}
 .qa-card:hover::before{opacity:1}
 .qa-card:active{transform:scale(.97) translateY(0)!important}
 .qa-badge{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;padding:3px 7px;border-radius:99px;background:var(--amber);color:#1a0f02;font-weight:700;overflow:hidden}
 .qa-badge::after{content:'';position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.55),transparent);animation:badge-shine 2.8s ease-in-out infinite}
-.qa-icon-wrap{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .4s var(--spring),box-shadow .3s var(--ease);box-shadow:0 6px 18px -6px rgba(0,0,0,.4)}
+.qa-icon-wrap{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .4s var(--spring),box-shadow .3s var(--ease);box-shadow:0 6px 18px -6px rgba(0,0,0,.4)}
 .qa-card:hover .qa-icon-wrap{transform:translateY(-3px) scale(1.07)}
-.qa-icon-wrap svg{width:24px;height:24px;color:#fff;stroke-width:1.8;transition:transform .35s var(--ease)}
+.qa-icon-wrap svg{width:22px;height:22px;color:#fff;stroke-width:1.8;transition:transform .35s var(--ease)}
 .qa-card:hover .qa-icon-wrap svg{transform:scale(1.08)}
 .qa-icon-wrap.tone-violet{background:linear-gradient(150deg,#7c3aed,#a78bfa)}
 .qa-icon-wrap.tone-teal{background:linear-gradient(150deg,#0d9488,#2dd4bf)}
 .qa-icon-wrap.tone-amber{background:linear-gradient(150deg,#d97706,#fbbf24)}
 .qa-icon-wrap.tone-rose{background:linear-gradient(150deg,#be123c,#fb7185)}
 .qa-icon-wrap.tone-blue{background:linear-gradient(150deg,#1d4ed8,#60a5fa)}
-/* PREMIUM ICON SLOT — drop a 96x96 PNG/SVG icon at the path below to replace
-   the lucide glyph with a custom illustrated icon. Keep the wrapper div + tone
-   class; just swap the inner <svg> for an <img src="../assets/icons/NAME.svg">
-   sized to 24x24–28x28 to match. */
-.qa-label{font-size:13.5px;font-weight:600;color:var(--tx2);line-height:1.3;transition:color .2s}
+.qa-icon-wrap.tone-green{background:linear-gradient(150deg,#15803d,#4ade80)}
+.qa-label{font-size:12.5px;font-weight:600;color:var(--tx2);line-height:1.3;transition:color .2s}
 .qa-card:hover .qa-label{color:var(--tx)}
-@media(max-width:980px){.qa-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:620px){.qa-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1080px){.qa-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:700px){.qa-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){.qa-grid{grid-template-columns:repeat(2,1fr)}}
 
-/* ── SCHEDULE ── */
-.sched-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--sur3);border:1px solid var(--bdr);border-radius:99px;padding:4px;width:max-content}
-.sched-tab{padding:7px 16px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--tx3);transition:color .25s var(--ease);position:relative;z-index:1}
+.sched-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--sur3);border:1px solid var(--bdr);border-radius:99px;padding:4px;width:max-content;position:relative}
+.sched-tab{padding:7px 16px;border-radius:99px;font-size:12.5px;font-weight:600;color:var(--tx3);transition:color .25s var(--ease);position:relative;z-index:1;white-space:nowrap}
 .sched-tab.on{color:var(--bg)}
 [data-mode="dark"] .sched-tab.on{color:#100f0e}
-.sched-tabs{position:relative}
 .sched-tab-indicator{position:absolute;top:4px;left:4px;height:calc(100% - 8px);border-radius:99px;background:var(--tx);transition:transform .35s var(--spring),width .35s var(--spring);z-index:0}
+
 .sched-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;margin-bottom:54px;scroll-snap-type:x proximity}
 .sched-row>*{scroll-snap-align:start}
 .sched-nav{display:flex;gap:8px}
@@ -173,7 +256,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .cal-btn{width:32px;height:32px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .2s}
 .cal-btn:hover{color:var(--amber);border-color:var(--bdr3)}
 .cal-btn svg{width:15px;height:15px}
-
 .sched-card{flex-shrink:0;width:280px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;transition:transform .35s var(--spring),border-color .25s,box-shadow .35s var(--ease);cursor:pointer}
 .sched-card:hover{border-color:var(--bdr3);transform:translateY(-5px);box-shadow:var(--sh2)}
 .sched-thumb{height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
@@ -185,8 +267,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .sched-thumb.subj-bio{background:linear-gradient(160deg,#2e3a1c,#171f0e)}
 .sched-thumb svg{width:34px;height:34px;color:rgba(255,255,255,.85);stroke-width:1.6;transition:transform .4s var(--spring);position:relative;z-index:1}
 .sched-card:hover .sched-thumb svg{transform:scale(1.15) rotate(-4deg)}
-/* PREMIUM ICON SLOT — for a richer look, replace .sched-thumb's svg with a
-   full illustration: <img src="../assets/subjects/chemistry.svg" style="width:64px;height:64px"/> */
 .sched-live-tag{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:4px 9px;border-radius:99px;background:rgba(0,0,0,.45);color:#fff;backdrop-filter:blur(6px);z-index:2}
 .sched-live-tag .dot{width:5px;height:5px;border-radius:50%;background:#ef4444;animation:pulse-ring 1.6s ease-in-out infinite}
 .sched-body{padding:16px 18px}
@@ -194,7 +274,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .sched-time{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx3)}
 .sched-time svg{width:12px;height:12px}
 
-/* ── TESTS ── */
 .test-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;scroll-snap-type:x proximity}
 .test-row>*{scroll-snap-align:start}
 .test-card{flex-shrink:0;width:300px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:transform .35s var(--spring),border-color .25s,box-shadow .35s var(--ease)}
@@ -216,7 +295,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .test-btn.solid:hover{background:var(--amber2);transform:translateY(-1px);box-shadow:0 6px 16px -4px rgba(217,119,6,.5)}
 .test-btn:active{transform:scale(.96)!important}
 
-/* ── IMPROVEMENT BOOK strip ── */
 .imp-card{display:flex;align-items:center;gap:16px;background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:16px 20px;margin-bottom:12px;transition:transform .3s var(--spring),border-color .25s,box-shadow .3s;cursor:pointer}
 .imp-card:hover{border-color:var(--bdr3);transform:translateX(4px);box-shadow:var(--sh)}
 .imp-tag{width:6px;height:38px;border-radius:99px;flex-shrink:0;transition:height .25s var(--spring)}
@@ -232,336 +310,453 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .imp-arrow svg{width:13px;height:13px;color:var(--tx3);transition:color .25s}
 .imp-card:hover .imp-arrow svg{color:#1a0f02}
 
-/* ── EMPTY STATES ── */
-.empty-note{font-size:12.5px;color:var(--tx4);padding:14px 0}
+.feed-list{display:flex;flex-direction:column;gap:0}
+.feed-item{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid var(--bdr);position:relative}
+.feed-item:last-child{border-bottom:none}
+.feed-rail{position:absolute;left:17px;top:42px;bottom:-14px;width:1px;background:var(--bdr2)}
+.feed-item:last-child .feed-rail{display:none}
+.feed-dot-wrap{width:34px;height:34px;border-radius:50%;background:var(--sur3);border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+.feed-dot-wrap svg{width:14px;height:14px;color:var(--amber)}
+.feed-text{font-size:13px;color:var(--tx2);line-height:1.5;padding-top:4px}
+.feed-text strong{color:var(--tx);font-weight:600}
+.feed-time{font-family:var(--mono);font-size:10.5px;color:var(--tx4);margin-top:2px;display:block}
 
-@media(max-width:700px){
-  .sched-card,.test-card{width:240px}
-}
+.empty-note{font-size:12.5px;color:var(--tx4);padding:14px 0;line-height:1.6}
+.empty-note code{font-family:var(--mono);background:var(--sur3);padding:1px 6px;border-radius:5px;font-size:11px}
+.skel{background:linear-gradient(100deg,var(--sur3) 30%,var(--sur4) 50%,var(--sur3) 70%);background-size:200% 100%;animation:skeleton-sweep 1.4s ease-in-out infinite;border-radius:12px}
+
+.toast-stack{position:fixed;bottom:28px;left:50%;display:flex;flex-direction:column;gap:8px;z-index:500;align-items:center}
+.toast{background:var(--sur);border:1px solid var(--bdr2);border-radius:12px;padding:12px 20px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);display:flex;align-items:center;gap:9px;white-space:nowrap;animation:toast-in .35s var(--springy) both}
+.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toast-dot.ok{background:var(--green)}
+.toast-dot.err{background:var(--red)}
+.toast-dot.info{background:var(--blue)}
+@media(max-width:700px){.sched-card,.test-card{width:240px}}
 </style>
 </head>
 <body>
 
-<div class="amb"><div class="amb-orb o1"></div><div class="amb-orb o2"></div></div>
+<div class="amb"><div class="amb-orb o1"></div><div class="amb-orb o2"></div><div class="amb-orb o3"></div></div>
 
-<!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
     <a class="nav-brand" href="../index.html">
-      <div class="nav-logo">
-        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      </div>
+      <div class="nav-logo"><svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
       <span class="nav-site-name">Books Coffee <em>&amp;</em> Dreams</span>
     </a>
-    <div class="nav-divider"></div>
-    <span class="nav-page-title">Explore</span>
-    <div class="nav-links">
-      <a class="nav-link" href="../index.html">Home</a>
-      <a class="nav-link active" href="explore.html">Explore</a>
-      <a class="nav-link" href="../courses.html">Courses</a>
-      <a class="nav-link" href="../community.html">Community</a>
+    <div class="nav-search-trigger" id="searchTrigger">
+      <svg data-lucide="search"></svg><span>Search courses, tools…</span><span class="nav-search-kbd">⌘K</span>
     </div>
     <div class="nav-right">
-      <button class="mode-toggle" id="modeToggle">
-        <span class="icon-sun"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
-        <span class="icon-moon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-        <span id="modeLabel">Light</span>
+      <div style="position:relative">
+        <button class="icon-btn" id="notifBtn"><svg data-lucide="bell"></svg><span class="notif-dot" id="notifDot" style="display:none"></span></button>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-head"><div class="notif-title">Notifications</div><div class="notif-mark" id="notifMarkAll">Mark all read</div></div>
+          <div id="notifList"><div class="notif-empty">Loading…</div></div>
+        </div>
+      </div>
+      <button class="icon-btn mode-toggle" id="modeToggle">
+        <span class="icon-sun"><svg width="16" height="16" data-lucide="sun"></svg></span>
+        <span class="icon-moon"><svg width="16" height="16" data-lucide="moon"></svg></span>
       </button>
       <div class="nav-user" onclick="location.href='../profile.html'">
-        <img class="nav-user-av" id="navAvatar" src="" alt=""/>
-        <span class="nav-user-name" id="navName">Loading…</span>
+        <div class="nav-user-av-wrap"><img class="nav-user-av" id="navAvatar" src="" alt=""/><div class="nav-user-level" id="navLevel">1</div></div>
+        <div class="nav-user-meta"><span class="nav-user-name" id="navName">Loading…</span><span class="nav-user-xp" id="navXpMeta">0 XP</span></div>
       </div>
     </div>
   </div>
 </nav>
 
+<div class="cmdk-overlay" id="cmdkOverlay">
+  <div class="cmdk-box">
+    <div class="cmdk-input-row"><svg data-lucide="search"></svg><input class="cmdk-input" id="cmdkInput" placeholder="Search tools, courses, anything…" autocomplete="off"/><span class="cmdk-esc">ESC</span></div>
+    <div class="cmdk-results" id="cmdkResults"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
 <div class="page">
 
-  <!-- QUICK ACTIONS -->
-  <div class="section-head reveal r1">
-    <div class="section-title">Quick Actions</div>
-  </div>
-  <div class="qa-grid reveal r2" id="qaGrid">
-    <div class="qa-card" onclick="location.href='ai-planner.html'">
-      <div class="qa-badge">New</div>
-      <div class="qa-icon-wrap tone-violet"><svg data-lucide="sparkles"></svg></div>
-      <div class="qa-label">AI Study<br/>Planner</div>
+  <div class="greet-row reveal r1">
+    <div>
+      <div class="greet-eyebrow"><span class="live-pip"></span>LIVE · <span id="greetTime">Loading…</span></div>
+      <div class="greet-h">Welcome back, <em id="greetName">Reader</em>.</div>
     </div>
-    <div class="qa-card" onclick="location.href='ai-study.html'">
-      <div class="qa-icon-wrap tone-teal"><svg data-lucide="file-text"></svg></div>
-      <div class="qa-label">Revision<br/>Notes</div>
-    </div>
-    <div class="qa-card" onclick="alert('Custom Practice — coming soon')">
-      <div class="qa-icon-wrap tone-amber"><svg data-lucide="target"></svg></div>
-      <div class="qa-label">Custom<br/>Practice</div>
-    </div>
-    <div class="qa-card" onclick="alert('Improvement Book — see below')">
-      <div class="qa-icon-wrap tone-rose"><svg data-lucide="trending-up"></svg></div>
-      <div class="qa-label">Improvement<br/>Book</div>
-    </div>
-    <div class="qa-card" onclick="location.href='flashcards.html'">
-      <div class="qa-icon-wrap tone-blue"><svg data-lucide="zap"></svg></div>
-      <div class="qa-label">Flashcards</div>
+    <div class="stat-strip">
+      <div class="stat-pill"><div class="stat-pill-icon fire"><svg data-lucide="flame"></svg></div><div><div class="stat-pill-n" id="stripStreak">—</div><div class="stat-pill-l">day streak</div></div></div>
+      <div class="stat-pill"><div class="stat-pill-icon xp"><svg data-lucide="zap"></svg></div><div><div class="stat-pill-n" id="stripXp">—</div><div class="stat-pill-l">total xp</div></div></div>
+      <div class="stat-pill"><div class="stat-pill-icon online"><svg data-lucide="users"></svg></div><div><div class="stat-pill-n" id="stripOnline">—</div><div class="stat-pill-l">studying now</div></div></div>
     </div>
   </div>
 
-  <!-- SCHEDULE -->
+  <div class="dash-row">
+    <div class="dash-card reveal r2">
+      <div class="dash-card-h"><div class="dash-card-title">Your streak</div><div class="dash-card-icon"><svg data-lucide="flame"></svg></div></div>
+      <div class="streak-flame">
+        <svg class="streak-n-icon" viewBox="0 0 24 24" fill="var(--amber)" stroke="none"><path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3 2 1 3 3.5 3 6a6 6 0 0 1-12 0c0-4 2-6 4-10z"/></svg>
+        <div class="streak-n" id="streakBig">0</div><div class="streak-label">days</div>
+      </div>
+      <div class="streak-cal" id="streakCal"></div>
+      <div class="empty-note" id="streakNote" style="display:none">Streak shown is from <code>users.streak</code>. The weekly grid is a visual built from that single number until per-day activity logs exist.</div>
+    </div>
+
+    <div class="dash-card reveal r3">
+      <div class="dash-card-h"><div class="dash-card-title">Level &amp; XP</div><div class="dash-card-icon"><svg data-lucide="trophy"></svg></div></div>
+      <div class="xp-ring-row">
+        <div class="xp-ring-wrap">
+          <svg viewBox="0 0 96 96">
+            <defs><linearGradient id="xpGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#92400e"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+            <circle class="xp-ring-track" cx="48" cy="48" r="40"/><circle class="xp-ring-fill" id="xpRingFill" cx="48" cy="48" r="40"/>
+          </svg>
+          <div class="xp-ring-center"><div class="xp-ring-level" id="xpRingLevel">1</div><div class="xp-ring-label">LEVEL</div></div>
+        </div>
+        <div class="xp-detail">
+          <div class="xp-detail-n"><strong id="xpDetailCur">0</strong> / <span id="xpDetailMax">500</span> XP</div>
+          <div class="xp-detail-n" style="color:var(--tx4);font-size:11px" id="xpDetailRemain">500 XP to next level</div>
+          <div class="xp-badges-row" id="xpBadgesRow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card reveal r4">
+      <div class="dash-card-h"><div class="dash-card-title">Studying now</div><div class="dash-card-icon"><svg data-lucide="radio"></svg></div></div>
+      <div class="online-list" id="onlineList">
+        <div class="skel" style="height:28px"></div><div class="skel" style="height:28px;margin-top:8px"></div><div class="skel" style="height:28px;margin-top:8px"></div>
+      </div>
+      <div class="online-total"><svg data-lucide="circle" style="width:8px;height:8px;color:var(--green)"></svg><b id="onlineTotal">—</b>&nbsp;readers active across BCD right now</div>
+    </div>
+  </div>
+
+  <div class="section-head reveal r2"><div class="section-title">Quick Actions</div></div>
+  <div class="qa-grid reveal r3" id="qaGrid">
+    <div class="qa-card" data-action="ai-planner.html"><div class="qa-badge">New</div><div class="qa-icon-wrap tone-violet"><svg data-lucide="sparkles"></svg></div><div class="qa-label">AI Study<br/>Planner</div></div>
+    <div class="qa-card" data-action="ai-study.html"><div class="qa-icon-wrap tone-teal"><svg data-lucide="file-text"></svg></div><div class="qa-label">Revision<br/>Notes</div></div>
+    <div class="qa-card" data-action="#custom-practice"><div class="qa-icon-wrap tone-amber"><svg data-lucide="target"></svg></div><div class="qa-label">Custom<br/>Practice</div></div>
+    <div class="qa-card" data-action="#improvement-book"><div class="qa-icon-wrap tone-rose"><svg data-lucide="trending-up"></svg></div><div class="qa-label">Improvement<br/>Book</div></div>
+    <div class="qa-card" data-action="flashcards.html"><div class="qa-icon-wrap tone-blue"><svg data-lucide="zap"></svg></div><div class="qa-label">Flashcards</div></div>
+    <div class="qa-card" data-action="pomodoro.html"><div class="qa-icon-wrap tone-green"><svg data-lucide="timer"></svg></div><div class="qa-label">Pomodoro<br/>Timer</div></div>
+  </div>
+
   <div class="section-head reveal r3">
     <div class="section-title">Schedule</div>
-    <div class="sched-nav">
-      <button class="cal-btn"><svg data-lucide="calendar"></svg></button>
-      <button class="sched-nav-btn" id="schedPrev"><svg data-lucide="chevron-left"></svg></button>
-      <button class="sched-nav-btn" id="schedNext"><svg data-lucide="chevron-right"></svg></button>
-    </div>
-  </div>
-  <div class="sched-tabs reveal r3">
-    <div class="sched-tab-indicator" id="schedIndicator1"></div>
-    <div class="sched-tab on" data-day="today">Today</div>
-    <div class="sched-tab" data-day="tomorrow">Tomorrow</div>
-    <div class="sched-tab" data-day="week">This Week</div>
-  </div>
-  <div class="sched-row reveal r4" id="schedRow">
-    <!-- populated by JS from `liveClasses` collection if present, else shows empty note -->
-  </div>
-
-  <!-- TESTS -->
-  <div class="section-head reveal r4">
-    <div class="section-title">Your Tests</div>
-    <a class="section-link" href="tests.html">View all <svg data-lucide="arrow-right"></svg></a>
+    <div class="sched-nav"><button class="cal-btn"><svg data-lucide="calendar"></svg></button><button class="sched-nav-btn" id="schedPrev"><svg data-lucide="chevron-left"></svg></button><button class="sched-nav-btn" id="schedNext"><svg data-lucide="chevron-right"></svg></button></div>
   </div>
   <div class="sched-tabs reveal r4">
-    <div class="sched-tab-indicator" id="schedIndicator2"></div>
-    <div class="sched-tab on" data-test="upcoming">Upcoming</div>
-    <div class="sched-tab" data-test="past">Past Tests</div>
-    <div class="sched-tab" data-test="missed">Missed Tests</div>
+    <div class="sched-tab-indicator" id="schedIndicator1"></div>
+    <div class="sched-tab on" data-day="today">Today</div><div class="sched-tab" data-day="tomorrow">Tomorrow</div><div class="sched-tab" data-day="week">This Week</div>
   </div>
-  <div class="test-row reveal r5" id="testRow">
-    <!-- populated by JS from `testSchedule` collection if present, else shows empty note -->
-  </div>
+  <div class="sched-row reveal r4" id="schedRow"></div>
 
-  <!-- IMPROVEMENT BOOK -->
-  <div class="section-head reveal r5">
-    <div class="section-title">Improvement Book</div>
-    <a class="section-link" href="#">View all <svg data-lucide="arrow-right"></svg></a>
+  <div class="section-head reveal r4"><div class="section-title">Your Tests</div><a class="section-link" href="#"><span>View all</span> <svg data-lucide="arrow-right"></svg></a></div>
+  <div class="sched-tabs reveal r5">
+    <div class="sched-tab-indicator" id="schedIndicator2"></div>
+    <div class="sched-tab on" data-test="upcoming">Upcoming</div><div class="sched-tab" data-test="past">Past Tests</div><div class="sched-tab" data-test="missed">Missed Tests</div>
   </div>
-  <div id="impList" class="reveal r6">
-    <!-- populated by JS from `userCourseProgress` weak-topic flags if present -->
+  <div class="test-row reveal r5" id="testRow"></div>
+
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:flex-start">
+    <div>
+      <div class="section-head reveal r5" id="improvement-book"><div class="section-title">Improvement Book</div><a class="section-link" href="#"><span>View all</span> <svg data-lucide="arrow-right"></svg></a></div>
+      <div id="impList" class="reveal r6"></div>
+    </div>
+    <div>
+      <div class="section-head reveal r6"><div class="section-title">Activity</div></div>
+      <div class="dash-card reveal r7" style="padding:6px 18px"><div class="feed-list" id="feedList"></div></div>
+    </div>
   </div>
 
 </div>
 
 <script>
 lucide.createIcons();
-
-/* ═══════════ SIGNATURE MOTION: magnetic tilt on Quick Action cards ═══════════
-   Each card tilts gently toward the cursor and the glow (.qa-card::before)
-   follows the pointer — like picking up a card and catching the light. */
-document.querySelectorAll('.qa-card').forEach(card=>{
-  card.addEventListener('pointermove', e=>{
-    const r=card.getBoundingClientRect();
-    const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
-    card.style.setProperty('--mx', (px*100)+'%');
-    card.style.setProperty('--my', (py*100)+'%');
-    const tiltX=(py-0.5)*-10, tiltY=(px-0.5)*10;
-    card.style.transform = `translateY(-6px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-  });
-  card.addEventListener('pointerleave', ()=>{ card.style.transform=''; });
-});
-
-/* ═══════════ SLIDING TAB INDICATOR ═══════════ */
-function fitIndicator(group, indicator, activeTab){
-  indicator.style.width = activeTab.offsetWidth+'px';
-  indicator.style.transform = `translateX(${activeTab.offsetLeft-4}px)`;
-}
-[['#schedIndicator1'],['#schedIndicator2']].forEach(([sel])=>{
-  const indicator=document.querySelector(sel);
-  if(!indicator) return;
-  const group=indicator.parentElement;
-  const active=group.querySelector('.sched-tab.on');
-  requestAnimationFrame(()=>fitIndicator(group,indicator,active));
-  group.querySelectorAll('.sched-tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
-      group.querySelectorAll('.sched-tab').forEach(t=>t.classList.remove('on'));
-      tab.classList.add('on');
-      fitIndicator(group,indicator,tab);
-    });
-  });
-});
-window.addEventListener('resize', ()=>{
-  document.querySelectorAll('.sched-tabs').forEach(group=>{
-    const indicator=group.querySelector('.sched-tab-indicator');
-    const active=group.querySelector('.sched-tab.on');
-    if(indicator&&active) fitIndicator(group,indicator,active);
-  });
-});
-
-/* ═══════════ MODE TOGGLE ═══════════ */
-const html=document.documentElement;
-const saved=localStorage.getItem('bcd-mode')||'dark';
-html.setAttribute('data-mode',saved);
-document.getElementById('modeLabel').textContent = saved==='dark'?'Dark':'Light';
-document.getElementById('modeToggle').onclick=()=>{
-  const n=html.getAttribute('data-mode')==='dark'?'light':'dark';
-  html.setAttribute('data-mode',n);
-  localStorage.setItem('bcd-mode',n);
-  document.getElementById('modeLabel').textContent = n==='dark'?'Dark':'Light';
-};
-
-/* ═══════════ FIREBASE ═══════════ */
 const firebaseConfig={apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",authDomain:"bcd-discord.firebaseapp.com",projectId:"bcd-discord",storageBucket:"bcd-discord.firebasestorage.app",messagingSenderId:"278895155371",appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"};
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
-let currentUser=null;
+let currentUser=null, currentUserData=null;
+const BADGE_EMOJI={Bookworm:'🐛',Explorer:'🗺️',Contributor:'✍️',Staff:'🛡️',Verified:'✅'};
 
 auth.onAuthStateChanged(async u=>{
   currentUser=u;
-  if(!u){ document.getElementById('navName').textContent='Sign in'; return; }
+  if(!u){ document.getElementById('navName').textContent='Sign in'; document.getElementById('greetName').textContent='Reader'; return; }
+  const name=(u.displayName||'Reader').split(' ')[0];
   document.getElementById('navName').textContent = u.displayName || 'Reader';
+  document.getElementById('greetName').textContent = name;
   if(u.photoURL) document.getElementById('navAvatar').src = u.photoURL;
-  await Promise.all([loadSchedule(u), loadTests(u), loadImprovement(u)]);
+  else document.getElementById('navAvatar').src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=d97706`;
+  db.collection('users').doc(u.uid).set({lastActive: firebase.firestore.FieldValue.serverTimestamp()}, {merge:true}).catch(()=>{});
+  try{ const snap=await db.collection('users').doc(u.uid).get(); currentUserData = snap.exists ? snap.data() : {}; }catch(e){ currentUserData = {}; }
+  renderGreetingTime(); renderXpLevel(); renderStreak();
+  loadNotifications(u); loadSchedule(u); loadTests(u); loadImprovement(u); loadActivityFeed(u); loadOnlineNow();
 });
 
-/* ═══════════ SCHEDULE — reads `liveClasses` collection (uid, subject, startsAt, dateKey)
-   if it exists. This collection does not exist in the current data model yet —
-   it needs to be created (e.g. by admin scheduling tool or course timetable)
-   for this section to show real data. Until then it shows an honest empty state. ═══════════ */
+function renderGreetingTime(){
+  const h=new Date().getHours();
+  document.getElementById('greetTime').textContent = h<5?'Late night session':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Night owl mode';
+}
+function renderXpLevel(){
+  const xp = currentUserData.xp || 0;
+  const level = Math.floor(xp/500)+1;
+  const xpIntoLevel = xp % 500;
+  const xpToGo = 500 - xpIntoLevel;
+  const pct = xpIntoLevel/500;
+  document.getElementById('navLevel').textContent = level;
+  document.getElementById('navXpMeta').textContent = xp+' XP';
+  document.getElementById('xpRingLevel').textContent = level;
+  document.getElementById('xpDetailCur').textContent = xpIntoLevel;
+  document.getElementById('xpDetailRemain').textContent = xpToGo+' XP to level '+(level+1);
+  document.getElementById('stripXp').textContent = xp.toLocaleString();
+  const offset = 251 - (pct*251);
+  requestAnimationFrame(()=>{ document.getElementById('xpRingFill').style.strokeDashoffset = offset; });
+  const badges = currentUserData.badges || [];
+  document.getElementById('xpBadgesRow').innerHTML = badges.map(b=>`<div class="xp-badge-chip" title="${escapeHtml(b)}">${BADGE_EMOJI[b]||'⭐'}</div>`).join('');
+}
+function renderStreak(){
+  const streak = currentUserData.streak || 0;
+  document.getElementById('streakBig').textContent = streak;
+  document.getElementById('stripStreak').textContent = streak;
+  const cal=document.getElementById('streakCal');
+  const days=['S','M','T','W','T','F','S'];
+  const today=new Date().getDay();
+  cal.innerHTML='';
+  for(let i=6;i>=0;i--){
+    const dayIdx=(today-i+7)%7;
+    const cell=document.createElement('div');
+    cell.className='streak-day'+(i<Math.min(streak,7)?' active':'')+(i===0?' today':'');
+    cell.textContent=days[dayIdx];
+    cal.appendChild(cell);
+  }
+  if(streak===0) document.getElementById('streakNote').style.display='block';
+}
+async function loadNotifications(user){
+  const list=document.getElementById('notifList');
+  try{
+    const snap=await db.collection('notifications').where('uid','==',user.uid).orderBy('createdAt','desc').limit(15).get();
+    if(snap.empty){ list.innerHTML=`<div class="notif-empty"><svg data-lucide="bell-off"></svg>No notifications yet.<br/><span style="font-size:11px;opacity:.7">Backed by the <code style="font-family:var(--mono)">notifications</code> collection.</span></div>`; lucide.createIcons(); return; }
+    let unreadCount=0;
+    list.innerHTML = snap.docs.map(d=>{
+      const n=d.data(); if(!n.read) unreadCount++;
+      const iconClass = n.type==='plan'?'t-plan':n.type==='test'?'t-test':n.type==='badge'?'t-badge':'t-system';
+      const icon = n.type==='plan'?'sparkles':n.type==='test'?'clipboard-check':n.type==='badge'?'award':'info';
+      return `<div class="notif-item ${n.read?'':'unread'}"><div class="notif-icon ${iconClass}"><svg data-lucide="${icon}"></svg></div><div class="notif-body"><div class="notif-text">${n.text||''}</div><div class="notif-time">${n.timeLabel||''}</div></div></div>`;
+    }).join('');
+    document.getElementById('notifDot').style.display = unreadCount>0?'block':'none';
+    lucide.createIcons();
+  }catch(e){ list.innerHTML=`<div class="notif-empty">Couldn't load notifications.</div>`; }
+}
 async function loadSchedule(user){
   const row=document.getElementById('schedRow');
   try{
     const todayKey=new Date().toISOString().slice(0,10);
-    const snap=await db.collection('liveClasses')
-      .where('uid','==',user.uid).where('dateKey','==',todayKey)
-      .orderBy('startsAt','asc').limit(6).get();
-    if(snap.empty){ row.innerHTML=`<div class="empty-note">No classes scheduled for today. <em>(Backed by the <code>liveClasses</code> collection — add entries there to populate this.)</em></div>`; return; }
+    const snap=await db.collection('liveClasses').where('uid','==',user.uid).where('dateKey','==',todayKey).orderBy('startsAt','asc').limit(6).get();
+    if(snap.empty){ row.innerHTML=`<div class="empty-note">No classes scheduled for today. <em>Backed by the <code>liveClasses</code> collection.</em></div>`; return; }
     row.innerHTML = snap.docs.map(d=>{
-      const c=d.data();
-      const subj=(c.subject||'General').toLowerCase();
+      const c=d.data(); const subj=(c.subject||'General').toLowerCase();
       const toneClass = subj.includes('chem')?'subj-chem' : subj.includes('phys')?'subj-phys' : subj.includes('bio')?'subj-bio' : 'subj-math';
       const icon = subj.includes('chem')?'flask-conical' : subj.includes('phys')?'atom' : subj.includes('bio')?'leaf' : 'sigma';
-      return `<div class="sched-card">
-        <div class="sched-thumb ${toneClass}">
-          ${c.live?'<div class="sched-live-tag"><span class="dot"></span> LIVE</div>':''}
-          <svg data-lucide="${icon}"></svg>
-        </div>
-        <div class="sched-body">
-          <div class="sched-subject">${escapeHtml(c.subject||'General')}</div>
-          <div class="sched-time"><svg data-lucide="clock"></svg>Starts ${escapeHtml(c.startsAtLabel||'—')}</div>
-        </div>
-      </div>`;
+      return `<div class="sched-card"><div class="sched-thumb ${toneClass}">${c.live?'<div class="sched-live-tag"><span class="dot"></span> LIVE</div>':''}<svg data-lucide="${icon}"></svg></div><div class="sched-body"><div class="sched-subject">${escapeHtml(c.subject||'General')}</div><div class="sched-time"><svg data-lucide="clock"></svg>Starts ${escapeHtml(c.startsAtLabel||'—')}</div></div></div>`;
     }).join('');
     lucide.createIcons();
-  }catch(e){
-    row.innerHTML=`<div class="empty-note">Schedule not available right now.</div>`;
-  }
+  }catch(e){ row.innerHTML=`<div class="empty-note">Schedule not available right now.</div>`; }
 }
-
-/* ═══════════ TESTS — reads `testSchedule` collection (uid or courseId-scoped).
-   Same note as above: this collection doesn't exist yet in the current backend.
-   Wire this up once test scheduling exists, e.g. in the admin panel. ═══════════ */
 async function loadTests(user){
   const row=document.getElementById('testRow');
   try{
-    const snap=await db.collection('testSchedule')
-      .where('uid','==',user.uid).orderBy('date','asc').limit(6).get();
-    if(snap.empty){ row.innerHTML=`<div class="empty-note">No tests scheduled yet. <em>(Backed by the <code>testSchedule</code> collection — add entries there to populate this.)</em></div>`; return; }
+    const snap=await db.collection('testSchedule').where('uid','==',user.uid).orderBy('date','asc').limit(6).get();
+    if(snap.empty){ row.innerHTML=`<div class="empty-note">No tests scheduled yet. <em>Backed by the <code>testSchedule</code> collection.</em></div>`; return; }
     row.innerHTML = snap.docs.map(d=>{
       const t=d.data();
       const statusClass = t.status==='over'?'over':t.status==='missed'?'missed':'upcoming';
       const statusLabel = t.status==='over'?'Test is over':t.status==='missed'?'Missed':'Upcoming test';
-      return `<div class="test-card">
-        <div class="test-status ${statusClass}">${statusLabel}</div>
-        <div class="test-name">${escapeHtml(t.name||'Untitled test')}</div>
-        <div class="test-meta">
-          <div class="test-meta-item"><svg data-lucide="calendar"></svg>${escapeHtml(t.dateLabel||'')}</div>
-          <div class="test-meta-item"><svg data-lucide="clock"></svg>${escapeHtml(t.duration||'')}</div>
-          <div class="test-meta-item"><svg data-lucide="monitor"></svg>${escapeHtml(t.mode||'CBT')}</div>
-        </div>
-        <div class="test-window">Test Window ${escapeHtml(t.window||'—')}</div>
-        <div class="test-actions">
-          <div class="test-btn ghost" onclick="location.href='${t.syllabusUrl||'#'}'">View Syllabus</div>
-          ${t.status==='over'?`<div class="test-btn solid" onclick="location.href='${t.solutionUrl||'#'}'">View Solution</div>`:''}
-        </div>
-      </div>`;
+      return `<div class="test-card"><div class="test-status ${statusClass}">${statusLabel}</div><div class="test-name">${escapeHtml(t.name||'Untitled test')}</div><div class="test-meta"><div class="test-meta-item"><svg data-lucide="calendar"></svg>${escapeHtml(t.dateLabel||'')}</div><div class="test-meta-item"><svg data-lucide="clock"></svg>${escapeHtml(t.duration||'')}</div><div class="test-meta-item"><svg data-lucide="monitor"></svg>${escapeHtml(t.mode||'CBT')}</div></div><div class="test-window">Test Window ${escapeHtml(t.window||'—')}</div><div class="test-actions"><div class="test-btn ghost" onclick="location.href='${t.syllabusUrl||'#'}'">View Syllabus</div>${t.status==='over'?`<div class="test-btn solid" onclick="location.href='${t.solutionUrl||'#'}'">View Solution</div>`:''}</div></div>`;
     }).join('');
     lucide.createIcons();
-  }catch(e){
-    row.innerHTML=`<div class="empty-note">Tests not available right now.</div>`;
-  }
+  }catch(e){ row.innerHTML=`<div class="empty-note">Tests not available right now.</div>`; }
 }
-
-/* ═══════════ IMPROVEMENT BOOK — reads real userCourseProgress docs and
-   surfaces topics where score/accuracy is low. Uses your actual data model. ═══════════ */
 async function loadImprovement(user){
   const list=document.getElementById('impList');
   try{
     const snap=await db.collection('userCourseProgress').where('uid','==',user.uid).limit(20).get();
     const weakTopics=[];
-    snap.forEach(d=>{
-      const p=d.data();
-      (p.topics||[]).forEach(t=>{
-        if(typeof t.accuracy==='number' && t.accuracy<60){
-          weakTopics.push({name:t.name, accuracy:t.accuracy, courseId:p.courseId});
-        }
-      });
-    });
-    if(weakTopics.length===0){
-      list.innerHTML = `<div class="empty-note">No weak topics flagged yet — these appear automatically once you've attempted a few tests or practice sets.</div>`;
-      return;
-    }
+    snap.forEach(d=>{ const p=d.data(); (p.topics||[]).forEach(t=>{ if(typeof t.accuracy==='number' && t.accuracy<60) weakTopics.push({name:t.name, accuracy:t.accuracy}); }); });
+    if(weakTopics.length===0){ list.innerHTML = `<div class="empty-note">No weak topics flagged yet — these appear automatically once you've attempted a few tests or practice sets.</div>`; return; }
     list.innerHTML = weakTopics.slice(0,6).map(t=>{
       const tier = t.accuracy<35?'weak':t.accuracy<60?'mid':'strong';
-      return `<div class="imp-card">
-        <div class="imp-tag ${tier}"></div>
-        <div class="imp-body">
-          <div class="imp-title">${escapeHtml(t.name)}</div>
-          <div class="imp-sub">${t.accuracy}% accuracy so far</div>
-        </div>
-        <div class="imp-arrow"><svg data-lucide="arrow-right"></svg></div>
-      </div>`;
+      return `<div class="imp-card"><div class="imp-tag ${tier}"></div><div class="imp-body"><div class="imp-title">${escapeHtml(t.name)}</div><div class="imp-sub">${t.accuracy}% accuracy so far</div></div><div class="imp-arrow"><svg data-lucide="arrow-right"></svg></div></div>`;
     }).join('');
     lucide.createIcons();
-  }catch(e){
-    list.innerHTML = `<div class="empty-note">Improvement data not available right now.</div>`;
-  }
+  }catch(e){ list.innerHTML = `<div class="empty-note">Improvement data not available right now.</div>`; }
 }
-
+async function loadActivityFeed(user){
+  const list=document.getElementById('feedList'); const items=[];
+  try{
+    const snap=await db.collection('communityPosts').where('uid','==',user.uid).orderBy('createdAt','desc').limit(4).get();
+    snap.forEach(d=>{ const p=d.data(); items.push({icon:'message-square', text:`You posted in <strong>${escapeHtml(p.category||'Community')}</strong>`, time:relTime(p.createdAt)}); });
+  }catch(e){}
+  if(currentUserData.xp) items.push({icon:'zap', text:`You've earned <strong>${currentUserData.xp} XP</strong> total`, time:''});
+  if(currentUserData.streak) items.push({icon:'flame', text:`<strong>${currentUserData.streak}-day</strong> streak going strong`, time:''});
+  if(items.length===0){ list.innerHTML=`<div class="empty-note" style="padding:18px 0">No activity yet — your study sessions, posts, and milestones will show up here.</div>`; return; }
+  list.innerHTML = items.map(it=>`<div class="feed-item"><div class="feed-rail"></div><div class="feed-dot-wrap"><svg data-lucide="${it.icon}"></svg></div><div><div class="feed-text">${it.text}</div>${it.time?`<span class="feed-time">${it.time}</span>`:''}</div></div>`).join('');
+  lucide.createIcons();
+}
+function relTime(ts){
+  if(!ts||!ts.toDate) return '';
+  const diff=(Date.now()-ts.toDate().getTime())/1000;
+  if(diff<3600) return Math.floor(diff/60)+'m ago';
+  if(diff<86400) return Math.floor(diff/3600)+'h ago';
+  return Math.floor(diff/86400)+'d ago';
+}
+async function loadOnlineNow(){
+  const list=document.getElementById('onlineList'); const totalEl=document.getElementById('onlineTotal'); const stripEl=document.getElementById('stripOnline');
+  try{
+    const tenMinAgo=new Date(Date.now()-10*60*1000);
+    const snap=await db.collection('users').where('lastActive','>',tenMinAgo).orderBy('lastActive','desc').limit(5).get();
+    if(snap.empty){ list.innerHTML=`<div class="empty-note">No one's active in the last 10 minutes yet. <em>Populates as more pages adopt the <code>lastActive</code> heartbeat.</em></div>`; totalEl.textContent='0'; stripEl.textContent='0'; return; }
+    list.innerHTML = snap.docs.map(d=>{
+      const u=d.data(); const initials=(u.displayName||'R').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="online-row"><div class="online-av">${initials}<span class="pip"></span></div><div class="online-name">${escapeHtml(u.displayName||'Reader')}</div><div class="online-action">studying</div></div>`;
+    }).join('');
+    totalEl.textContent = snap.size; stripEl.textContent = snap.size;
+  }catch(e){ list.innerHTML=`<div class="empty-note">Live presence not available right now.</div>`; totalEl.textContent='—'; stripEl.textContent='—'; }
+}
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
 
+document.querySelectorAll('.qa-card').forEach(card=>{
+  card.addEventListener('pointermove', e=>{
+    const r=card.getBoundingClientRect(); const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    card.style.setProperty('--mx', (px*100)+'%'); card.style.setProperty('--my', (py*100)+'%');
+    card.style.transform = `translateY(-6px) rotateX(${(py-0.5)*-10}deg) rotateY(${(px-0.5)*10}deg)`;
+  });
+  card.addEventListener('pointerleave', ()=>{ card.style.transform=''; });
+  card.addEventListener('click', ()=>{
+    const dest=card.dataset.action;
+    if(dest && dest[0]!=='#') location.href=dest;
+    else if(dest) document.querySelector(dest)?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+function fitIndicator(indicator, activeTab){ indicator.style.width = activeTab.offsetWidth+'px'; indicator.style.transform = `translateX(${activeTab.offsetLeft-4}px)`; }
+['#schedIndicator1','#schedIndicator2'].forEach(sel=>{
+  const indicator=document.querySelector(sel); if(!indicator) return;
+  const group=indicator.parentElement; const active=group.querySelector('.sched-tab.on');
+  requestAnimationFrame(()=>fitIndicator(indicator,active));
+  group.querySelectorAll('.sched-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{ group.querySelectorAll('.sched-tab').forEach(t=>t.classList.remove('on')); tab.classList.add('on'); fitIndicator(indicator,tab); });
+  });
+});
+window.addEventListener('resize', ()=>{
+  document.querySelectorAll('.sched-tabs').forEach(group=>{
+    const indicator=group.querySelector('.sched-tab-indicator'); const active=group.querySelector('.sched-tab.on');
+    if(indicator&&active) fitIndicator(indicator,active);
+  });
+});
+
+const notifBtn=document.getElementById('notifBtn'), notifPanel=document.getElementById('notifPanel');
+notifBtn.addEventListener('click', e=>{ e.stopPropagation(); notifPanel.classList.toggle('open'); });
+document.addEventListener('click', e=>{ if(!notifPanel.contains(e.target) && e.target!==notifBtn) notifPanel.classList.remove('open'); });
+document.getElementById('notifMarkAll').addEventListener('click', async e=>{
+  e.stopPropagation();
+  document.querySelectorAll('.notif-item.unread').forEach(n=>n.classList.remove('unread'));
+  document.getElementById('notifDot').style.display='none';
+  if(currentUser){
+    try{
+      const snap=await db.collection('notifications').where('uid','==',currentUser.uid).where('read','==',false).get();
+      const batch=db.batch(); snap.forEach(d=>batch.update(d.ref,{read:true})); await batch.commit();
+      showToast('All notifications marked read','ok');
+    }catch(err){}
+  }
+});
+
+const SEARCH_INDEX=[
+  {group:'Tools', icon:'sparkles', label:'AI Study Planner', sub:'Adaptive daily plans', href:'ai-planner.html'},
+  {group:'Tools', icon:'file-text', label:'Revision Notes / AI Study Engine', sub:'Upload anything, get notes', href:'ai-study.html'},
+  {group:'Tools', icon:'zap', label:'Flashcards', sub:'Spaced repetition review', href:'flashcards.html'},
+  {group:'Tools', icon:'timer', label:'Pomodoro Timer', sub:'Focus sprints', href:'pomodoro.html'},
+  {group:'Tools', icon:'trees', label:'Forest — Focus Mode', sub:'Grow a tree while you study', href:'forest.html'},
+  {group:'Tools', icon:'list-checks', label:'Todo List', sub:'Daily tasks', href:'todolist.html'},
+  {group:'Pages', icon:'book-open', label:'Courses', sub:'Browse all courses', href:'../courses.html'},
+  {group:'Pages', icon:'users', label:'Community', sub:'Discussions and posts', href:'../community.html'},
+  {group:'Pages', icon:'user', label:'Profile', sub:'Your account', href:'../profile.html'},
+  {group:'Pages', icon:'settings', label:'Settings', sub:'Preferences', href:'../settings.html'},
+];
+const cmdkOverlay=document.getElementById('cmdkOverlay'), cmdkInput=document.getElementById('cmdkInput'), cmdkResults=document.getElementById('cmdkResults');
+let cmdkActiveIdx=0, cmdkCurrentResults=[];
+function openCmdk(){ cmdkOverlay.classList.add('open'); cmdkInput.value=''; cmdkInput.focus(); renderCmdkResults(''); }
+function closeCmdk(){ cmdkOverlay.classList.remove('open'); }
+document.getElementById('searchTrigger').addEventListener('click', openCmdk);
+cmdkOverlay.addEventListener('click', e=>{ if(e.target===cmdkOverlay) closeCmdk(); });
+document.addEventListener('keydown', e=>{
+  if((e.metaKey||e.ctrlKey) && e.key==='k'){ e.preventDefault(); openCmdk(); }
+  if(e.key==='Escape') closeCmdk();
+  if(cmdkOverlay.classList.contains('open')){
+    if(e.key==='ArrowDown'){ e.preventDefault(); cmdkActiveIdx=Math.min(cmdkActiveIdx+1,cmdkCurrentResults.length-1); highlightCmdk(); }
+    if(e.key==='ArrowUp'){ e.preventDefault(); cmdkActiveIdx=Math.max(cmdkActiveIdx-1,0); highlightCmdk(); }
+    if(e.key==='Enter' && cmdkCurrentResults[cmdkActiveIdx]){ location.href=cmdkCurrentResults[cmdkActiveIdx].href; }
+  }
+});
+cmdkInput.addEventListener('input', ()=>renderCmdkResults(cmdkInput.value));
+function fuzzyMatch(query, text){
+  query=query.toLowerCase(); text=text.toLowerCase();
+  if(!query) return {match:true, score:0};
+  if(text.includes(query)) return {match:true, score:100-text.indexOf(query)};
+  let qi=0; for(let i=0;i<text.length && qi<query.length;i++) if(text[i]===query[qi]) qi++;
+  return {match: qi===query.length, score: qi===query.length?10:0};
+}
+function highlightMatch(text, query){
+  if(!query) return escapeHtml(text);
+  const idx=text.toLowerCase().indexOf(query.toLowerCase());
+  if(idx===-1) return escapeHtml(text);
+  return escapeHtml(text.slice(0,idx))+'<mark>'+escapeHtml(text.slice(idx,idx+query.length))+'</mark>'+escapeHtml(text.slice(idx+query.length));
+}
+function renderCmdkResults(query){
+  const scored=SEARCH_INDEX.map(item=>({...item, ...fuzzyMatch(query, item.label+' '+item.sub)})).filter(i=>i.match).sort((a,b)=>b.score-a.score);
+  cmdkCurrentResults=scored; cmdkActiveIdx=0;
+  if(scored.length===0){ cmdkResults.innerHTML=`<div class="cmdk-empty">No results for "${escapeHtml(query)}"</div>`; return; }
+  const groups={}; scored.forEach(it=>{ (groups[it.group]=groups[it.group]||[]).push(it); });
+  cmdkResults.innerHTML = Object.entries(groups).map(([g,items])=>`<div class="cmdk-group-label">${g}</div>${items.map(it=>{
+    const globalIdx=scored.indexOf(it);
+    return `<div class="cmdk-item ${globalIdx===0?'active':''}" data-idx="${globalIdx}" data-href="${it.href}"><div class="cmdk-item-icon"><svg data-lucide="${it.icon}"></svg></div><div class="cmdk-item-text">${highlightMatch(it.label,query)}<div class="cmdk-item-sub">${escapeHtml(it.sub)}</div></div></div>`;
+  }).join('')}`).join('');
+  lucide.createIcons();
+  cmdkResults.querySelectorAll('.cmdk-item').forEach(el=>{
+    el.addEventListener('click', ()=>location.href=el.dataset.href);
+    el.addEventListener('mouseenter', ()=>{ cmdkActiveIdx=parseInt(el.dataset.idx); highlightCmdk(); });
+  });
+}
+function highlightCmdk(){ cmdkResults.querySelectorAll('.cmdk-item').forEach(el=>el.classList.toggle('active', parseInt(el.dataset.idx)===cmdkActiveIdx)); }
+
+function showToast(msg,type='ok'){
+  const stack=document.getElementById('toastStack');
+  const t=document.createElement('div'); t.className='toast';
+  t.innerHTML=`<div class="toast-dot ${type}"></div><span>${escapeHtml(msg)}</span>`;
+  stack.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, 3200);
+}
+
+const html=document.documentElement;
+const saved=localStorage.getItem('bcd-mode')||'dark';
+html.setAttribute('data-mode',saved);
+document.getElementById('modeToggle').addEventListener('click', ()=>{
+  const n=html.getAttribute('data-mode')==='dark'?'light':'dark';
+  html.setAttribute('data-mode',n); localStorage.setItem('bcd-mode',n);
+});
 </script>
 </body>
 </html>
 <!--
-NOTES FOR THE TEAM:
+WHAT'S REAL vs WHAT NEEDS A NEW COLLECTION
 
-1. ICONS: This page uses Lucide (https://lucide.dev) via CDN as the default
-   icon set — clean, consistent, free, and reads as premium at this weight.
-   Two spots are built to accept upgraded custom icons instead:
+REAL (no backend changes needed):
+  XP/Level   → users.xp        | Streak → users.streak       | Badges → users.badges[]
+  Improvement Book → userCourseProgress | Activity (posts) → communityPosts
+  Online Now → users.lastActive (this file writes the heartbeat itself on every load)
 
-   a) Quick Action tiles (.qa-icon-wrap) — currently an inline <svg data-lucide="...">.
-      To swap in a custom premium icon: replace that svg with
-      <img src="../assets/icons/NAME.svg" style="width:26px;height:26px"/>
-      Recommended source if you want paid premium icons: Phosphor Icons (free,
-      phosphoricons.com) for a softer feel, or Iconscout / Flaticon premium
-      packs (paid, highest production polish) if budget allows post-revenue.
+NEEDS A NEW COLLECTION (shows honest empty state with the exact name until then):
+  Notifications → notifications (uid, type, text, read, createdAt)
+  Schedule      → liveClasses   (uid, subject, dateKey, startsAt, live)
+  Tests         → testSchedule  (uid, name, date, status, window, syllabusUrl, solutionUrl)
 
-   b) Schedule subject thumbnails (.sched-thumb) — currently a lucide glyph
-      (flask-conical / atom / leaf / sigma per subject). To swap in a custom
-      illustrated subject icon: replace the svg with
-      <img src="../assets/subjects/chemistry.svg" style="width:64px;height:64px"/>
-      and repeat per subject (physics.svg, biology.svg, maths.svg).
-
-   Drop files at: /assets/icons/ and /assets/subjects/ relative to site root,
-   then update the two spots above. No other code changes needed.
-
-2. DATA: Quick Actions and Improvement Book are wired to your real Firestore
-   collections (courses, userCourseProgress). Schedule and Tests reference
-   `liveClasses` and `testSchedule` collections that don't exist in your
-   backend yet — the page handles their absence gracefully (honest empty
-   state, not fake data) but you'll want an admin flow to populate them
-   before this looks "alive" to a real user or a judge.
-
-3. This page intentionally does NOT copy any third-party coaching platform's
-   layout, icon set, or visual design — the structure (quick actions /
-   schedule / tests) is a standard dashboard pattern, but every visual
-   decision here is original to BCD's amber/coffee brand system.
+ICONS: Lucide via CDN throughout. COMMAND PALETTE: ⌘K / Ctrl+K, static tool index —
+extend with real course titles by fetching courses_main into SEARCH_INDEX.
+SECURITY: lock Firestore rules on notifications / lastActive / userCourseProgress to owning uid.
 -->
