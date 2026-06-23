@@ -3,18 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>TodoList — Tasks, Lists &amp; Lines of Sight</title>
+<title>Sprout — Tasks, Lists &amp; Lines of Sight</title>
 <meta name="description" content="A focused task manager for Books Coffee and Dreams: lists, due dates, priorities, subtasks, tags, and a clean line of sight to what matters today.">
-<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/todo-list.png" type="image/png">
+<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" type="image/png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
 
 <!-- Firebase (Books Coffee and Dreams — bcd-discord project) -->
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
+<!-- Lucide Icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js">if(typeof lucide !== "undefined") lucide.createIcons();
+</script>
 
 <style>
 /* ============================================================
@@ -120,7 +132,7 @@ ul,ol{list-style:none}
 
 h1,h2,h3,h4{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
 
-.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon{width:18px!important;height:18px!important;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .icon.filled{fill:currentColor;stroke:none}
 
 ::selection{background:var(--tomato-soft-2)}
@@ -522,50 +534,18 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 </head>
 <body>
 
-<!-- ============ ICON SPRITE ============ -->
-<svg style="display:none">
-  <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="icon-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
-  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
-  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
-  <symbol id="icon-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
-  <symbol id="icon-tag" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="icon-archive" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 13h4"/></symbol>
-  <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
-  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="icon-grid" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></symbol>
-  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
-  <symbol id="icon-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V15"/></symbol>
-  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/><path d="M10 11v6M14 11v6"/></symbol>
-  <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></symbol>
-  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
-  <symbol id="icon-sprout" viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 12 4 11 4 4c7 0 8 6 8 8M12 12c0-2 1-8 8-8 0 7-8 8-8 8z"/></symbol>
-  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
-  <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
-  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
-  <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
-  <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
-  <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
-  <symbol id="icon-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 7"/></symbol>
-  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
-  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></symbol>
-  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></symbol>
-  <symbol id="icon-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
-</svg>
-
 <div class="topbar-mobile">
-  <button class="menu-btn" id="menuBtn"><svg class="icon"><use href="#icon-grid"/></svg></button>
-  <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/todo-list.png" alt="" width="26" height="26">
-  <div class="brand-name">TodoList</div>
+  <button class="menu-btn" id="menuBtn"><i data-lucide="menu" class="icon"></i></button>
+  <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="26" height="26">
+  <div class="brand-name">Sprout</div>
 </div>
 
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/todo-list.png" alt="" width="36" height="36">
+      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="36" height="36">
       <div>
-        <div class="brand-name">TodoList</div>
+        <div class="brand-name">Sprout</div>
         <div class="brand-tag">Tasks &amp; Lines of Sight</div>
       </div>
     </div>
@@ -573,22 +553,22 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
     <nav class="nav">
       <div class="nav-section-label">Lines of sight</div>
       <button class="nav-item active" data-view="today">
-        <svg class="icon"><use href="#icon-sun"/></svg><span>Today</span>
+        <i data-lucide="sun" class="icon"></i><span>Today</span>
         <span class="count" id="countToday">0</span>
       </button>
       <button class="nav-item" data-view="upcoming">
-        <svg class="icon"><use href="#icon-calendar"/></svg><span>Upcoming</span>
+        <i data-lucide="calendar" class="icon"></i><span>Upcoming</span>
         <span class="count" id="countUpcoming">0</span>
       </button>
       <button class="nav-item" data-view="inbox">
-        <svg class="icon"><use href="#icon-inbox"/></svg><span>Inbox</span>
+        <i data-lucide="inbox" class="icon"></i><span>Inbox</span>
         <span class="count" id="countInbox">0</span>
       </button>
       <button class="nav-item" data-view="tags">
-        <svg class="icon"><use href="#icon-tag"/></svg><span>Tags</span>
+        <i data-lucide="tag" class="icon"></i><span>Tags</span>
       </button>
       <button class="nav-item" data-view="completed">
-        <svg class="icon"><use href="#icon-archive"/></svg><span>Completed</span>
+        <i data-lucide="archive" class="icon"></i><span>Completed</span>
       </button>
     </nav>
 
@@ -596,20 +576,20 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
     <div class="nav-lists" id="navLists"></div>
     <div style="padding:0 12px 8px">
       <button class="btn-add-list" id="btnAddListSidebar">
-        <svg class="icon" style="width:14px;height:14px"><use href="#icon-plus"/></svg><span>New list</span>
+        <i data-lucide="plus" class="icon" style="width:14px;height:14px"></i><span>New list</span>
       </button>
     </div>
 
     <div class="nav-section-label" style="padding-left:22px">&nbsp;</div>
     <nav class="nav" style="padding-top:0">
       <button class="nav-item" data-view="settings">
-        <svg class="icon"><use href="#icon-settings"/></svg><span>Settings</span>
+        <i data-lucide="settings" class="icon"></i><span>Settings</span>
       </button>
     </nav>
 
     <div class="sidebar-foot">
       <div class="streak-box">
-        <svg class="icon"><use href="#icon-sprout"/></svg>
+        <i data-lucide="sprout" class="icon"></i>
         <div class="streak-box-text">
           <span class="streak-num" id="sidebarStreak">0</span>
           <span class="streak-label">Day streak</span>
@@ -634,28 +614,28 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
           <p class="view-sub" id="todayDateSub">Everything due today, plus anything overdue.</p>
         </div>
         <div class="view-meta">
-          <span class="meta-chip"><svg class="icon" style="width:13px;height:13px"><use href="#icon-calendar"/></svg><span id="todayDateLabel">—</span></span>
+          <span class="meta-chip"><i data-lucide="calendar" class="icon" style="width:13px;height:13px"></i><span id="todayDateLabel">—</span></span>
         </div>
       </div>
 
       <div class="stat-strip">
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-target"/></svg>
+          <i data-lucide="target" class="icon"></i>
           <div class="stat-num" id="statDueToday">0</div>
           <div class="stat-label">Due today</div>
         </div>
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-alert"/></svg>
+          <i data-lucide="alert-triangle" class="icon"></i>
           <div class="stat-num" id="statOverdue">0</div>
           <div class="stat-label">Overdue</div>
         </div>
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-check"/></svg>
+          <i data-lucide="check" class="icon"></i>
           <div class="stat-num" id="statCompletedToday">0</div>
           <div class="stat-label">Done today</div>
         </div>
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-sprout"/></svg>
+          <i data-lucide="sprout" class="icon"></i>
           <div class="stat-num" id="statStreakToday">0</div>
           <div class="stat-label">Day streak</div>
         </div>
@@ -679,7 +659,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
           <p class="view-sub">Everything with a due date, grouped day by day.</p>
         </div>
         <div class="view-meta">
-          <span class="meta-chip"><svg class="icon" style="width:13px;height:13px"><use href="#icon-calendar"/></svg><span id="upcomingRangeLabel">Next 14 days</span></span>
+          <span class="meta-chip"><i data-lucide="calendar" class="icon" style="width:13px;height:13px"></i><span id="upcomingRangeLabel">Next 14 days</span></span>
         </div>
       </div>
 
@@ -714,8 +694,8 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
           <p class="view-sub" id="listViewSub">—</p>
         </div>
         <div class="view-meta">
-          <button class="icon-btn" id="btnEditList" title="Edit list"><svg class="icon" style="width:15px;height:15px"><use href="#icon-edit"/></svg></button>
-          <button class="icon-btn" id="btnDeleteList" title="Delete list"><svg class="icon" style="width:15px;height:15px"><use href="#icon-trash"/></svg></button>
+          <button class="icon-btn" id="btnEditList" title="Edit list"><i data-lucide="pencil" class="icon" style="width:15px;height:15px"></i></button>
+          <button class="icon-btn" id="btnDeleteList" title="Delete list"><i data-lucide="trash-2" class="icon" style="width:15px;height:15px"></i></button>
         </div>
       </div>
 
@@ -772,7 +752,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--tomato)"><use href="#icon-link"/></svg>
+          <i data-lucide="link" class="icon" style="width:15px;height:15px;color:var(--tomato)"></i>
           <h3 style="font-size:14.5px">Ripen subjects</h3>
         </div>
         <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:16px">
@@ -782,13 +762,13 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
         <div id="subjectListSettings" style="margin-bottom:14px"></div>
         <div style="display:flex;gap:10px">
           <input type="text" class="input" id="newSubjectInput" placeholder="New subject name, e.g. Organic Chemistry">
-          <button class="btn btn-primary" id="btnAddSubjectSettings"><svg class="icon"><use href="#icon-plus"/></svg>Add</button>
+          <button class="btn btn-primary" id="btnAddSubjectSettings"><i data-lucide="plus" class="icon"></i>Add</button>
         </div>
       </div>
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--tomato)"><use href="#icon-sun"/></svg>
+          <i data-lucide="sun" class="icon" style="width:15px;height:15px;color:var(--tomato)"></i>
           <h3 style="font-size:14.5px">Appearance</h3>
         </div>
         <div class="sound-row" style="padding:0 0 0 0">
@@ -810,15 +790,15 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--tomato)"><use href="#icon-download"/></svg>
+          <i data-lucide="download" class="icon" style="width:15px;height:15px;color:var(--tomato)"></i>
           <h3 style="font-size:14.5px">Your data</h3>
         </div>
         <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">
           All data syncs to your Books Coffee and Dreams account. Export a backup, or import on another device.
         </p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-secondary" id="btnExportData"><svg class="icon"><use href="#icon-download"/></svg>Export data (.json)</button>
-          <button class="btn btn-secondary" id="btnImportData"><svg class="icon"><use href="#icon-upload"/></svg>Import data</button>
+          <button class="btn btn-secondary" id="btnExportData"><i data-lucide="download" class="icon"></i>Export data (.json)</button>
+          <button class="btn btn-secondary" id="btnImportData"><i data-lucide="upload" class="icon"></i>Import data</button>
           <input type="file" id="importFileInput" accept="application/json" style="display:none">
         </div>
       </div>
@@ -827,7 +807,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
         <h3 style="font-size:14.5px;color:var(--tomato-deep);margin-bottom:6px">Reset all data</h3>
         <p style="font-size:12.5px;color:var(--ink)">Permanently deletes every task, list, and tag from your account. This cannot be undone.</p>
         <button class="btn btn-danger" style="margin-top:14px;background:var(--surface);border:1px solid var(--tomato-soft-2)" id="btnResetAll">
-          <svg class="icon"><use href="#icon-trash"/></svg>Reset everything
+          <i data-lucide="trash-2" class="icon"></i>Reset everything
         </button>
       </div>
     </div>
@@ -839,7 +819,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 <div class="panel" id="taskPanel">
   <div class="panel-head">
     <span class="panel-head-title">Task</span>
-    <button class="modal-close" id="btnClosePanel"><svg class="icon"><use href="#icon-x"/></svg></button>
+    <button class="modal-close" id="btnClosePanel"><i data-lucide="x" class="icon"></i></button>
   </div>
   <div class="panel-body">
     <textarea class="panel-title-input" id="panelTitleInput" placeholder="Task title…" rows="1"></textarea>
@@ -908,8 +888,8 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
     </div>
   </div>
   <div class="panel-foot">
-    <button class="btn btn-danger" id="btnDeleteTask"><svg class="icon"><use href="#icon-trash"/></svg>Delete</button>
-    <button class="btn btn-primary" id="btnSaveTask"><svg class="icon"><use href="#icon-check"/></svg>Done</button>
+    <button class="btn btn-danger" id="btnDeleteTask"><i data-lucide="trash-2" class="icon"></i>Delete</button>
+    <button class="btn btn-primary" id="btnSaveTask"><i data-lucide="check" class="icon"></i>Done</button>
   </div>
 </div>
 
@@ -918,7 +898,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
   <div class="modal">
     <div class="modal-head">
       <span class="modal-title" id="listModalTitle">New list</span>
-      <button class="modal-close" data-close="modalList"><svg class="icon"><use href="#icon-x"/></svg></button>
+      <button class="modal-close" data-close="modalList"><i data-lucide="x" class="icon"></i></button>
     </div>
     <div class="modal-body">
       <div class="field">
@@ -942,7 +922,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
   <div class="modal" style="width:380px">
     <div class="modal-head">
       <span class="modal-title" id="confirmTitle">Are you sure?</span>
-      <button class="modal-close" data-close="modalConfirm"><svg class="icon"><use href="#icon-x"/></svg></button>
+      <button class="modal-close" data-close="modalConfirm"><i data-lucide="x" class="icon"></i></button>
     </div>
     <div class="modal-body">
       <div class="modal-danger-box">
@@ -1104,6 +1084,7 @@ function showToast(icon, title, desc, opts){
     });
   }
   wrap.appendChild(el);
+  refreshIcons(el);
   setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(), 200); }, opts.duration || 3200);
 }
 
@@ -1158,6 +1139,20 @@ window.Sprout = {
   registerActivity, showToast, parseQuickAdd
 };
 })();
+
+/* lucideIcon: generates a lucide icon element and re-runs createIcons on its parent.
+   Use instead of <svg class="icon"><use href="#icon-X"/> in dynamic innerHTML. */
+function lucideIcon(name, extraStyle){
+  return extraStyle
+    ? "<i data-lucide=\""+name+"\" class=\"icon\" style=\""+extraStyle+"\"></i>"
+    : "<i data-lucide=\""+name+"\" class=\"icon\"></i>";
+}
+function refreshIcons(el){
+  if(typeof lucide!=="undefined") lucide.createIcons({nodes:[el||document]});
+}
+window.lucideIcon = lucideIcon;
+window.refreshIcons = refreshIcons;
+
 /* ============================================================
    NAVIGATION, MODALS, THEME
    ============================================================ */
@@ -1334,7 +1329,7 @@ function renderTaskRow(task){
     if(S.isOverdue(task.dueDate)) cls += ' due-overdue';
     else if(S.isToday(task.dueDate)) cls += ' due-today';
     chip.className = cls;
-    chip.innerHTML = '<svg class="icon"><use href="#icon-calendar"/></svg>'+formatDueLabel(task.dueDate, task.dueTime);
+    chip.innerHTML = '<i data-lucide="calendar" class="icon"></i>'+formatDueLabel(task.dueDate, task.dueTime);
     metaRow.appendChild(chip);
   }
 
@@ -1351,7 +1346,7 @@ function renderTaskRow(task){
     if(subj){
       const chip = document.createElement('span');
       chip.className = 'task-chip';
-      chip.innerHTML = '<svg class="icon"><use href="#icon-link"/></svg>'+subj;
+      chip.innerHTML = '<i data-lucide="link" class="icon"></i>'+subj;
       metaRow.appendChild(chip);
     }
   }
@@ -1367,7 +1362,7 @@ function renderTaskRow(task){
   if(prog){
     const chip = document.createElement('span');
     chip.className = 'task-chip subtasks';
-    chip.innerHTML = '<svg class="icon"><use href="#icon-check"/></svg>'+prog.done+'/'+prog.total;
+    chip.innerHTML = '<i data-lucide="check" class="icon"></i>'+prog.done+'/'+prog.total;
     metaRow.appendChild(chip);
   }
 
@@ -1378,14 +1373,14 @@ function renderTaskRow(task){
   actions.className = 'task-actions';
   const editBtn = document.createElement('button');
   editBtn.className = 'task-action-btn';
-  editBtn.innerHTML = '<svg class="icon" style="width:14px;height:14px"><use href="#icon-edit"/></svg>';
+  editBtn.innerHTML = '<i data-lucide="pencil" class="icon" style="width:14px;height:14px"></i>';
   editBtn.title = 'Edit';
   editBtn.addEventListener('click', (e)=>{ e.stopPropagation(); window.SproutPanel.openForTask(task.id); });
   actions.appendChild(editBtn);
 
   const delBtn = document.createElement('button');
   delBtn.className = 'task-action-btn delete';
-  delBtn.innerHTML = '<svg class="icon" style="width:14px;height:14px"><use href="#icon-trash"/></svg>';
+  delBtn.innerHTML = '<i data-lucide="trash-2" class="icon" style="width:14px;height:14px"></i>';
   delBtn.title = 'Delete';
   delBtn.addEventListener('click', (e)=>{ e.stopPropagation(); deleteTaskWithUndo(task.id); });
   actions.appendChild(delBtn);
@@ -1414,12 +1409,13 @@ function renderTaskList(container, tasks, opts){
     return (a.createdAt||0)-(b.createdAt||0);
   });
   sorted.forEach(t=> container.appendChild(renderTaskRow(t)));
+refreshIcons(container);
 }
 
 function renderEmptyState(title, desc, icon){
   const el = document.createElement('div');
   el.className = 'empty-state';
-  el.innerHTML = `<svg class="icon"><use href="#${icon}"/></svg>
+  el.innerHTML = `<i data-lucide="${icon.replace('icon-','')}" class="icon"></i>
     <div class="empty-state-title">${title}</div>
     <div class="empty-state-desc">${desc}</div>`;
   return el;
@@ -1447,6 +1443,7 @@ function renderGroupedByDate(container, tasks){
     const sorted = groups[key].sort((a,b)=>(a.priority||4)-(b.priority||4));
     sorted.forEach(t=> container.appendChild(renderTaskRow(t)));
   });
+refreshIcons(container);
 }
 
 /* ---------- task mutations ---------- */
@@ -1569,7 +1566,7 @@ function renderTagPills(){
     pill.innerHTML = `<span>#${tag}</span>`;
     const rm = document.createElement('button');
     rm.type = 'button';
-    rm.innerHTML = '<svg class="icon" style="width:10px;height:10px"><use href="#icon-x"/></svg>';
+    rm.innerHTML = '<i data-lucide="x" class="icon" style="width:10px;height:10px"></i>';
     rm.addEventListener('click', ()=>{
       pendingTags = pendingTags.filter(t=>t!==tag);
       renderTagPills();
@@ -1599,7 +1596,7 @@ function renderSubtaskList(){
 
     const rm = document.createElement('button');
     rm.className = 'subtask-remove';
-    rm.innerHTML = '<svg class="icon" style="width:13px;height:13px"><use href="#icon-x"/></svg>';
+    rm.innerHTML = '<i data-lucide="x" class="icon" style="width:13px;height:13px"></i>';
     rm.addEventListener('click', ()=>{ pendingSubtasks.splice(idx,1); renderSubtaskList(); });
     row.appendChild(rm);
 
@@ -1642,7 +1639,7 @@ function openForTask(taskId){
   const created = new Date(task.createdAt);
   document.getElementById('panelCreatedAt').textContent = created.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) + ' at ' + created.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
 
-  document.getElementById('btnSaveTask').innerHTML = '<svg class="icon"><use href="#icon-check"/></svg>Save';
+  document.getElementById('btnSaveTask').innerHTML = '<i data-lucide="check" class="icon"></i>Save';
 
   window.SproutNav.openPanel();
 }
@@ -1668,7 +1665,7 @@ function openForNew(presetFields){
   renderSubtaskList();
 
   document.getElementById('panelCreatedAt').textContent = 'Not yet saved';
-  document.getElementById('btnSaveTask').innerHTML = '<svg class="icon"><use href="#icon-plus"/></svg>Create';
+  document.getElementById('btnSaveTask').innerHTML = '<i data-lucide="plus" class="icon"></i>Create';
 
   window.SproutNav.openPanel();
   setTimeout(()=>document.getElementById('panelTitleInput').focus(), 50);
@@ -2082,7 +2079,7 @@ function renderSubjectList(){
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)';
     row.innerHTML = `
-      <svg class="icon" style="width:14px;height:14px;color:var(--ink-faint)"><use href="#icon-book"/></svg>
+      <i data-lucide="book-open" class="icon" style="width:14px;height:14px;color:var(--ink-faint)"></i>
       <span style="flex:1;font-size:13px">${escapeHtml(subj.name)}</span>
     `;
     container.appendChild(row);
@@ -2274,7 +2271,7 @@ function init(){
 
   auth.onAuthStateChanged(user=>{
     if(!user){
-      location.href = 'https://bookscoffeedreams.github.io/login.html';
+      location.href = 'login.html';
       return;
     }
     currentUser = user;
@@ -2454,6 +2451,7 @@ window.SproutFirebase = { init, getCurrentUser: ()=>currentUser };
 init();
 })();
 
+if(typeof lucide !== "undefined") lucide.createIcons();
 </script>
 </body>
 </html>
