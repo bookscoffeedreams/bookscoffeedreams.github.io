@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Grove — A Focus Forest</title>
 <meta name="description" content="Plant a tree, stay focused, watch it grow. A focus forest for Books Coffee and Dreams — strict or relaxed mode, your own grove, and a shared Community Grove with everyone at BCD.">
-<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/forest.png" type="image/png">
+<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" type="image/png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<!-- Lucide Icons — premium, consistent icon set -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
 
 <style>
 /* ============================================================
@@ -130,7 +132,10 @@ a{color:inherit;text-decoration:none}
 ul,ol{list-style:none}
 h1,h2,h3,h4{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
 
-.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon{width:18px!important;height:18px!important;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* Lucide replaces <i data-lucide> with <svg class="icon"> — these ensure
+   our sizing wins over Lucide's inline width/height="24" attributes */
+i[data-lucide]{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .icon.filled{fill:currentColor;stroke:none}
 
 ::selection{background:var(--vine-soft-2)}
@@ -439,39 +444,16 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 </head>
 <body>
 
-<!-- ============ ICON SPRITE ============ -->
-<svg style="display:none">
-  <symbol id="icon-sprout" viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 12 4 11 4 4c7 0 8 6 8 8M12 12c0-2 1-8 8-8 0 7-8 8-8 8z"/></symbol>
-  <symbol id="icon-tree" viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9a3 3 0 1 1 6 0c1.5 0 3 1.5 3 3.5S16.5 16 15 16H9c-1.5 0-3-1.5-3-3.5S7.5 9 9 9z"/></symbol>
-  <symbol id="icon-grove" viewBox="0 0 24 24"><path d="M7 21v-5M7 16a2.5 2.5 0 1 1 5 0c1 0 2 1 2 2.3S13 21 12 21H7"/><path d="M16 21v-3M16 18a2 2 0 1 1 4 0c.8 0 1.6.8 1.6 1.8S20.8 21 20 21h-4"/><path d="M7 16V8a3 3 0 1 1 0-6 3 3 0 1 1 6 0c0 1.7-1.3 3-3 3"/></symbol>
-  <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
-  <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
-  <symbol id="icon-grid" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></symbol>
-  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
-  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
-  <symbol id="icon-flame" viewBox="0 0 24 24"><path d="M12 2s5 5 5 11a5 5 0 0 1-10 0c0-2 1-3 1-3s.5 2 2 2c-1-2-1-5 1-7 0 2 1 3 2 3 0-2-1-4-1-6z"/></symbol>
-  <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
-  <symbol id="icon-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13c0-7 9-12 17-12 0 8-5 17-12 17a4.5 4.5 0 0 1-4.5-4.5C4.5 9 9 7 12 7"/></symbol>
-  <symbol id="icon-skull" viewBox="0 0 24 24"><circle cx="9" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="11" r="1.4" fill="currentColor" stroke="none"/><path d="M12 2a8 8 0 0 0-8 8v5l2 2v2h3v-2h2v2h2v-2h3v-2l2-2v-5a8 8 0 0 0-8-8z"/></symbol>
-  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></symbol>
-  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></symbol>
-  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/><path d="M10 11v6M14 11v6"/></symbol>
-  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
-  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
-  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
-</svg>
-
 <div class="topbar-mobile">
-  <button class="menu-btn" id="menuBtn"><svg class="icon"><use href="#icon-grid"/></svg></button>
-  <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/forest.png" alt="" width="26" height="26">
+  <button class="menu-btn" id="menuBtn"><i data-lucide="menu" class="icon"></i></button>
+  <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="26" height="26">
   <div class="brand-name">Grove</div>
 </div>
 
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/forest.png" alt="" width="36" height="36">
+      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="36" height="36">
       <div>
         <div class="brand-name">Grove</div>
         <div class="brand-tag">A Focus Forest</div>
@@ -481,27 +463,27 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
     <nav class="nav">
       <div class="nav-section-label">Grow</div>
       <button class="nav-item active" data-view="plant">
-        <svg class="icon"><use href="#icon-sprout"/></svg><span>Plant</span>
+        <i data-lucide="sprout" class="icon"></i><span>Plant</span>
       </button>
       <button class="nav-item" data-view="mygrove">
-        <svg class="icon"><use href="#icon-tree"/></svg><span>My Grove</span>
+        <i data-lucide="tree-deciduous" class="icon"></i><span>My Grove</span>
         <span class="count" id="countMyTrees">0</span>
       </button>
       <button class="nav-item" data-view="community">
-        <svg class="icon"><use href="#icon-globe"/></svg><span>Community Grove</span>
+        <i data-lucide="globe" class="icon"></i><span>Community Grove</span>
       </button>
     </nav>
 
     <nav class="nav">
       <div class="nav-section-label">&nbsp;</div>
       <button class="nav-item" data-view="settings">
-        <svg class="icon"><use href="#icon-settings"/></svg><span>Settings</span>
+        <i data-lucide="settings" class="icon"></i><span>Settings</span>
       </button>
     </nav>
 
     <div class="sidebar-foot">
       <div class="streak-box">
-        <svg class="icon"><use href="#icon-flame"/></svg>
+        <i data-lucide="flame" class="icon"></i>
         <div class="streak-box-text">
           <span class="streak-num" id="sidebarStreak">0</span>
           <span class="streak-label">Day streak</span>
@@ -526,7 +508,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
           <p class="view-sub">Choose a duration, plant a seed, and stay with it. Leave a strict session and your tree withers.</p>
         </div>
         <div class="view-meta">
-          <span class="meta-chip" id="modeChip"><svg class="icon" style="width:13px;height:13px"><use href="#icon-shield"/></svg><span id="modeChipLabel">Strict mode</span></span>
+          <span class="meta-chip" id="modeChip"><i data-lucide="shield-check" class="icon" style="width:13px;height:13px"></i><span id="modeChipLabel">Strict mode</span></span>
         </div>
       </div>
 
@@ -552,32 +534,32 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
             </div>
           </div>
           <button class="plant-btn" id="btnPlant">
-            <svg class="icon"><use href="#icon-sprout"/></svg><span>Plant a seed</span>
+            <i data-lucide="sprout" class="icon"></i><span>Plant a seed</span>
           </button>
           <button class="plant-btn danger" id="btnGiveUp" style="display:none">
-            <svg class="icon"><use href="#icon-x"/></svg><span>Give up</span>
+            <i data-lucide="x" class="icon"></i><span>Give up</span>
           </button>
         </div>
       </div>
 
       <div class="stat-strip">
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-tree"/></svg>
+          <i data-lucide="tree-deciduous" class="icon"></i>
           <div class="stat-num" id="statTreesGrown">0</div>
           <div class="stat-label">Trees grown</div>
         </div>
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-skull"/></svg>
+          <i data-lucide="skull" class="icon"></i>
           <div class="stat-num" id="statTreesWithered">0</div>
           <div class="stat-label">Withered</div>
         </div>
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-clock"/></svg>
+          <i data-lucide="clock" class="icon"></i>
           <div class="stat-num" id="statFocusHours">0h</div>
           <div class="stat-label">Focus time</div>
         </div>
         <div class="stat-tile">
-          <svg class="icon"><use href="#icon-flame"/></svg>
+          <i data-lucide="flame" class="icon"></i>
           <div class="stat-num" id="statStreakPlant">0</div>
           <div class="stat-label">Day streak</div>
         </div>
@@ -612,9 +594,9 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
       <div class="community-canvas-wrap">
         <div class="community-canvas" id="communityCanvas"></div>
         <div class="community-stats-bar">
-          <div class="stat-inline"><svg class="icon" style="width:14px;height:14px"><use href="#icon-tree"/></svg><strong id="communityTotalTrees">0</strong> trees planted</div>
-          <div class="stat-inline"><svg class="icon" style="width:14px;height:14px"><use href="#icon-clock"/></svg><strong id="communityTotalHours">0h</strong> total focus</div>
-          <div class="stat-inline"><svg class="icon" style="width:14px;height:14px"><use href="#icon-sprout"/></svg>Yours <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--vine-bright);box-shadow:0 0 6px var(--vine-bright);margin-left:4px"></span></div>
+          <div class="stat-inline"><i data-lucide="tree-deciduous" class="icon" style="width:14px;height:14px"></i><strong id="communityTotalTrees">0</strong> trees planted</div>
+          <div class="stat-inline"><i data-lucide="clock" class="icon" style="width:14px;height:14px"></i><strong id="communityTotalHours">0h</strong> total focus</div>
+          <div class="stat-inline"><i data-lucide="sprout" class="icon" style="width:14px;height:14px"></i>Yours <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--vine-bright);box-shadow:0 0 6px var(--vine-bright);margin-left:4px"></span></div>
         </div>
       </div>
     </div>
@@ -629,7 +611,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-shield"/></svg>
+          <i data-lucide="shield-check" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
           <h3 style="font-size:14.5px">Focus mode</h3>
         </div>
         <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:16px">
@@ -645,7 +627,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-globe"/></svg>
+          <i data-lucide="globe" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
           <h3 style="font-size:14.5px">Community Grove</h3>
         </div>
         <div class="sound-row-head">
@@ -657,7 +639,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-sun"/></svg>
+          <i data-lucide="sun" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
           <h3 style="font-size:14.5px">Appearance</h3>
         </div>
         <div class="sound-row-head">
@@ -671,13 +653,13 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-          <svg class="icon" style="width:15px;height:15px;color:var(--vine)"><use href="#icon-download"/></svg>
+          <i data-lucide="download" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
           <h3 style="font-size:14.5px">Your data</h3>
         </div>
         <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">All data syncs to your Books Coffee and Dreams account.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-secondary" id="btnExportData"><svg class="icon"><use href="#icon-download"/></svg>Export data (.json)</button>
-          <button class="btn btn-secondary" id="btnImportData"><svg class="icon"><use href="#icon-upload"/></svg>Import data</button>
+          <button class="btn btn-secondary" id="btnExportData"><i data-lucide="download" class="icon"></i>Export data (.json)</button>
+          <button class="btn btn-secondary" id="btnImportData"><i data-lucide="upload" class="icon"></i>Import data</button>
           <input type="file" id="importFileInput" accept="application/json" style="display:none">
         </div>
       </div>
@@ -686,7 +668,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
         <h3 style="font-size:14.5px;color:var(--tomato-deep);margin-bottom:6px">Reset all data</h3>
         <p style="font-size:12.5px;color:var(--ink)">Permanently deletes your whole grove — every tree, grown or withered. This cannot be undone.</p>
         <button class="btn btn-danger" style="margin-top:14px;background:var(--surface);border:1px solid var(--tomato-soft-2)" id="btnResetAll">
-          <svg class="icon"><use href="#icon-trash"/></svg>Reset everything
+          <i data-lucide="trash-2" class="icon"></i>Reset everything
         </button>
       </div>
     </div>
@@ -698,7 +680,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
   <div class="modal">
     <div class="modal-head">
       <span class="modal-title">You left the tree</span>
-      <button class="modal-close" data-close="modalWither"><svg class="icon"><use href="#icon-x"/></svg></button>
+      <button class="modal-close" data-close="modalWither"><i data-lucide="x" class="icon"></i></button>
     </div>
     <div class="modal-body">
       <svg class="wither-modal-tree" id="witherModalSvg" viewBox="0 0 200 200"></svg>
@@ -717,7 +699,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
   <div class="modal">
     <div class="modal-head">
       <span class="modal-title">Fully grown</span>
-      <button class="modal-close" data-close="modalCelebrate"><svg class="icon"><use href="#icon-x"/></svg></button>
+      <button class="modal-close" data-close="modalCelebrate"><i data-lucide="x" class="icon"></i></button>
     </div>
     <div class="modal-body">
       <svg class="wither-modal-tree" id="celebrateModalSvg" viewBox="0 0 200 200" style="filter:none"></svg>
@@ -737,7 +719,7 @@ html[data-theme="dark"] .toast .icon{color:var(--vine)}
   <div class="modal" style="width:380px">
     <div class="modal-head">
       <span class="modal-title" id="confirmTitle">Are you sure?</span>
-      <button class="modal-close" data-close="modalConfirm"><svg class="icon"><use href="#icon-x"/></svg></button>
+      <button class="modal-close" data-close="modalConfirm"><i data-lucide="x" class="icon"></i></button>
     </div>
     <div class="modal-body">
       <div class="modal-danger-box">
@@ -860,8 +842,9 @@ function showToast(icon, title, desc, opts){
   if(!wrap) return;
   const el = document.createElement('div');
   el.className = 'toast';
-  el.innerHTML = `<svg class="icon"><use href="#${icon}"/></svg><span>${title}</span>`;
+  el.innerHTML = `<i data-lucide="${icon.replace('icon-','')}" class="icon"></i><span>${title}</span>`;
   wrap.appendChild(el);
+  refreshIcons(el);
   setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(), 200); }, opts.duration || 3200);
 }
 
@@ -874,6 +857,20 @@ window.Grove = {
   registerActivity, showToast
 };
 })();
+
+/* lucideIcon: generates a lucide icon element and re-runs createIcons on its parent.
+   Use instead of <svg class="icon"><use href="#icon-X"/> in dynamic innerHTML. */
+function lucideIcon(name, extraStyle){
+  return extraStyle
+    ? "<i data-lucide=\""+name+"\" class=\"icon\" style=\""+extraStyle+"\"></i>"
+    : "<i data-lucide=\""+name+"\" class=\"icon\"></i>";
+}
+function refreshIcons(el){
+  if(typeof lucide!=="undefined") lucide.createIcons({nodes:[el||document]});
+}
+window.lucideIcon = lucideIcon;
+window.refreshIcons = refreshIcons;
+
 /* ============================================================
    TREE RENDERER
    Generates an original SVG tree at one of 6 growth stages
@@ -1292,7 +1289,7 @@ function mygrove(){
   grid.innerHTML = '';
   if(!STATE.trees.length){
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-      <svg class="icon"><use href="#icon-tree"/></svg>
+      <i data-lucide="tree-deciduous" class="icon"></i>
       <div class="empty-state-title">Your grove is empty</div>
       <div class="empty-state-desc">Plant your first seed to begin.</div>
     </div>`;
@@ -1322,6 +1319,7 @@ function mygrove(){
     tile.appendChild(dur);
     grid.appendChild(tile);
   });
+  refreshIcons(grid);
 }
 
 function community(){
@@ -1341,12 +1339,13 @@ function settings(){
 function updateModeChip(){
   const label = document.getElementById('modeChipLabel');
   const chip = document.getElementById('modeChip');
+  const iconEl = chip ? chip.querySelector('i[data-lucide]') : null;
   if(STATE.settings.strictMode){
     label.textContent = 'Strict mode';
-    chip.querySelector('svg use').setAttribute('href','#icon-shield');
+    if(iconEl){ iconEl.setAttribute('data-lucide','shield-check'); refreshIcons(chip); }
   }else{
     label.textContent = 'Relaxed mode';
-    chip.querySelector('svg use').setAttribute('href','#icon-leaf');
+    if(iconEl){ iconEl.setAttribute('data-lucide','leaf'); refreshIcons(chip); }
   }
 }
 
@@ -1472,7 +1471,7 @@ function render(){
 
   if(!display.length){
     canvas.innerHTML = `<div class="empty-state" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <svg class="icon"><use href="#icon-globe"/></svg>
+      <i data-lucide="globe" class="icon"></i>
       <div class="empty-state-title">The grove is waiting</div>
       <div class="empty-state-desc">Be the first to plant a tree here today.</div>
     </div>`;
@@ -1593,7 +1592,7 @@ function init(){
 
   auth.onAuthStateChanged(user=>{
     if(!user){
-      location.href = 'https://bookscoffeedreams.github.io/login.html';
+      location.href = 'login.html';
       return;
     }
     currentUser = user;
@@ -1764,6 +1763,8 @@ window.GroveFirebase = { init, getCurrentUser: ()=>currentUser };
 init();
 })();
 
+// Initialize Lucide icons after all DOM and app modules have loaded
+if(typeof lucide !== 'undefined') lucide.createIcons();
 </script>
 </body>
 </html>
