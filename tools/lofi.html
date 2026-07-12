@@ -106,6 +106,18 @@ a{color:inherit;text-decoration:none}
 .scene-btn.active{color:var(--amber3);border-color:var(--bdr3);background:rgba(217,119,6,.1)}
 .scene-btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
 
+/* ---------- room pulse (live presence) ---------- */
+.room-pulse{position:relative;z-index:5;display:flex;align-items:center;justify-content:center;gap:11px;padding:0 20px;margin-bottom:22px;flex-wrap:wrap}
+.rp-avatars{display:flex;align-items:center}
+.rp-avatars img,.rp-avatars .rp-initial{width:26px;height:26px;border-radius:50%;object-fit:cover;background:var(--sur3);border:2px solid var(--bg);margin-left:-8px;box-shadow:0 0 0 1px var(--bdr2);position:relative}
+.rp-avatars img:first-child,.rp-avatars .rp-initial:first-child{margin-left:0}
+.rp-avatars .rp-initial{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--amber3);background:var(--sur3)}
+.rp-avatars .rp-more{width:26px;height:26px;border-radius:50%;background:var(--sur3);border:2px solid var(--bg);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--tx4)}
+.rp-text{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--tx3);display:flex;align-items:center;gap:8px}
+.rp-dot{opacity:.4}
+.rp-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--green);animation:rp-pulse 2s ease-in-out infinite}
+@keyframes rp-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
 /* ---------- main / desk card ---------- */
 .nook{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;padding:0 20px 60px;min-height:calc(100vh - 140px);justify-content:center}
 .desk-card{width:100%;max-width:460px;background:var(--glass);backdrop-filter:blur(22px) saturate(1.1);border:1px solid var(--glass-bdr);border-radius:28px;padding:34px 30px 28px;box-shadow:var(--sh2);text-align:center;position:relative}
@@ -269,6 +281,15 @@ a{color:inherit;text-decoration:none}
 
 <main class="nook">
   <div class="scene-picker" id="scenePicker"></div>
+
+  <div class="room-pulse" id="roomPulse">
+    <div class="rp-avatars" id="rpAvatars"></div>
+    <div class="rp-text">
+      <span id="rpCount">The room is quiet right now</span>
+      <span class="rp-dot">·</span>
+      <span id="rpMinutes">0 minutes focused today</span>
+    </div>
+  </div>
 
   <section class="desk-card" id="deskCard">
     <div class="mode-tabs" id="modeTabs">
@@ -684,6 +705,7 @@ function startTimer(){
   playIcon = document.getElementById('playIcon');
   clockDisplay.classList.add('breathing');
   updateClockText();
+  if(timer.mode === 'focus') startPresence();
 }
 function pauseTimer(){
   timer.running = false;
@@ -692,6 +714,7 @@ function pauseTimer(){
   playIcon = document.getElementById('playIcon');
   clockDisplay.classList.remove('breathing');
   updateClockText();
+  stopPresence();
 }
 startPauseBtn.addEventListener('click', function(){ timer.running ? pauseTimer() : startTimer(); });
 document.getElementById('resetBtn').addEventListener('click', function(){ pauseTimer(); resetClockDisplay(); });
@@ -806,6 +829,7 @@ function recordFocusSession(minutes){
   renderStats();
   queueCloudSync();
   mirrorSessionToDiscord('pomodoroFocusMs', minutes*60*1000, true);
+  bumpCommunityPulse(minutes);
 
   var streak = computeStreak() + (wasFirstToday ? 1 : 0);
   if(wasFirstToday){
@@ -1051,6 +1075,112 @@ function mirrorSessionToDiscord(kind, elapsedMs, isComplete){
 }
 
 /* ============================================================
+   THE ROOM IS ALIVE — live presence bubbles + community pulse
+   Two small, public, real-time Firestore reads that make the room
+   feel shared: who's focusing right now, and how many minutes the
+   whole community has focused today. Both degrade gracefully to
+   "the room is quiet" if Firestore isn't reachable.
+   ============================================================ */
+var presencePingTimer = null;
+var presenceActive = false;
+
+function startPresence(){
+  if(!fbUser || !fbDb || presenceActive) return;
+  presenceActive = true;
+  writePresence();
+  presencePingTimer = setInterval(writePresence, 25000);
+}
+function writePresence(){
+  if(!fbUser || !fbDb) return;
+  fbDb.collection('focusPresence').doc(fbUser.uid).set({
+    username: (discordUser && discordUser.username) || fbUser.displayName || 'A reader',
+    avatar: (discordUser && discordUser.avatar) || fbUser.photoURL || null,
+    scene: currentScene,
+    lastPing: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+function stopPresence(){
+  if(!presenceActive) return;
+  presenceActive = false;
+  clearInterval(presencePingTimer);
+  if(fbUser && fbDb){
+    fbDb.collection('focusPresence').doc(fbUser.uid).delete().catch(function(){});
+  }
+}
+window.addEventListener('beforeunload', stopPresence);
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden) stopPresence();
+});
+
+var STALE_MS = 2 * 60 * 1000; // ignore presence pings older than 2 minutes
+
+function listenPresence(){
+  if(!fbDb) return;
+  fbDb.collection('focusPresence').orderBy('lastPing', 'desc').limit(24)
+    .onSnapshot(function(snap){
+      var now = Date.now();
+      var people = [];
+      snap.forEach(function(doc){
+        var d = doc.data();
+        var pingMs = d.lastPing && d.lastPing.toMillis ? d.lastPing.toMillis() : 0;
+        if(now - pingMs < STALE_MS) people.push(d);
+      });
+      renderRoomPulsePeople(people);
+    }, function(){ /* rules not published yet, or offline — stays at default text */ });
+}
+
+function renderRoomPulsePeople(people){
+  var avatarsEl = document.getElementById('rpAvatars');
+  var countEl = document.getElementById('rpCount');
+  avatarsEl.innerHTML = '';
+  var shown = people.slice(0, 5);
+  shown.forEach(function(p){
+    if(p.avatar){
+      var img = document.createElement('img');
+      img.src = p.avatar;
+      img.alt = '';
+      img.onerror = function(){ this.style.visibility = 'hidden'; };
+      avatarsEl.appendChild(img);
+    }else{
+      var el = document.createElement('div');
+      el.className = 'rp-initial';
+      el.textContent = (p.username || '?').charAt(0).toUpperCase();
+      avatarsEl.appendChild(el);
+    }
+  });
+  if(people.length > shown.length){
+    var more = document.createElement('div');
+    more.className = 'rp-more';
+    more.textContent = '+' + (people.length - shown.length);
+    avatarsEl.appendChild(more);
+  }
+  if(people.length === 0){
+    countEl.textContent = 'The room is quiet right now';
+  }else if(people.length === 1){
+    countEl.innerHTML = '<span class="rp-live-dot"></span>1 person focusing right now';
+  }else{
+    countEl.innerHTML = '<span class="rp-live-dot"></span>' + people.length + ' people focusing right now';
+  }
+}
+
+function listenCommunityPulse(){
+  if(!fbDb) return;
+  fbDb.collection('communityStats').doc(todayKey()).onSnapshot(function(doc){
+    var minutesEl = document.getElementById('rpMinutes');
+    var data = doc.exists ? doc.data() : { totalMinutes: 0 };
+    minutesEl.textContent = (data.totalMinutes || 0).toLocaleString() + ' minutes focused today';
+  }, function(){ /* rules not published yet, or offline */ });
+}
+
+function bumpCommunityPulse(minutes){
+  if(!fbUser || !fbDb) return;
+  fbDb.collection('communityStats').doc(todayKey()).set({
+    totalMinutes: firebase.firestore.FieldValue.increment(minutes),
+    totalSessions: firebase.firestore.FieldValue.increment(1)
+  }, { merge:true }).catch(function(){});
+}
+
+/* ============================================================
    OPTIONAL FIREBASE SYNC
    Signed-in users get their tasks/stats/settings mirrored to
    Firestore under users/{uid}/tools/nook. Nothing here blocks
@@ -1072,6 +1202,8 @@ function initFirebase(){
     if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     var auth = firebase.auth();
     fbDb = firebase.firestore();
+    listenPresence();
+    listenCommunityPulse();
     auth.onAuthStateChanged(function(user){
       fbUser = user;
       renderAccountPill();
