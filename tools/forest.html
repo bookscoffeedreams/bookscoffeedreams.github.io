@@ -9,7 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&amp;family=IBM+Plex+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet">
 
 <!-- Firebase (Books Coffee and Dreams — bcd-discord project) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
@@ -21,90 +21,92 @@
 <style>
 /* ============================================================
    GROVE — A Focus Forest for Books Coffee and Dreams
-   Design tokens shared exactly with Ripen and Sprout for visual
-   continuity across BCD's productivity suite. Grove leans
-   hardest into vine-green as its primary color (growth is the
-   whole point), with tomato reserved strictly for the
-   withering/distracted state — color itself tells the story.
+   Rebranded onto the same tokens as the rest of the site and
+   The Nook — amber/coffee palette, Instrument Serif for hero
+   moments, DM Sans everywhere else, IBM Plex Mono for labels.
+   Every variable keeps its original NAME — vine still means
+   growth/success, tomato still means withering/distracted —
+   only the hues moved to sit in the amber family.
    ============================================================ */
 :root{
-  --paper:#fbfaf8;
+  --paper:#faf7f2;
   --surface:#ffffff;
-  --surface-2:#f5f3ee;
-  --ink:#1c1b19;
-  --ink-soft:#6f6b63;
-  --ink-faint:#aca791;
-  --line:#e7e2d8;
-  --line-strong:#d8d1c2;
+  --surface-2:#f4efe6;
+  --ink:#1c1410;
+  --ink-soft:#7a6248;
+  --ink-faint:#b09880;
+  --line:rgba(120,83,32,.14);
+  --line-strong:rgba(120,83,32,.28);
 
-  --tomato:#e0452e;
-  --tomato-deep:#b6341f;
-  --tomato-soft:#fce6df;
-  --tomato-soft-2:#f6cabb;
+  --tomato:#c2410c;
+  --tomato-deep:#9a3412;
+  --tomato-soft:#fde4d0;
+  --tomato-soft-2:#fbceac;
 
-  --vine:#52805a;
-  --vine-deep:#3a5e42;
-  --vine-bright:#6fa377;
-  --vine-soft:#e3ebe2;
-  --vine-soft-2:#c9dcc8;
+  --vine:#6b8e6f;
+  --vine-deep:#4a6b4f;
+  --vine-bright:#7fa383;
+  --vine-soft:#e8efe6;
+  --vine-soft-2:#d2e3d3;
 
-  --amber:#cf9a3a;
-  --amber-deep:#8a5d12;
-  --amber-soft:#f7ecd6;
+  --amber:#d97706;
+  --amber-deep:#92400e;
+  --amber-soft:#fef3c7;
 
-  --bark:#8a6f4f;
-  --bark-deep:#5c4a35;
-  --sky-day:#dceae0;
-  --sky-dusk:#f3ddc8;
-  --sky-night:#1b2a23;
+  --bark:#8a6a48;
+  --bark-deep:#5c4530;
+  --sky-day:#fdf1d8;
+  --sky-dusk:#f7dcb0;
+  --sky-night:#1a140c;
 
-  --shadow-sm:0 1px 2px rgba(28,27,25,.05);
-  --shadow:0 1px 2px rgba(28,27,25,.04),0 10px 26px -12px rgba(28,27,25,.14);
-  --shadow-lg:0 6px 20px rgba(28,27,25,.07),0 28px 64px -22px rgba(28,27,25,.20);
+  --shadow-sm:0 1px 2px rgba(120,83,32,.08);
+  --shadow:0 1px 2px rgba(120,83,32,.06),0 10px 26px -12px rgba(60,40,15,.16);
+  --shadow-lg:0 6px 20px rgba(60,40,15,.10),0 28px 64px -22px rgba(40,25,10,.22);
 
   --radius:14px;--radius-sm:9px;--radius-lg:22px;--radius-pill:999px;
 
-  --display:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
-  --body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,'SF Mono','Cascadia Code','Roboto Mono',Consolas,monospace;
+  --serif:'Instrument Serif',serif;
+  --display:'DM Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'DM Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono','Cascadia Code','Roboto Mono',Consolas,monospace;
 
   --sidebar-w:236px;
 }
 
 html[data-theme="dark"]{
-  --paper:#13160f;
-  --surface:#1b1f16;
-  --surface-2:#242a1d;
-  --ink:#eef1e8;
-  --ink-soft:#a3ab97;
-  --ink-faint:#646e57;
-  --line:#2e3526;
-  --line-strong:#3d4632;
+  --paper:#100f0e;
+  --surface:#1a1917;
+  --surface-2:#222018;
+  --ink:#f5f0e8;
+  --ink-soft:#b8aa98;
+  --ink-faint:#7a6e60;
+  --line:rgba(217,119,6,.16);
+  --line-strong:rgba(217,119,6,.3);
 
-  --tomato:#ec5a40;
-  --tomato-deep:#ff8567;
-  --tomato-soft:#332420;
-  --tomato-soft-2:#46302a;
+  --tomato:#e35d2f;
+  --tomato-deep:#f4844f;
+  --tomato-soft:#2e1c12;
+  --tomato-soft-2:#42281a;
 
-  --vine:#6fa377;
-  --vine-deep:#9bcaa2;
-  --vine-bright:#86c08e;
-  --vine-soft:#1f2c20;
-  --vine-soft-2:#2b3e2c;
+  --vine:#7fa383;
+  --vine-deep:#9ec2a3;
+  --vine-bright:#9ec2a3;
+  --vine-soft:#1c2620;
+  --vine-soft-2:#28382c;
 
-  --amber:#e0ad55;
-  --amber-deep:#f0c878;
-  --amber-soft:#2e2818;
+  --amber:#f59e0b;
+  --amber-deep:#fbbf24;
+  --amber-soft:#2c2410;
 
-  --bark:#a3855f;
-  --bark-deep:#6b5640;
-  --sky-day:#1c2b20;
-  --sky-dusk:#2a261c;
-  --sky-night:#0c1410;
+  --bark:#a8895f;
+  --bark-deep:#6b5238;
+  --sky-day:#241c10;
+  --sky-dusk:#2e2010;
+  --sky-night:#0a0806;
 
-  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 26px -12px rgba(0,0,0,.6);
-  --shadow-lg:0 6px 20px rgba(0,0,0,.4),0 28px 64px -22px rgba(0,0,0,.7);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -12px rgba(0,0,0,.7);
+  --shadow-lg:0 6px 20px rgba(0,0,0,.5),0 28px 64px -22px rgba(0,0,0,.8);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -158,7 +160,7 @@ i[data-lucide]{display:inline-flex;align-items:center;justify-content:center;fle
 }
 .brand{display:flex;align-items:center;gap:11px;padding:22px 18px 18px}
 .brand-mark{width:36px;height:36px;flex-shrink:0;object-fit:contain;border-radius:8px}
-.brand-name{font-family:var(--display);font-size:17px;font-weight:700;line-height:1.1}
+.brand-name{font-family:var(--serif);font-style:italic;font-size:19px;font-weight:400;line-height:1.1}
 .brand-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase;margin-top:1px}
 
 .nav{flex:0 0 auto;padding:6px 12px;display:flex;flex-direction:column;gap:1px}
@@ -204,7 +206,7 @@ i[data-lucide]{display:inline-flex;align-items:center;justify-content:center;fle
 
 .view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap;padding-right:148px}
 @media (max-width:760px){.view-head{padding-right:0}}
-.view-title{font-size:29px;line-height:1.15}
+.view-title{font-family:var(--serif);font-style:italic;font-weight:400;font-size:34px;line-height:1.1}
 .view-sub{color:var(--ink-soft);font-size:13px;margin-top:6px;max-width:540px}
 .view-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .meta-chip{
@@ -254,7 +256,7 @@ i[data-lucide]{display:inline-flex;align-items:center;justify-content:center;fle
 .plant-card[data-daytime="dusk"]{background:linear-gradient(180deg, var(--sky-dusk) 0%, var(--surface) 78%)}
 .plant-card[data-daytime="night"]{background:linear-gradient(180deg, var(--sky-night) 0%, var(--surface) 78%)}
 .plant-card[data-daytime="night"] .view-title,
-.plant-card[data-daytime="night"] .plant-state-label{color:#eef1e8}
+.plant-card[data-daytime="night"] .plant-state-label{color:#f5f0e8}
 
 .plant-ground{
   position:absolute;left:0;right:0;bottom:0;height:120px;
@@ -341,7 +343,7 @@ i[data-lucide]{display:inline-flex;align-items:center;justify-content:center;fle
   white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;transform:translate(-50%,-110%);font-family:var(--mono);
   z-index:20;
 }
-html[data-theme="dark"] .community-tree-tooltip{background:#eef1e8;color:#13160f}
+html[data-theme="dark"] .community-tree-tooltip{background:#f5f0e8;color:#100f0e}
 .community-tree:hover .community-tree-tooltip{opacity:1}
 
 .community-stats-bar{
@@ -376,11 +378,11 @@ html[data-theme="dark"] .input,html[data-theme="dark"] .select,html[data-theme="
 .input:focus,.select:focus,.textarea:focus{border-color:var(--vine);box-shadow:0 0 0 3px var(--vine-soft)}
 .select{
   appearance:none;cursor:pointer;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236f6b63' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a6248' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 13px center;padding-right:32px;
 }
 html[data-theme="dark"] .select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a3ab97' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b8aa98' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 .switch{width:38px;height:22px;border-radius:var(--radius-pill);background:var(--line-strong);position:relative;transition:background .15s;flex-shrink:0}
@@ -400,7 +402,7 @@ html[data-theme="dark"] .select{
 
 .empty-state{padding:60px 20px;text-align:center}
 .empty-state .icon{width:38px;height:38px;color:var(--line-strong);margin:0 auto 14px}
-.empty-state-title{font-family:var(--display);font-weight:700;font-size:15px;margin-bottom:5px}
+.empty-state-title{font-family:var(--serif);font-style:italic;font-weight:400;font-size:20px;margin-bottom:6px}
 .empty-state-desc{font-size:12.5px;color:var(--ink-soft);max-width:280px;margin:0 auto}
 
 .species-badge{
@@ -431,12 +433,12 @@ html[data-theme="dark"] .select{
   font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);
   animation:toastIn .2s ease;
 }
-html[data-theme="dark"] .toast{background:#eef1e8;color:#13160f}
+html[data-theme="dark"] .toast{background:#f5f0e8;color:#100f0e}
 .toast .icon{width:15px;height:15px;color:var(--vine-deep)}
 .toast-undo{font-weight:700;color:var(--amber-deep);margin-left:4px}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-html[data-theme="dark"] .switch::after{background:#13160f}
+html[data-theme="dark"] .switch::after{background:#100f0e}
 html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:var(--line-strong)}
 html[data-theme="dark"] .toast .icon{color:var(--vine)}
 
@@ -889,9 +891,9 @@ function colorsFor(hue, withered, theme){
     return { trunk:'#8a7a5f', canopy:'#b6a888', canopyDeep:'#9c8e70', accent:'#c2b596' };
   }
   if(hue==='amber'){
-    return { trunk:'#8a6f4f', canopy:'#cf9a3a', canopyDeep:'#8a5d12', accent:'#f0c878' };
+    return { trunk:'#8a6a48', canopy:'#d97706', canopyDeep:'#92400e', accent:'#fbbf24' };
   }
-  return { trunk:'#8a6f4f', canopy:'#52805a', canopyDeep:'#3a5e42', accent:'#6fa377' };
+  return { trunk:'#8a6a48', canopy:'#6b8e6f', canopyDeep:'#4a6b4f', accent:'#7fa383' };
 }
 
 function stageSeed(c){
@@ -1765,6 +1767,62 @@ init();
 
 // Initialize Lucide icons after all DOM and app modules have loaded
 if(typeof lucide !== 'undefined') lucide.createIcons();
+</script>
+
+<!-- ============================================================
+     DISCORD BRIDGE — mirrors grown-tree count into the linked
+     Discord user's profile (users/{discordId}.treesPlanted).
+     NOTE: unlike the todo/focus bridges, your bot doesn't
+     currently read or display this field anywhere (no /profile
+     line, no badge) — there was no existing Grove/forest concept
+     on the Discord side to connect to, so this just writes the
+     data and holds it ready. Say the word if you want a matching
+     badge, !profile line, or leaderboard for it — same pattern
+     as everything else, just needs the bot-side piece added.
+     ============================================================ -->
+<script>
+(function(){
+  var G = window.Grove;
+  if(!G) return;
+  var STATE = G.STATE;
+  var saveState = G.saveState;
+
+  var lastGrownCount = STATE.trees.filter(function(t){ return t.status==='grown'; }).length;
+
+  var fbUser = null, fbDb = null, linkedDiscordId = null;
+
+  function waitForFirebase(){
+    if(!window.firebase || !firebase.apps || !firebase.apps.length){
+      setTimeout(waitForFirebase, 400);
+      return;
+    }
+    fbDb = firebase.firestore();
+    firebase.auth().onAuthStateChanged(function(user){
+      fbUser = user;
+      linkedDiscordId = null;
+      if(user){
+        fbDb.collection('users').doc(user.uid).get().then(function(doc){
+          linkedDiscordId = (doc.exists && doc.data().linkedDiscordId) || null;
+        }).catch(function(){});
+      }
+    });
+  }
+  waitForFirebase();
+
+  function mirrorTree(amount){
+    if(!fbUser || !fbDb || !linkedDiscordId || amount <= 0) return;
+    fbDb.collection('users').doc(linkedDiscordId).set({
+      treesPlanted: firebase.firestore.FieldValue.increment(amount),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge:true }).catch(function(){});
+  }
+
+  saveState.postHooks.push(function(){
+    var grownNow = STATE.trees.filter(function(t){ return t.status==='grown'; }).length;
+    if(grownNow > lastGrownCount) mirrorTree(grownNow - lastGrownCount);
+    lastGrownCount = grownNow;
+  });
+})();
 </script>
 </body>
 </html>
