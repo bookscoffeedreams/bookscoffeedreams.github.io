@@ -1485,5 +1485,20 @@ if(typeof lucide !== 'undefined') lucide.createIcons();
 
 })();
 </script>
+   <!-- Put this inside your <head> tag -->
+<script src="https://jsdelivr.net"></script>
+<script>
+  // 1. Get your Application ID from the Discord Developer Portal
+  // 2. Replace the numbers below with your actual Application ID
+  const discordSdk = new Discord.DiscordSDK("1038320013557375056");
+
+  async function setupDiscord() {
+    await discordSdk.ready();
+    console.log("Discord is ready!");
+  }
+
+  setupDiscord();
+</script>
+
 </body>
 </html>
