@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 
 <!-- Firebase (Books Coffee and Dreams — bcd-discord project). Optional: the Nook works fully without it. -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
@@ -1485,20 +1485,5 @@ if(typeof lucide !== 'undefined') lucide.createIcons();
 
 })();
 </script>
-   <!-- Put this inside your <head> tag -->
-<script src="https://jsdelivr.net"></script>
-<script>
-  // 1. Get your Application ID from the Discord Developer Portal
-  // 2. Replace the numbers below with your actual Application ID
-  const discordSdk = new Discord.DiscordSDK("1038320013557375056");
-
-  async function setupDiscord() {
-    await discordSdk.ready();
-    console.log("Discord is ready!");
-  }
-
-  setupDiscord();
-</script>
-
 </body>
 </html>
