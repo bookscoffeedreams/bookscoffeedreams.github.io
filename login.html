@@ -12,6 +12,7 @@
 :root{
   --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
   --red:#dc2626;--green:#16a34a;
+  --discord:#5865f2;--discord2:#7289da;
   --serif:'Instrument Serif',serif;
   --sans:'DM Sans',sans-serif;
   --mono:'IBM Plex Mono',monospace;
@@ -34,167 +35,127 @@
   --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 20px 60px rgba(120,83,32,.14);
   --scr:rgba(217,119,6,.2);
 }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{
-  font-family:var(--sans);background:var(--bg);color:var(--tx);
-  min-height:100vh;display:flex;flex-direction:column;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden;
-  transition:background .35s,color .35s;
-}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .35s,color .35s;}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
 a{text-decoration:none;color:inherit}
 button{cursor:pointer;border:none;background:none;font-family:var(--sans)}
 input{font-family:var(--sans)}
-
-/* Grid texture */
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
   background-size:60px 60px}
-
-/* Ambient glow */
-.glow-1{position:fixed;top:-15%;right:-10%;width:55vw;height:55vh;border-radius:50%;
-  background:radial-gradient(circle,rgba(217,119,6,.12),transparent 65%);
-  pointer-events:none;z-index:0;animation:g1 18s ease-in-out infinite alternate}
-.glow-2{position:fixed;bottom:-15%;left:-10%;width:45vw;height:45vh;border-radius:50%;
-  background:radial-gradient(circle,rgba(217,119,6,.07),transparent 65%);
-  pointer-events:none;z-index:0;animation:g1 24s ease-in-out infinite alternate-reverse}
+.glow-1{position:fixed;top:-15%;right:-10%;width:55vw;height:55vh;border-radius:50%;background:radial-gradient(circle,rgba(217,119,6,.12),transparent 65%);pointer-events:none;z-index:0;animation:g1 18s ease-in-out infinite alternate}
+.glow-2{position:fixed;bottom:-15%;left:-10%;width:45vw;height:45vh;border-radius:50%;background:radial-gradient(circle,rgba(217,119,6,.07),transparent 65%);pointer-events:none;z-index:0;animation:g1 24s ease-in-out infinite alternate-reverse}
 @keyframes g1{0%{transform:translate(0,0)}100%{transform:translate(5vw,5vh)}}
-@keyframes hero-line{0%{background-position:0%}100%{background-position:200%}}
-@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
 @keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
 
-/* ── LAYOUT ── */
-.layout{
-  position:relative;z-index:2;
-  flex:1;display:grid;grid-template-columns:1fr 1fr;
-  min-height:100vh;
-}
+.layout{position:relative;z-index:2;flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
 
-/* ── LEFT PANEL ── */
-.left-panel{
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:40px 48px;
-  background:var(--bg2);border-right:1px solid var(--bdr);
-  position:relative;overflow:hidden;
-}
-/* Decorative watermark */
-.left-panel::after{
-  content:'"';position:absolute;bottom:-60px;right:-20px;
-  font-family:var(--serif);font-size:320px;font-style:italic;
-  color:rgba(217,119,6,.05);line-height:1;pointer-events:none;
-  user-select:none;
-}
-
-.left-top{}
+/* LEFT PANEL — unchanged from original */
+.left-panel{display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;background:var(--bg2);border-right:1px solid var(--bdr);position:relative;overflow:hidden;}
+.left-panel::after{content:'"';position:absolute;bottom:-60px;right:-20px;font-family:var(--serif);font-size:320px;font-style:italic;color:rgba(217,119,6,.05);line-height:1;pointer-events:none;user-select:none;}
 .left-logo{display:flex;align-items:center;gap:12px;margin-bottom:60px}
-.logo-gem{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);
-  display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite}
+.logo-gem{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite}
 .logo-gem svg{width:18px;height:18px}
 .logo-name{font-family:var(--serif);font-size:18px;color:var(--tx)}
 .logo-name em{color:var(--amber);font-style:italic}
-
-.left-headline{
-  font-family:var(--serif);
-  font-size:clamp(36px,4vw,56px);
-  font-weight:400;line-height:1.05;
-  letter-spacing:-.03em;color:var(--tx);
-  margin-bottom:20px;
-}
+.left-headline{font-family:var(--serif);font-size:clamp(36px,4vw,56px);font-weight:400;line-height:1.05;letter-spacing:-.03em;color:var(--tx);margin-bottom:20px;}
 .left-headline em{color:var(--amber);font-style:italic;display:block}
 .left-sub{font-size:15px;color:var(--tx3);line-height:1.75;max-width:360px;margin-bottom:40px}
-
-/* Testimonial */
-.testimonial{
-  background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:20px 22px;
-  position:relative;overflow:hidden;
-}
-.testimonial::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent);
-  position:absolute;top:0;left:0;right:0}
+.testimonial{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;}
+.testimonial::before{content:'';display:block;height:2px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,transparent);position:absolute;top:0;left:0;right:0}
 .t-quote{font-family:var(--serif);font-size:32px;color:rgba(217,119,6,.3);line-height:.8;margin-bottom:6px}
 .t-text{font-family:var(--serif);font-size:15px;font-style:italic;line-height:1.7;color:var(--tx2);margin-bottom:14px}
 .t-author{display:flex;align-items:center;gap:10px}
-.t-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#92400e,#d97706);
-  display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px;color:#fff;flex-shrink:0}
+.t-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px;color:#fff;flex-shrink:0}
 .t-name{font-size:13px;font-weight:600;color:var(--tx2)}
 .t-role{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:1px}
-
-/* Stats row */
 .stats-row{display:flex;gap:32px;margin-bottom:40px}
 .stat-n{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--amber2);letter-spacing:-.03em;line-height:1}
 .stat-l{font-family:var(--mono);font-size:10px;color:var(--tx4);text-transform:uppercase;letter-spacing:.14em;margin-top:3px}
 
-/* ── RIGHT PANEL ── */
-.right-panel{
-  display:flex;align-items:center;justify-content:center;
-  padding:40px 48px;position:relative;
-}
-
-/* Mode toggle top-right */
-.theme-btn{
-  position:fixed;top:24px;right:28px;z-index:100;
-  display:flex;align-items:center;gap:7px;padding:7px 16px;
-  border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);
-  color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s;
-}
+/* RIGHT PANEL */
+.right-panel{display:flex;align-items:center;justify-content:center;padding:40px 48px;position:relative;}
+.theme-btn{position:fixed;top:24px;right:28px;z-index:100;display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-family:var(--mono);transition:all .2s;}
 .theme-btn:hover{border-color:var(--bdr2);color:var(--amber)}
 .theme-btn svg{width:13px;height:13px}
 .t-sun,.t-moon{transition:all .3s var(--spring)}
 [data-mode="dark"] .t-sun{display:none}[data-mode="dark"] .t-moon{display:block}
 [data-mode="light"] .t-sun{display:block}[data-mode="light"] .t-moon{display:none}
 
-/* Form */
 .form-wrap{width:100%;max-width:400px;animation:fade-up .6s var(--spring) .1s both}
-
 .form-heading{font-family:var(--serif);font-size:30px;font-weight:400;letter-spacing:-.02em;color:var(--tx);margin-bottom:6px}
 .form-heading em{font-style:italic;color:var(--amber)}
-.form-sub{font-size:14px;color:var(--tx3);margin-bottom:32px;line-height:1.6}
+.form-sub{font-size:14px;color:var(--tx3);margin-bottom:28px;line-height:1.6}
 
 /* Tabs */
-.auth-tabs{display:flex;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:4px;gap:3px;margin-bottom:28px}
+.auth-tabs{display:flex;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:4px;gap:3px;margin-bottom:22px}
 .auth-tab{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:600;color:var(--tx4);transition:all .2s;text-align:center}
 .auth-tab.active{background:var(--sur);color:var(--tx);box-shadow:var(--sh)}
+
+/* DISCORD BUTTON */
+.btn-discord{
+  width:100%;padding:12px 16px;border-radius:11px;
+  background:linear-gradient(135deg,rgba(88,101,242,.18),rgba(88,101,242,.08));
+  border:1px solid rgba(88,101,242,.38);
+  color:#7289da;font-size:14px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .22s;margin-bottom:10px;position:relative;overflow:hidden;
+}
+.btn-discord::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(88,101,242,.07) 50%,transparent);background-size:200%;animation:shimmer 3s linear infinite}
+.btn-discord:hover{border-color:rgba(88,101,242,.65);background:linear-gradient(135deg,rgba(88,101,242,.28),rgba(88,101,242,.14));transform:translateY(-1px);box-shadow:0 6px 22px rgba(88,101,242,.3)}
+.btn-discord:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.dc-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:#5865f2;padding:5px}
+.dc-icon img{width:100%;height:100%;object-fit:contain;display:block}
+.dc-badge{font-family:var(--mono);font-size:8px;padding:2px 7px;border-radius:99px;background:rgba(88,101,242,.15);border:1px solid rgba(88,101,242,.3);color:#7289da;letter-spacing:.06em;margin-left:auto;flex-shrink:0}
+
+/* Discord scope panel */
+.dc-scope-panel{
+  background:rgba(88,101,242,.06);border:1px solid rgba(88,101,242,.25);
+  border-radius:11px;padding:14px 16px;margin-bottom:12px;
+  display:none;animation:fade-up .25s var(--spring) both;
+}
+.dc-scope-panel.show{display:block}
+.dc-scope-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.dc-scope-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:#5865f2;padding:6px}
+.dc-scope-icon img{width:100%;height:100%;object-fit:contain;display:block;filter:brightness(0) invert(1)}
+.dc-scope-title{font-size:13px;font-weight:700;color:var(--tx2)}
+.dc-scope-sub{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:1px}
+.dc-scope-items{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.dc-scope-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx3)}
+.dc-scope-item svg{width:12px;height:12px;color:#5865f2;flex-shrink:0}
+.dc-auth-btn{width:100%;padding:10px;border-radius:9px;background:#5865f2;color:#fff;font-size:13px;font-weight:700;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:7px}
+.dc-auth-btn:hover{background:#4752c4;transform:translateY(-1px);box-shadow:0 6px 20px rgba(88,101,242,.45)}
+.dc-auth-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.dc-auth-btn svg{width:14px;height:14px;fill:currentColor}
+.dc-cancel{display:block;text-align:center;font-size:11px;color:var(--tx4);cursor:pointer;transition:color .15s}
+.dc-cancel:hover{color:var(--tx3)}
 
 /* Fields */
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .field-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
 .inp-wrap{position:relative}
-.inp-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--tx4);pointer-events:none}
-.inp{
-  width:100%;padding:11px 14px 11px 40px;
-  background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;
-  color:var(--tx);font-size:14px;outline:none;transition:all .22s;
-}
+.inp-wrap svg.inp-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--tx4);pointer-events:none}
+.inp{width:100%;padding:11px 14px 11px 40px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;color:var(--tx);font-size:14px;outline:none;transition:all .22s;}
 .inp::placeholder{color:var(--tx4)}
 .inp:focus{border-color:var(--bdr2);box-shadow:0 0 0 3px rgba(217,119,6,.08)}
 .inp.error{border-color:rgba(220,38,38,.5);box-shadow:0 0 0 3px rgba(220,38,38,.07)}
-/* Eye toggle */
 .eye-btn{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--tx4);transition:color .18s;padding:2px}
 .eye-btn:hover{color:var(--amber)}
 .eye-btn svg{width:15px;height:15px}
-/* No left icon for password field */
 .pw-inp{padding-left:14px!important;padding-right:40px}
-
-/* Error message */
 .field-err{font-size:11px;color:var(--red);font-family:var(--mono);display:none;align-items:center;gap:4px;margin-top:2px}
 .field-err svg{width:11px;height:11px;flex-shrink:0}
-
-/* Forgot */
 .forgot-row{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:18px}
 .forgot-link{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.06em;transition:color .18s}
 .forgot-link:hover{color:var(--amber)}
 
 /* Buttons */
-.btn-primary{
-  width:100%;padding:13px;border-radius:11px;
-  background:linear-gradient(135deg,#92400e,#d97706);
-  color:#fff;font-size:14px;font-weight:600;
-  transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3);
-  position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-bottom:16px;
-}
+.btn-primary{width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:14px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;}
 .btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%);opacity:0;transition:.2s}
 .btn-primary:hover::after{opacity:1}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.5)}
@@ -202,47 +163,36 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .btn-primary svg{width:15px;height:15px}
 .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
 .btn-primary.loading .spinner{display:block}
-.btn-primary.loading .btn-text,.btn-primary.loading svg{display:none}
+.btn-primary.loading .btn-text,.btn-primary.loading svg:not(.spinner){display:none}
 
 /* Divider */
-.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .div-line{flex:1;height:1px;background:var(--bdr)}
 .div-text{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx4)}
 
 /* Google btn */
-.btn-google{
-  width:100%;padding:12px;border-radius:11px;
-  background:var(--sur2);border:1px solid var(--bdr);
-  color:var(--tx2);font-size:14px;font-weight:500;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:all .2s;
-}
+.btn-google{width:100%;padding:12px;border-radius:11px;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx2);font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;}
 .btn-google:hover{border-color:var(--bdr2);background:var(--sur3);transform:translateY(-1px)}
 .btn-google img{width:18px;height:18px}
 
-/* Footer links */
 .form-footer{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px;font-size:13px;color:var(--tx4)}
 .form-footer a{color:var(--amber);transition:opacity .18s}
 .form-footer a:hover{opacity:.75}
 .form-footer-dot{width:3px;height:3px;border-radius:50%;background:var(--tx4)}
 
 /* Toast */
-.toast{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
-  background:var(--sur);border:1px solid var(--bdr2);
-  border-radius:10px;padding:12px 20px;
-  font-size:13px;font-weight:500;color:var(--tx);
-  box-shadow:var(--sh2);z-index:999;
-  opacity:0;transition:all .3s var(--spring);
-  display:flex;align-items:center;gap:9px;white-space:nowrap;
-  pointer-events:none;
-}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:500;color:var(--tx);box-shadow:var(--sh2);z-index:999;opacity:0;transition:all .3s var(--spring);display:flex;align-items:center;gap:9px;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.error .toast-icon{color:var(--red)}
 .toast.success .toast-icon{color:var(--green)}
 .toast-icon svg{width:15px;height:15px}
 
-/* ── RESPONSIVE ── */
+/* Discord connecting overlay */
+.dc-loading{display:none;flex-direction:column;align-items:center;gap:12px;padding:20px 0;text-align:center}
+.dc-loading.show{display:flex}
+.dc-spin{width:32px;height:32px;border:3px solid rgba(88,101,242,.2);border-top-color:#5865f2;border-radius:50%;animation:spin .7s linear infinite}
+.dc-loading-text{font-size:13px;color:var(--tx3)}
+
 @media(max-width:780px){
   .layout{grid-template-columns:1fr}
   .left-panel{display:none}
@@ -253,11 +203,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </style>
 </head>
 <body>
-
 <div class="glow-1"></div>
 <div class="glow-2"></div>
 
-<!-- Theme toggle -->
 <button class="theme-btn" id="themeBtn">
   <span class="t-sun"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
   <span class="t-moon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
@@ -265,60 +213,112 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </button>
 
 <div class="layout">
-
-  <!-- LEFT PANEL -->
   <div class="left-panel">
-    <div class="left-top">
+    <div>
       <div class="left-logo">
         <div class="logo-gem">
           <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </div>
         <span class="logo-name">Books Coffee <em>&amp;</em> Dreams</span>
       </div>
-
-      <div class="left-headline">
-        Welcome<br>back to<br><em>your home.</em>
-      </div>
+      <div class="left-headline">Welcome<br>back to<br><em>your home.</em></div>
       <div class="left-sub">A warm community for readers, learners, and dreamers. Sign in and continue your journey.</div>
-
       <div class="stats-row">
         <div><div class="stat-n" id="memberCount">—</div><div class="stat-l">Members</div></div>
         <div><div class="stat-n" id="postCount">—</div><div class="stat-l">Discussions</div></div>
         <div><div class="stat-n">∞</div><div class="stat-l">Dreams</div></div>
       </div>
     </div>
-
     <div class="testimonial">
       <div class="t-quote">"</div>
       <div class="t-text">This community changed the way I approach reading. The conversations here are genuinely inspiring and warm.</div>
       <div class="t-author">
         <div class="t-av">A</div>
-        <div>
-          <div class="t-name">Aisha</div>
-          <div class="t-role">Community Member</div>
-        </div>
+        <div><div class="t-name">Aisha</div><div class="t-role">Community Member</div></div>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT PANEL -->
   <div class="right-panel">
     <div class="form-wrap">
-
       <div class="form-heading">Sign <em>in.</em></div>
       <div class="form-sub">Welcome back — good to see you again.</div>
 
-      <!-- Tabs -->
       <div class="auth-tabs">
         <div class="auth-tab active" id="tabSignIn">Sign In</div>
         <div class="auth-tab" id="tabSignUp" onclick="location.href='signup.html'" style="cursor:pointer">Create Account</div>
+      </div>
+
+      <!-- ═══ DISCORD BUTTON ═══ -->
+      <button class="btn-discord" id="discordBtn" onclick="toggleDiscordScope()">
+        <div class="dc-icon">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/discord.svg" alt="Discord" style="filter:brightness(0) invert(1)"/>
+        </div>
+        Continue with Discord
+        <span class="dc-badge">Recommended</span>
+      </button>
+
+      <!-- Discord OAuth scope panel -->
+      <div class="dc-scope-panel" id="dcScopePanel">
+        <div class="dc-scope-head">
+          <div class="dc-scope-icon">
+            <img src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/discord.svg" alt="Discord"/>
+          </div>
+          <div>
+            <div class="dc-scope-title">Authorise BCD</div>
+            <div class="dc-scope-sub">bcd-discord · discord.com</div>
+          </div>
+        </div>
+        <div class="dc-scope-items">
+          <div class="dc-scope-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Access your username, avatar, and email
+          </div>
+          <div class="dc-scope-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Verify BCD Community Server membership
+          </div>
+          <div class="dc-scope-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            We never see your Discord password
+          </div>
+        </div>
+        <!-- Loading state inside scope panel -->
+        <div class="dc-loading" id="dcLoading">
+          <div class="dc-spin"></div>
+          <div class="dc-loading-text" id="dcLoadingText">Opening Discord authorisation…</div>
+        </div>
+        <button class="dc-auth-btn" id="dcAuthBtn" onclick="handleDiscordOAuth()">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/discord.svg" alt="Discord" style="width:16px;height:16px;object-fit:contain;filter:brightness(0) invert(1)"/>
+          Authorise with Discord
+        </button>
+        <span class="dc-cancel" onclick="toggleDiscordScope()">Cancel</span>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="div-line"></div>
+        <span class="div-text">or continue with</span>
+        <div class="div-line"></div>
+      </div>
+
+      <!-- Google -->
+      <button class="btn-google" id="googleBtn">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"/>
+        Sign in with Google
+      </button>
+
+      <div class="divider" style="margin-top:14px">
+        <div class="div-line"></div>
+        <span class="div-text">or email</span>
+        <div class="div-line"></div>
       </div>
 
       <!-- Email field -->
       <div class="field">
         <label class="field-label">Email</label>
         <div class="inp-wrap">
-          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <svg class="inp-ico" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           <input class="inp" id="emailInp" type="email" placeholder="you@example.com" autocomplete="email"/>
         </div>
         <div class="field-err" id="emailErr"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="emailErrMsg">Enter a valid email</span></div>
@@ -336,32 +336,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="field-err" id="passErr"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="passErrMsg">Enter your password</span></div>
       </div>
 
-      <!-- Forgot -->
       <div class="forgot-row">
         <a class="forgot-link" href="reset.html">Forgot password?</a>
       </div>
 
-      <!-- Sign in button -->
       <button class="btn-primary" id="signInBtn">
         <span class="btn-text">Sign In</span>
         <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         <div class="spinner"></div>
       </button>
 
-      <!-- Divider -->
-      <div class="divider">
-        <div class="div-line"></div>
-        <span class="div-text">or continue with</span>
-        <div class="div-line"></div>
-      </div>
-
-      <!-- Google -->
-      <button class="btn-google" id="googleBtn">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"/>
-        Sign in with Google
-      </button>
-
-      <!-- Footer -->
       <div class="form-footer">
         <span>New here?</span>
         <a href="signup.html">Create an account</a>
@@ -372,178 +356,321 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast">
   <span class="toast-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
   <span id="toastMsg"></span>
 </div>
 
 <script>
+// ─── DISCORD CONFIG ───────────────────────────────────────────────────────────
+// Replace these two values. Everything else is automatic.
+const DISCORD_CLIENT_ID = 'YOUR_BOT_CLIENT_ID'; // from Discord Developer Portal → your BCD app → OAuth2
+const DISCORD_REDIRECT_URI = 'https://bookscoffeedreams.github.io/auth/discord/callback'; // must match what you add in Discord portal → OAuth2 → Redirects
+// Your Cloudflare Worker URL (deploy discord-auth-worker.js):
+const DISCORD_WORKER_URL = 'https://bcd-discord-auth.YOUR_SUBDOMAIN.workers.dev';
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Theme
-const H=document.documentElement;
-const sv=localStorage.getItem('bcd-settings-mode')||'dark';
-H.setAttribute('data-mode',sv);
-function updateMode(){document.getElementById('modeLabel').textContent=H.getAttribute('data-mode')==='dark'?'Light':'Dark'}
+const H = document.documentElement;
+const sv = localStorage.getItem('bcd-settings-mode') || 'dark';
+H.setAttribute('data-mode', sv);
+function updateMode() { document.getElementById('modeLabel').textContent = H.getAttribute('data-mode') === 'dark' ? 'Light' : 'Dark'; }
 updateMode();
-document.getElementById('themeBtn').addEventListener('click',()=>{
-  const n=H.getAttribute('data-mode')==='dark'?'light':'dark';
-  H.setAttribute('data-mode',n);localStorage.setItem('bcd-settings-mode',n);updateMode();
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const n = H.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
+  H.setAttribute('data-mode', n); localStorage.setItem('bcd-settings-mode', n); updateMode();
 });
 
 // Toast
 let toastTimer;
-function showToast(msg,type='error'){
-  const t=document.getElementById('toast');
-  const icon=t.querySelector('.toast-icon svg');
-  document.getElementById('toastMsg').textContent=msg;
-  t.className='toast '+type;
-  const iconPath=type==='success'
-    ?'<polyline points="20 6 9 17 4 12"/>'
-    :'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
-  icon.innerHTML=iconPath;
+function showToast(msg, type = 'error') {
+  const t = document.getElementById('toast');
+  const icon = t.querySelector('.toast-icon svg');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = 'toast ' + type;
+  icon.innerHTML = type === 'success'
+    ? '<polyline points="20 6 9 17 4 12"/>'
+    : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// Password show/hide
-document.getElementById('eyeBtn').addEventListener('click',()=>{
-  const inp=document.getElementById('passInp');
-  const isPass=inp.type==='password';
-  inp.type=isPass?'text':'password';
-  document.getElementById('eyeIcon').innerHTML=isPass
-    ?'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-    :'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+// Password toggle
+document.getElementById('eyeBtn').addEventListener('click', () => {
+  const inp = document.getElementById('passInp');
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  document.getElementById('eyeIcon').innerHTML = isPass
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
 });
 
 // Enter key
-document.getElementById('passInp').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('signInBtn').click()});
-document.getElementById('emailInp').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('passInp').focus()});
-
-// Clear errors on input
-['emailInp','passInp'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>{
-    document.getElementById(id).classList.remove('error');
-  });
+document.getElementById('passInp').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('signInBtn').click(); });
+document.getElementById('emailInp').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('passInp').focus(); });
+['emailInp', 'passInp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => document.getElementById(id).classList.remove('error'));
 });
+
+// Discord scope toggle
+function toggleDiscordScope() {
+  const panel = document.getElementById('dcScopePanel');
+  panel.classList.toggle('show');
+}
+
+// ─── DISCORD OAUTH2 FLOW ─────────────────────────────────────────────────────
+// How it works:
+// 1. User clicks "Authorise with Discord" → we open Discord's OAuth2 URL in a popup
+// 2. Discord redirects to your callback page with ?code=...
+// 3. Your callback page posts the code back to this window via postMessage
+// 4. This window sends the code to your Cloudflare Worker
+// 5. Worker exchanges code for token with Discord, gets user info, creates a Firebase custom token
+// 6. We sign in with the custom token → user is authenticated in Firebase
+// ─────────────────────────────────────────────────────────────────────────────
+
+let dcPopup = null;
+
+function handleDiscordOAuth() {
+  document.getElementById('dcAuthBtn').style.display = 'none';
+  document.getElementById('dcLoading').classList.add('show');
+  document.getElementById('dcLoadingText').textContent = 'Opening Discord authorisation…';
+
+  // Generate a random state to prevent CSRF
+  const state = Math.random().toString(36).substring(2, 15);
+  sessionStorage.setItem('dc_oauth_state', state);
+
+  const params = new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID,
+    redirect_uri: DISCORD_REDIRECT_URI,
+    response_type: 'code',
+    scope: 'identify email guilds.members.read',
+    state: state,
+    prompt: 'none' // skip consent screen if already authorised
+  });
+
+  const oauthUrl = `https://discord.com/api/oauth2/authorize?${params}`;
+  const w = 480, h = 700;
+  const left = Math.round(window.screenX + (window.outerWidth - w) / 2);
+  const top = Math.round(window.screenY + (window.outerHeight - h) / 2);
+  dcPopup = window.open(oauthUrl, 'discord-oauth', `width=${w},height=${h},left=${left},top=${top},toolbar=0,menubar=0`);
+
+  if (!dcPopup) {
+    // Popup blocked — fall back to redirect
+    showToast('Popup blocked. Allow popups for this site or use email sign-in.', 'error');
+    resetDiscordBtn();
+    return;
+  }
+
+  // Listen for the callback postMessage
+  window.addEventListener('message', onDiscordCallback, { once: true });
+
+  // Detect if popup was closed manually
+  const pollClosed = setInterval(() => {
+    if (dcPopup && dcPopup.closed) {
+      clearInterval(pollClosed);
+      window.removeEventListener('message', onDiscordCallback);
+      resetDiscordBtn();
+    }
+  }, 500);
+}
+
+async function onDiscordCallback(event) {
+  // Only accept messages from our own origin
+  if (event.origin !== window.location.origin) return;
+  if (!event.data || event.data.type !== 'discord_oauth_callback') return;
+
+  if (dcPopup) dcPopup.close();
+
+  const { code, state, error } = event.data;
+
+  if (error) {
+    showToast('Discord authorisation was cancelled.', 'error');
+    resetDiscordBtn();
+    return;
+  }
+
+  // Verify state
+  if (state !== sessionStorage.getItem('dc_oauth_state')) {
+    showToast('Security check failed. Please try again.', 'error');
+    resetDiscordBtn();
+    return;
+  }
+
+  document.getElementById('dcLoadingText').textContent = 'Authenticating with BCD…';
+
+  try {
+    // Exchange code for Firebase custom token via Cloudflare Worker
+    const res = await fetch(`${DISCORD_WORKER_URL}/auth/discord`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, redirect_uri: DISCORD_REDIRECT_URI })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Worker returned an error');
+    }
+
+    const { firebaseToken, user: dcUser } = await res.json();
+
+    document.getElementById('dcLoadingText').textContent = `Signing in as ${dcUser.username}…`;
+
+    // Sign into Firebase with the custom token
+    const result = await auth.signInWithCustomToken(firebaseToken);
+    await ensureUserDoc(result.user, dcUser);
+
+    showToast(`Welcome, ${dcUser.username}! Redirecting…`, 'success');
+    setTimeout(() => {
+      const redirect = new URLSearchParams(location.search).get('redirect') || 'index.html';
+      location.href = redirect;
+    }, 900);
+
+  } catch (e) {
+    console.error('Discord auth error:', e);
+    showToast('Discord sign-in failed: ' + (e.message || 'Unknown error'), 'error');
+    resetDiscordBtn();
+  }
+}
+
+function resetDiscordBtn() {
+  document.getElementById('dcAuthBtn').style.display = 'flex';
+  document.getElementById('dcLoading').classList.remove('show');
+}
+// ─────────────────────────────────────────────────────────────────────────────
 </script>
 
 <script>
 firebase.initializeApp({
-  apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-  authDomain:"bcd-discord.firebaseapp.com",
-  projectId:"bcd-discord",
-  storageBucket:"bcd-discord.appspot.com",
-  messagingSenderId:"278895155371",
-  appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"
+  apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain: "bcd-discord.firebaseapp.com",
+  projectId: "bcd-discord",
+  storageBucket: "bcd-discord.appspot.com",
+  messagingSenderId: "278895155371",
+  appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
 });
-const auth=firebase.auth();
-const db=firebase.firestore();
-const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-// Load community stats
-async function loadStats(){
-  try{
-    const [u,p]=await Promise.all([db.collection('users').get(),db.collection('communityPosts').get()]);
-    document.getElementById('memberCount').textContent=u.size+'+';
-    document.getElementById('postCount').textContent=p.size+'+';
-  }catch(e){}
+async function loadStats() {
+  try {
+    const [u, p] = await Promise.all([db.collection('users').get(), db.collection('communityPosts').get()]);
+    document.getElementById('memberCount').textContent = u.size + '+';
+    document.getElementById('postCount').textContent = p.size + '+';
+  } catch (e) {}
 }
 loadStats();
 
-async function ensureUserDoc(user){
-  const ref=db.collection('users').doc(user.uid);
-  const snap=await ref.get();
-  if(!snap.exists){
-    await ref.set({
-      uid:user.uid,
-      name:user.displayName||'User',
-      email:user.email||'',
-      photoURL:user.photoURL||'',
-      xp:0,badges:[],streak:0,role:'user',
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    },{merge:true});
+async function ensureUserDoc(user, discordUser = null) {
+  const ref = db.collection('users').doc(user.uid);
+  const snap = await ref.get();
+  const base = {
+    uid: user.uid,
+    name: discordUser ? discordUser.username : (user.displayName || 'User'),
+    email: user.email || '',
+    photoURL: discordUser
+      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+      : (user.photoURL || ''),
+    xp: 0, badges: [], streak: 0, role: 'user',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if (discordUser) {
+    base.discordId = discordUser.id;
+    base.discordUsername = discordUser.username;
+    base.authProvider = 'discord';
+  }
+  if (!snap.exists) {
+    await ref.set(base, { merge: true });
   } else {
-    const d=snap.data();
-    if(!d.role) await ref.set({role:'user'},{merge:true});
+    // Update Discord fields if signing in via Discord
+    if (discordUser) {
+      await ref.set({
+        discordId: discordUser.id,
+        discordUsername: discordUser.username,
+        photoURL: base.photoURL,
+        authProvider: 'discord'
+      }, { merge: true });
+    }
+    const d = snap.data();
+    if (!d.role) await ref.set({ role: 'user' }, { merge: true });
   }
 }
 
 // Redirect if already logged in
-auth.onAuthStateChanged(async user=>{
-  if(user){
+auth.onAuthStateChanged(async user => {
+  if (user) {
     await ensureUserDoc(user);
-    const redirect=new URLSearchParams(location.search).get('redirect')||'index.html';
-    location.href=redirect;
+    const redirect = new URLSearchParams(location.search).get('redirect') || 'index.html';
+    location.href = redirect;
   }
 });
 
-function setLoading(on){
-  const btn=document.getElementById('signInBtn');
-  btn.disabled=on;
-  btn.classList.toggle('loading',on);
+function setLoading(on) {
+  const btn = document.getElementById('signInBtn');
+  btn.disabled = on;
+  btn.classList.toggle('loading', on);
 }
 
-function firebaseErrMsg(code){
-  const map={
-    'auth/user-not-found':'No account found with this email.',
-    'auth/wrong-password':'Incorrect password. Try again.',
-    'auth/invalid-email':'Please enter a valid email address.',
-    'auth/too-many-requests':'Too many attempts. Please wait and try again.',
-    'auth/user-disabled':'This account has been disabled.',
-    'auth/invalid-credential':'Incorrect email or password.',
-    'auth/network-request-failed':'Network error. Check your connection.',
+function firebaseErrMsg(code) {
+  const map = {
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Incorrect password. Try again.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/too-many-requests': 'Too many attempts. Please wait and try again.',
+    'auth/user-disabled': 'This account has been disabled.',
+    'auth/invalid-credential': 'Incorrect email or password.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
   };
-  return map[code]||'Something went wrong. Please try again.';
+  return map[code] || 'Something went wrong. Please try again.';
 }
 
-// Sign in
-document.getElementById('signInBtn').addEventListener('click',async()=>{
-  const email=document.getElementById('emailInp').value.trim();
-  const pass=document.getElementById('passInp').value;
-  let ok=true;
+// Email sign-in
+document.getElementById('signInBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInp').value.trim();
+  const pass = document.getElementById('passInp').value;
+  let ok = true;
 
-  if(!email||!/\S+@\S+\.\S+/.test(email)){
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
     document.getElementById('emailInp').classList.add('error');
-    document.getElementById('emailErrMsg').textContent='Enter a valid email address';
-    document.getElementById('emailErr').style.display='flex'; ok=false;
-  } else { document.getElementById('emailErr').style.display='none'; }
+    document.getElementById('emailErrMsg').textContent = 'Enter a valid email address';
+    document.getElementById('emailErr').style.display = 'flex'; ok = false;
+  } else { document.getElementById('emailErr').style.display = 'none'; }
 
-  if(!pass){
+  if (!pass) {
     document.getElementById('passInp').classList.add('error');
-    document.getElementById('passErrMsg').textContent='Enter your password';
-    document.getElementById('passErr').style.display='flex'; ok=false;
-  } else { document.getElementById('passErr').style.display='none'; }
+    document.getElementById('passErrMsg').textContent = 'Enter your password';
+    document.getElementById('passErr').style.display = 'flex'; ok = false;
+  } else { document.getElementById('passErr').style.display = 'none'; }
 
-  if(!ok) return;
+  if (!ok) return;
   setLoading(true);
-  try{
-    const result=await auth.signInWithEmailAndPassword(email,pass);
+  try {
+    const result = await auth.signInWithEmailAndPassword(email, pass);
     await ensureUserDoc(result.user);
-    showToast('Signed in! Redirecting…','success');
-    setTimeout(()=>{
-      const redirect=new URLSearchParams(location.search).get('redirect')||'index.html';
-      location.href=redirect;
-    },800);
-  }catch(e){
+    showToast('Signed in! Redirecting…', 'success');
+    setTimeout(() => {
+      const redirect = new URLSearchParams(location.search).get('redirect') || 'index.html';
+      location.href = redirect;
+    }, 800);
+  } catch (e) {
     showToast(firebaseErrMsg(e.code));
     setLoading(false);
   }
 });
 
-// Google sign in
-document.getElementById('googleBtn').addEventListener('click',async()=>{
-  try{
-    const provider=new firebase.auth.GoogleAuthProvider();
-    const result=await auth.signInWithPopup(provider);
+// Google sign-in
+document.getElementById('googleBtn').addEventListener('click', async () => {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await auth.signInWithPopup(provider);
     await ensureUserDoc(result.user);
-    showToast('Signed in with Google! Redirecting…','success');
-    setTimeout(()=>{
-      const redirect=new URLSearchParams(location.search).get('redirect')||'index.html';
-      location.href=redirect;
-    },800);
-  }catch(e){
-    if(e.code!=='auth/popup-closed-by-user') showToast(firebaseErrMsg(e.code));
+    showToast('Signed in with Google! Redirecting…', 'success');
+    setTimeout(() => {
+      const redirect = new URLSearchParams(location.search).get('redirect') || 'index.html';
+      location.href = redirect;
+    }, 800);
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') showToast(firebaseErrMsg(e.code));
   }
 });
 </script>
