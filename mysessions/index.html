@@ -712,7 +712,7 @@ main{padding-top:58px;position:relative;z-index:1}
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
     <div id="navAuth">
-      <button class="btn-nav-primary" onclick="navTo('auth')">Join Free</button>
+      <button class="btn-nav-primary" id="navJoinBtn" onclick="S.user ? document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'}) : navTo('auth')">Join Free</button>
     </div>
   </div>
 </nav>
@@ -737,9 +737,9 @@ main{padding-top:58px;position:relative;z-index:1}
       <h1>Work with others.<br><em>Get more done.</em></h1>
       <p class="hero-desc">Live coworking sessions for people who lose focus working alone. Video on, distractions off — join a room and actually finish what you started.</p>
       <div class="hero-cta">
-        <button class="btn-primary" onclick="navTo('auth')">
+        <button class="btn-primary" id="heroCtaBtn" onclick="S.user ? document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'}) : navTo('auth')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Start a free session
+          <span id="heroCtaLabel">Start a free session</span>
         </button>
         <button class="btn-secondary" onclick="document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'})">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1270,8 +1270,8 @@ const FB_CFG = {
 
 // ── LiveKit config ──
 // After deploying your Cloudflare Worker, paste its URL here:
-const LIVEKIT_WS_URL   = 'wss://YOUR_LIVEKIT_PROJECT.livekit.cloud';
-const TOKEN_WORKER_URL = 'https://mysession-token.anshumanbahekar.workers.dev/token';
+const LIVEKIT_WS_URL  = 'wss://mysession-bookscoffeedreams.livekit.cloud'; // Your LiveKit Cloud WS URL
+const TOKEN_WORKER_URL = 'https://mysession-token.YOUR_CF_SUBDOMAIN.workers.dev/token'; // Your Worker URL
 firebase.initializeApp(FB_CFG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
@@ -1302,9 +1302,10 @@ const S = {
   mCamOn: true,
   mMicOn: true,
   mPreviewStream: null,
-  // Daily
+  // LiveKit
   livekitRoom: null,
   participants: {},
+  pendingRoomAfterAuth: null,
   // Unsub
   unsubs: [],
   chatUnsub: null,
@@ -1334,11 +1335,14 @@ try{
 
 // ══ NAVIGATION ══
 function navTo(v){
-  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active')});
-  document.getElementById('page-'+v).classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(t=>{
-    t.classList.toggle('active', t.dataset.view===v);
-  });
+  const target = document.getElementById('page-'+v);
+  if(!target){ console.warn('No page:',v); return; }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  target.classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));
+  window.scrollTo(0,0);
+  if(v==='sessions') initSessionsPage();
+  if(v==='community') initCommunityPage();
 }
 function goHome(){navTo('home')}
 function navToFocus(){navTo('focus')}
@@ -1529,7 +1533,12 @@ async function initTicker(){
 
 // ══ OPEN JOIN MODAL ══
 function openJoin(room){
-  if(!S.user){ toast('Sign in to join a session','info'); navTo('auth'); return; }
+  if(!S.user){
+    S.pendingRoomAfterAuth = room;
+    toast('Sign in first — we'll take you straight to the room','info');
+    navTo('auth');
+    return;
+  }
   S.pendingRoom = room;
   document.getElementById('mTitle').textContent = `Join — ${room.name}`;
   document.getElementById('mRoomName').textContent = room.name;
@@ -2308,7 +2317,20 @@ auth.onAuthStateChanged(user=>{
       displayName:name,email:user.email,photoURL:user.photoURL,
       lastSeen:FS.FieldValue.serverTimestamp()
     },{merge:true}).catch(()=>{});
-    navTo('home');
+    // Update hero CTA and nav button labels for logged-in users
+    const heroLabel = document.getElementById('heroCtaLabel');
+    if(heroLabel) heroLabel.textContent = 'Browse rooms';
+    const navJoinBtn = document.getElementById('navJoinBtn');
+    if(navJoinBtn) navJoinBtn.textContent = 'Browse rooms';
+    // Only redirect to home if currently on auth page
+    const onAuth = document.getElementById('page-auth').classList.contains('active');
+    if(onAuth){
+      navTo('home');
+      // If they tried to join a room before signing in, open it now
+      if(S.pendingRoomAfterAuth){
+        setTimeout(()=>{ openJoin(S.pendingRoomAfterAuth); S.pendingRoomAfterAuth=null; }, 400);
+      }
+    }
   }else{
     el.innerHTML=`<button class="nav-icon-btn" onclick="navTo('auth')" style="border:1px solid var(--bdr)" title="Sign in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
     <button class="btn-nav-primary" onclick="navTo('auth')">Join free</button>`;
@@ -2338,18 +2360,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('page-auth').classList.contains('active')&&document.activeElement.id==='iPass') authSubmit();
 });
 
-// ══ NAVIGATION (extended) ══
-const _navTo = navTo;
-function navTo(v){
-  const target = document.getElementById('page-'+v);
-  if(!target){ console.warn('No page:',v); return; }
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  target.classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));
-  window.scrollTo(0,0);
-  if(v==='sessions') initSessionsPage();
-  if(v==='community') initCommunityPage();
-}
+// ══ NAVIGATION (extended hooks now in primary navTo above) ══
 
 // ══ SESSIONS PAGE ══
 async function initSessionsPage(){
