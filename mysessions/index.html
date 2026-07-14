@@ -11,8 +11,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
-<!-- Daily.co for WebRTC video -->
-<script src="https://unpkg.com/@daily-co/daily-js"></script>
+<!-- LiveKit WebRTC SDK -->
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2.5.3/dist/livekit-client.umd.min.js"></script>
 <style>
 /* ══ TOKENS ══ */
 :root{
@@ -1267,6 +1267,11 @@ const FB_CFG = {
   messagingSenderId:'278895155371',
   appId:'1:278895155371:web:177a468f5fa3f0abfe3fee'
 };
+
+// ── LiveKit config ──
+// After deploying your Cloudflare Worker, paste its URL here:
+const LIVEKIT_WS_URL  = 'wss://mysession-bookscoffeedreams.livekit.cloud'; // Your LiveKit Cloud WS URL
+const TOKEN_WORKER_URL = 'https://mysession-token.YOUR_CF_SUBDOMAIN.workers.dev/token'; // Your Worker URL
 firebase.initializeApp(FB_CFG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
@@ -1298,7 +1303,7 @@ const S = {
   mMicOn: true,
   mPreviewStream: null,
   // Daily
-  dailyCall: null,
+  livekitRoom: null,
   participants: {},
   // Unsub
   unsubs: [],
@@ -1713,161 +1718,304 @@ function syncTask(){
   if(S.sessionDocId) db.collection('ms_sessions').doc(S.sessionDocId).update({task:t}).catch(()=>{});
 }
 
-// ══ VIDEO (Daily.co WebRTC) ══
-async function startVideoSession(){
-  const roomId = S.session.roomId;
-  const userName = S.user.displayName || S.user.email?.split('@')[0] || 'Anonymous';
+// ══ VIDEO (LiveKit WebRTC — real multi-user SFU) ══
 
-  // Create or get a Daily room via their API (no backend needed for public rooms)
-  // We'll use Daily's "demo" approach with a room name derived from the room ID
-  const dailyRoomName = `mysession-${roomId}`;
+async function fetchLiveKitToken(roomName){
+  const identity = S.user.uid;
+  const name     = S.user.displayName || S.user.email?.split('@')[0] || 'User';
+  try{
+    const res = await fetch(TOKEN_WORKER_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ roomName, participantIdentity: identity, participantName: name })
+    });
+    if(!res.ok) throw new Error(`Worker returned ${res.status}`);
+    const { token } = await res.json();
+    return token;
+  }catch(e){
+    throw new Error('Could not get video token: '+e.message);
+  }
+}
+
+async function startVideoSession(){
+  const roomId  = S.session.roomId;
+  const userName = S.user.displayName || S.user.email?.split('@')[0] || 'User';
+
+  // Show connecting state immediately
+  const grid = document.getElementById('videoGrid');
+  if(grid) grid.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;
+    min-height:200px;color:var(--tx4);flex-direction:column;gap:12px;grid-column:1/-1">
+    <div class="spinner"></div>
+    <span style="font-size:13px">Connecting video...</span>
+  </div>`;
+
+  // Check LiveKit SDK loaded
+  if(typeof LivekitClient === 'undefined'){
+    toast('Video SDK not loaded — check connection','err');
+    renderNoVideoFallback();
+    return;
+  }
 
   try{
-    // Try to create call frame
-    if(typeof window.DailyIframe==='undefined'){
-      // Daily not loaded — show local video only
-      showLocalVideoOnly();
-      return;
+    const token = await fetchLiveKitToken(roomId);
+
+    // Create LiveKit Room
+    S.livekitRoom = new LivekitClient.Room({
+      adaptiveStream: true,
+      dynacast: true,
+      videoCaptureDefaults: {
+        resolution: LivekitClient.VideoPresets.h360.resolution,
+      },
+    });
+
+    // ── Event listeners ──
+    S.livekitRoom
+      .on(LivekitClient.RoomEvent.ParticipantConnected,    ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.ParticipantDisconnected, ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.TrackSubscribed,         ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.TrackUnsubscribed,       ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.LocalTrackPublished,     ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.LocalTrackUnpublished,   ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.TrackMuted,              ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.TrackUnmuted,            ()=> renderVideoGrid())
+      .on(LivekitClient.RoomEvent.Disconnected, ()=>{
+        toast('Disconnected from video room','err');
+        renderVideoGrid();
+      })
+      .on(LivekitClient.RoomEvent.Reconnecting,  ()=> toast('Reconnecting video...','info'))
+      .on(LivekitClient.RoomEvent.Reconnected,   ()=> toast('Video reconnected','ok'));
+
+    // ── Connect ──
+    await S.livekitRoom.connect(LIVEKIT_WS_URL, token);
+
+    // ── Publish local tracks ──
+    if(S.camOn || S.micOn){
+      await S.livekitRoom.localParticipant.enableCameraAndMicrophone();
+      if(!S.camOn) await S.livekitRoom.localParticipant.setCameraEnabled(false);
+      if(!S.micOn) await S.livekitRoom.localParticipant.setMicrophoneEnabled(false);
     }
 
-    S.dailyCall = window.DailyIframe.createCallObject({
-      audioSource: S.micOn,
-      videoSource: S.camOn,
-      dailyConfig: {experimentalChromeVideoMuteLightOff: true}
-    });
-
-    S.dailyCall.on('participant-joined', onParticipantChanged);
-    S.dailyCall.on('participant-updated', onParticipantChanged);
-    S.dailyCall.on('participant-left', onParticipantLeft);
-    S.dailyCall.on('track-started', onTrackEvent);
-    S.dailyCall.on('track-stopped', onTrackEvent);
-
-    // Join the Daily room
-    // Using Daily's pre-built public demo rooms (works without backend)
-    await S.dailyCall.join({
-      url: `https://booksdev.daily.co/${dailyRoomName}`,
-      userName: userName,
-      startVideoOff: !S.camOn,
-      startAudioOff: !S.micOn,
-    });
+    // Store local stream for controls
+    const camTrack = S.livekitRoom.localParticipant.getTrack(LivekitClient.Track.Source.Camera);
+    if(camTrack?.track) {
+      S.localStream = new MediaStream([camTrack.track.mediaStreamTrack]);
+    }
 
     renderVideoGrid();
+    toast('Video connected','ok');
+
   }catch(e){
-    console.log('Daily.co:', e.message);
-    // Fallback to local getUserMedia display
+    console.error('LiveKit error:', e);
+    // If worker URL not configured, show helpful message
+    if(e.message.includes('token') || e.message.includes('Worker') || e.message.includes('Failed to fetch')){
+      toast('Configure LIVEKIT token worker URL to enable video','info');
+    }else{
+      toast('Video unavailable — focusing without video','info');
+    }
+    // Still show local camera at minimum
     showLocalVideoOnly();
   }
 }
 
+// Fallback: show only local camera when LiveKit not configured
 async function showLocalVideoOnly(){
   try{
-    const stream = await navigator.mediaDevices.getUserMedia({video:S.camOn, audio:S.micOn});
+    const constraints = {};
+    if(S.camOn) constraints.video = { width:1280, height:720 };
+    if(S.micOn) constraints.audio = true;
+    if(!S.camOn && !S.micOn){ renderNoVideoFallback(); return; }
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     S.localStream = stream;
-    renderLocalTile(stream);
+    renderLocalOnlyTile(stream);
   }catch(e){
     renderNoVideoFallback();
   }
 }
 
-function renderLocalTile(stream){
-  const name = S.user?.displayName || 'You';
+function renderLocalOnlyTile(stream){
+  const name  = S.user?.displayName || 'You';
   const color = avc(name);
-  const grid = document.getElementById('videoGrid');
-  grid.innerHTML = `
-    <div class="video-tile">
-      <div class="tile-self-label">You</div>
-      <video id="localVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover"></video>
-      <div class="video-tile-overlay">
-        <span class="tile-name">${name}</span>
-        <div class="tile-mute-icons">
-          <svg id="tileVidIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-          <svg id="tileMicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-        </div>
-      </div>
-    </div>
-    <div class="video-tile" style="opacity:.5">
-      <div class="tile-av"><div class="pav" style="width:48px;height:48px;font-size:18px;background:${avc('Jordan')}">${ini('Jordan')}</div><span>Waiting for others...</span></div>
-    </div>
-    <div class="video-tile" style="opacity:.35">
-      <div class="tile-av"><div class="pav" style="width:48px;height:48px;font-size:18px;background:${avc('Sofia')}">${ini('Sofia')}</div><span>Come join</span></div>
-    </div>`;
-  const v=document.getElementById('localVideo');
-  if(v) v.srcObject=stream;
+  const grid  = document.getElementById('videoGrid');
+  if(!grid) return;
+
+  const tile = document.createElement('div');
+  tile.className = 'video-tile';
+  tile.style.gridColumn = 'span 2';
+
+  const v = document.createElement('video');
+  v.autoplay = true; v.muted = true; v.playsInline = true;
+  v.style.cssText = 'width:100%;height:100%;object-fit:cover';
+  v.srcObject = stream;
+  tile.appendChild(v);
+
+  const selfLabel = document.createElement('div');
+  selfLabel.className = 'tile-self-label';
+  selfLabel.textContent = 'You (local preview)';
+  tile.appendChild(selfLabel);
+
+  const ov = document.createElement('div');
+  ov.className = 'video-tile-overlay';
+  ov.innerHTML = `<span class="tile-name">${name}</span>`;
+  tile.appendChild(ov);
+
+  // Waiting slot
+  const waiting = document.createElement('div');
+  waiting.className = 'no-video-placeholder';
+  waiting.style.cssText = 'grid-column:span 2;min-height:140px';
+  waiting.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <p>Configure LiveKit token worker to see others here. Your camera is working.</p>`;
+
+  grid.innerHTML = '';
+  grid.appendChild(tile);
+  grid.appendChild(waiting);
 }
 
 function renderNoVideoFallback(){
-  const name = S.user?.displayName || 'You';
+  const name  = S.user?.displayName || 'You';
   const color = avc(name);
-  document.getElementById('videoGrid').innerHTML = `
-    <div class="video-tile">
+  const grid  = document.getElementById('videoGrid');
+  if(!grid) return;
+  grid.innerHTML = `
+    <div class="video-tile" style="grid-column:span 2">
       <div class="tile-self-label">You</div>
-      <div class="tile-av" style="background:${color}40">
-        <div class="pav" style="width:52px;height:52px;font-size:20px;background:${color}">${ini(name)}</div>
-        <span>${name}</span>
+      <div class="tile-av" style="background:${color}22">
+        <div class="pav" style="width:56px;height:56px;font-size:22px;background:${color}">${ini(name)}</div>
+        <span style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px">${name}</span>
       </div>
-      <div class="video-tile-overlay">
-        <span class="tile-name">${name}</span>
-        <div class="tile-mute-icons">
-          <svg class="muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"/></svg>
-        </div>
-      </div>
+      <div class="video-tile-overlay"><span class="tile-name">${name}</span></div>
     </div>
     <div class="no-video-placeholder" style="grid-column:span 2">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      <p>Camera access not granted. Others in the room appear here when they join.</p>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      <p>Camera permission denied. Allow camera access and rejoin to use video.</p>
     </div>`;
 }
 
-function onParticipantChanged(e){ renderVideoGrid(); }
-function onParticipantLeft(e){ delete S.participants[e.participant.session_id]; renderVideoGrid(); }
-function onTrackEvent(e){ renderVideoGrid(); }
-
 function renderVideoGrid(){
-  if(!S.dailyCall) return;
-  const parts = S.dailyCall.participants();
+  const room = S.livekitRoom;
   const grid = document.getElementById('videoGrid');
   if(!grid) return;
-  grid.innerHTML='';
-  Object.values(parts).forEach(p=>{
-    const tile = document.createElement('div');
-    tile.className='video-tile';
-    const name=p.user_name||'Anonymous';
-    const color=avc(name);
-    const hasCam = p.tracks?.video?.persistentTrack;
-    if(hasCam){
-      const v=document.createElement('video');
-      v.autoplay=true; v.playsInline=true;
-      if(p.local) v.muted=true;
-      const ms=new MediaStream([p.tracks.video.persistentTrack]);
-      if(p.tracks.audio?.persistentTrack) ms.addTrack(p.tracks.audio.persistentTrack);
-      v.srcObject=ms;
-      tile.appendChild(v);
-    }else{
-      const av=document.createElement('div');
-      av.className='tile-av';
-      av.style.background=color+'22';
-      av.innerHTML=`<div class="pav" style="width:52px;height:52px;font-size:20px;background:${color}">${ini(name)}</div><span>${name}</span>`;
-      tile.appendChild(av);
-    }
-    if(p.local){const s=document.createElement('div');s.className='tile-self-label';s.textContent='You';tile.appendChild(s);}
-    const ov=document.createElement('div');
-    ov.className='video-tile-overlay';
-    const camOff=!p.tracks?.video?.persistentTrack;
-    const micOff=p.tracks?.audio?.state==='off'||p.tracks?.audio?.state==='interrupted';
-    ov.innerHTML=`<span class="tile-name">${name}</span><div class="tile-mute-icons">
-      <svg class="${camOff?'muted':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-      <svg class="${micOff?'muted':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-    </div>`;
-    tile.appendChild(ov);
-    grid.appendChild(tile);
+  if(!room){ return; }
+
+  grid.innerHTML = '';
+
+  // ── Local participant ──
+  const local = room.localParticipant;
+  const localTile = buildParticipantTile(local, true);
+  grid.appendChild(localTile);
+
+  // ── Remote participants ──
+  room.remoteParticipants.forEach(p => {
+    grid.appendChild(buildParticipantTile(p, false));
   });
+
+  // ── Waiting slot if alone ──
+  if(room.remoteParticipants.size === 0){
+    const waiting = document.createElement('div');
+    waiting.className = 'video-tile';
+    waiting.innerHTML = `<div class="tile-av" style="opacity:.4">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;color:rgba(255,255,255,.3)">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span style="font-size:11px;margin-top:8px">Waiting for others to join</span>
+    </div>`;
+    grid.appendChild(waiting);
+  }
+}
+
+function buildParticipantTile(participant, isLocal){
+  const tile = document.createElement('div');
+  tile.className = 'video-tile';
+  const name  = participant.name || participant.identity || 'Anonymous';
+  const color = avc(name);
+
+  // Find video and audio tracks
+  let videoTrack = null;
+  let audioTrack = null;
+  let camMuted   = true;
+  let micMuted   = true;
+
+  if(isLocal){
+    const camPub = participant.getTrack(LivekitClient.Track.Source.Camera);
+    const micPub = participant.getTrack(LivekitClient.Track.Source.Microphone);
+    if(camPub && !camPub.isMuted && camPub.track) { videoTrack = camPub.track.mediaStreamTrack; camMuted = false; }
+    if(micPub && !micPub.isMuted) micMuted = false;
+  } else {
+    participant.getTracks().forEach(pub => {
+      if(pub.kind === LivekitClient.Track.Kind.Video && pub.track && !pub.isMuted){
+        videoTrack = pub.track.mediaStreamTrack; camMuted = false;
+      }
+      if(pub.kind === LivekitClient.Track.Kind.Audio && pub.track && !pub.isMuted) micMuted = false;
+    });
+  }
+
+  if(videoTrack){
+    const v = document.createElement('video');
+    v.autoplay = true; v.playsInline = true;
+    if(isLocal) v.muted = true;
+    v.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    v.srcObject = new MediaStream([videoTrack]);
+    tile.appendChild(v);
+  } else {
+    const av = document.createElement('div');
+    av.className = 'tile-av';
+    av.style.background = color+'22';
+    av.innerHTML = `<div class="pav" style="width:52px;height:52px;font-size:20px;background:${color}">${ini(name)}</div>
+      <span style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px">${name}</span>`;
+    tile.appendChild(av);
+  }
+
+  // Audio element for remote participants
+  if(!isLocal && audioTrack){
+    const a = document.createElement('audio');
+    a.autoplay = true;
+    a.srcObject = new MediaStream([audioTrack]);
+    tile.appendChild(a);
+  }
+
+  if(isLocal){
+    const label = document.createElement('div');
+    label.className = 'tile-self-label';
+    label.textContent = 'You';
+    tile.appendChild(label);
+  }
+
+  const ov = document.createElement('div');
+  ov.className = 'video-tile-overlay';
+  ov.innerHTML = `<span class="tile-name">${name}</span>
+    <div class="tile-mute-icons">
+      <svg class="${camMuted?'muted':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+      </svg>
+      <svg class="${micMuted?'muted':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      </svg>
+    </div>`;
+  tile.appendChild(ov);
+
+  return tile;
 }
 
 // Media toggles
 async function toggleCam(){
   S.camOn=!S.camOn;
-  if(S.dailyCall){ S.dailyCall.setLocalVideo(S.camOn); }
-  else if(S.localStream){ S.localStream.getVideoTracks().forEach(t=>t.enabled=S.camOn); }
+  if(S.livekitRoom){
+    await S.livekitRoom.localParticipant.setCameraEnabled(S.camOn);
+  } else if(S.localStream){
+    S.localStream.getVideoTracks().forEach(t=>t.enabled=S.camOn);
+  }
   const btn=document.getElementById('btnCam');
   const icon=document.getElementById('camIcon');
   if(btn) btn.className=`cb-icon${S.camOn?'':' muted'}`;
@@ -1878,8 +2026,11 @@ async function toggleCam(){
 }
 async function toggleMic(){
   S.micOn=!S.micOn;
-  if(S.dailyCall){ S.dailyCall.setLocalAudio(S.micOn); }
-  else if(S.localStream){ S.localStream.getAudioTracks().forEach(t=>t.enabled=S.micOn); }
+  if(S.livekitRoom){
+    await S.livekitRoom.localParticipant.setMicrophoneEnabled(S.micOn);
+  } else if(S.localStream){
+    S.localStream.getAudioTracks().forEach(t=>t.enabled=S.micOn);
+  }
   const btn=document.getElementById('btnMic');
   const icon=document.getElementById('micIcon');
   if(btn) btn.className=`cb-icon${S.micOn?'':' muted'}`;
@@ -1889,25 +2040,35 @@ async function toggleMic(){
   if(S.sessionDocId) db.collection('ms_sessions').doc(S.sessionDocId).update({micOn:S.micOn}).catch(()=>{});
 }
 async function toggleScreen(){
+  const screenSvg = '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>';
+  const screenOffSvg = '<line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/><path d="M10 5h7a2 2 0 0 1 2 2v9.34"/>';
+
   if(S.screenOn){
-    S.screenOn=false;
-    if(S.screenStream){S.screenStream.getTracks().forEach(t=>t.stop());S.screenStream=null;}
-    if(S.dailyCall) S.dailyCall.stopScreenShare();
+    S.screenOn = false;
+    if(S.livekitRoom){
+      try{ await S.livekitRoom.localParticipant.setScreenShareEnabled(false); }catch(e){}
+    }
+    if(S.screenStream){ S.screenStream.getTracks().forEach(t=>t.stop()); S.screenStream=null; }
     document.getElementById('btnScreen').className='cb-icon';
-    document.getElementById('screenIcon').innerHTML='<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>';
+    document.getElementById('screenIcon').innerHTML=screenSvg;
+    toast('Screenshare stopped','info');
+    renderVideoGrid();
     return;
   }
   try{
-    if(S.dailyCall){
-      await S.dailyCall.startScreenShare();
-    }else{
-      S.screenStream = await navigator.mediaDevices.getDisplayMedia({video:true});
+    if(S.livekitRoom){
+      await S.livekitRoom.localParticipant.setScreenShareEnabled(true);
+    } else {
+      S.screenStream = await navigator.mediaDevices.getDisplayMedia({video:true, audio:true});
     }
-    S.screenOn=true;
+    S.screenOn = true;
     document.getElementById('btnScreen').className='cb-icon active';
-    document.getElementById('screenIcon').innerHTML='<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>';
+    document.getElementById('screenIcon').innerHTML=screenOffSvg;
     toast('Screenshare started','ok');
-  }catch(e){toast('Screenshare cancelled','info')}
+    renderVideoGrid();
+  }catch(e){
+    toast('Screenshare cancelled','info');
+  }
 }
 
 // ══ LEAVE / FINISH ══
@@ -1918,9 +2079,9 @@ function leaveSession(){
 async function finishSession(){
   clearInterval(S.timerInterval); S.timerRunning=false;
   // Stop media
-  if(S.dailyCall){ try{await S.dailyCall.leave();await S.dailyCall.destroy();}catch(e){} S.dailyCall=null; }
-  if(S.localStream){S.localStream.getTracks().forEach(t=>t.stop());S.localStream=null;}
-  if(S.screenStream){S.screenStream.getTracks().forEach(t=>t.stop());S.screenStream=null;}
+  if(S.livekitRoom){ try{ await S.livekitRoom.disconnect(); }catch(e){} S.livekitRoom=null; }
+  if(S.localStream){ S.localStream.getTracks().forEach(t=>t.stop()); S.localStream=null; }
+  if(S.screenStream){ S.screenStream.getTracks().forEach(t=>t.stop()); S.screenStream=null; }
   // Unsub chat
   if(S.chatUnsub){S.chatUnsub();S.chatUnsub=null;}
   // Save win
@@ -2406,7 +2567,7 @@ async function finishSession(){
   const roomName=S.session?.roomName||'Session';
   const rounds=S.round||1;
   // Stop media
-  if(S.dailyCall){ try{await S.dailyCall.leave();await S.dailyCall.destroy();}catch(e){} S.dailyCall=null; }
+  if(S.livekitRoom){ try{ await S.livekitRoom.disconnect(); }catch(e){} S.livekitRoom=null; }
   if(S.localStream){S.localStream.getTracks().forEach(t=>t.stop());S.localStream=null;}
   if(S.screenStream){S.screenStream.getTracks().forEach(t=>t.stop());S.screenStream=null;}
   if(S.chatUnsub){S.chatUnsub();S.chatUnsub=null;}
@@ -2436,6 +2597,31 @@ initRooms();
 initTicker();
 loadHomeWins();
 loadHeroStats();
+
+// Show setup banner if LiveKit not configured
+(function checkSetup(){
+  if(TOKEN_WORKER_URL.includes('YOUR_CF_SUBDOMAIN') || LIVEKIT_WS_URL.includes('mysession-bookscoffeedreams')){
+    const banner = document.createElement('div');
+    banner.id = 'setup-banner';
+    banner.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:800;
+      background:var(--sur);border:1px solid rgba(99,102,241,.3);border-radius:12px;
+      padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh2);
+      font-size:12px;color:var(--tx2);max-width:520px;width:calc(100vw - 48px)`;
+    banner.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--in2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span style="flex:1">
+        <strong style="color:var(--tx)">Video setup needed</strong> — 
+        Deploy the Cloudflare Worker + get a free LiveKit Cloud account, then update 
+        <code style="font-family:var(--mono);font-size:10px;background:var(--sur2);padding:2px 6px;border-radius:4px">LIVEKIT_WS_URL</code> and 
+        <code style="font-family:var(--mono);font-size:10px;background:var(--sur2);padding:2px 6px;border-radius:4px">TOKEN_WORKER_URL</code> in the HTML. 
+        Everything else is fully working.
+      </span>
+      <button onclick="this.parentElement.remove()" style="color:var(--tx4);flex-shrink:0;font-size:16px;line-height:1;padding:2px 4px">×</button>`;
+    document.body.appendChild(banner);
+  }
+})();
 
 // Subscribe wins collection for live hero counter
 db.collection('ms_wins').onSnapshot(snap=>{
