@@ -472,6 +472,17 @@ async function ensureUserDoc(user){
   } else {
     const d=snap.data();
     if(!d.role) await ref.set({role:'user'},{merge:true});
+    // Self-heal: an earlier version of Discord sign-in didn't attach the
+    // real name/avatar, leaving accounts stuck on the placeholder even
+    // though the live session actually has the correct info. If we can
+    // see the real values now and the stored ones still look like that
+    // old placeholder, quietly correct them — never overwrites a name
+    // or photo that was ever actually set to something real.
+    const looksPlaceholder = (!d.name || d.name==='User') && !d.photoURL;
+    const haveRealInfo = user.displayName && user.displayName!=='User';
+    if(looksPlaceholder && haveRealInfo){
+      await ref.set({ name:user.displayName, photoURL:user.photoURL||'' },{merge:true});
+    }
   }
 }
 
@@ -591,7 +602,12 @@ document.getElementById('discordBtn').addEventListener('click',()=>{
   .then(async data=>{
     if(!data.ok){ showToast('Could not sign in with Discord'); return; }
     const result = await auth.signInWithCustomToken(data.token);
-    await ensureUserDoc(result.user);
+    await result.user.updateProfile({
+      displayName: data.discordUser.username,
+      photoURL: data.discordUser.avatar || undefined
+    });
+    await result.user.reload();
+    await ensureUserDoc(auth.currentUser);
     showToast('Signed in with Discord! Redirecting\u2026','success');
     setTimeout(()=>{ location.href = redirect; },800);
   })
