@@ -722,7 +722,7 @@ function toggleTheme(){
 <body>
 
 <!-- NAV -->
-<canvas id="bg-canvas" id="bgCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45"></canvas>
+<canvas id="bgCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45"></canvas>
 <nav class="nav">
   <div class="nav-brand" onclick="goHome()">
     <div class="nav-gem">
@@ -1325,7 +1325,6 @@ const FS   = firebase.firestore;
 // ══ STATE ══
 const S = {
   user: null,
-  authMode: 'signin',
   roomType: 'group',
   rooms: [],
   pendingRoom: null,
@@ -1361,7 +1360,6 @@ const AVC = ['#4f46e5','#0891b2','#059669','#d97706','#dc2626','#7c3aed','#db277
 function avc(s=''){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%AVC.length;return AVC[h]}
 function ini(n=''){return(n.trim().split(/\s+/).map(w=>w[0]).join('')||'?').slice(0,2).toUpperCase()}
 
-// ══ THEME ══
 // ══ NAVIGATION ══
 function navTo(v){
   const target = document.getElementById('page-'+v);
@@ -2126,35 +2124,6 @@ function leaveSession(){
   if(S.timerRunning && !confirm('Timer is running. Leave session?')) return;
   finishSession();
 }
-async function finishSession(){
-  clearInterval(S.timerInterval); S.timerRunning=false;
-  // Stop media
-  if(S.livekitRoom){ try{ await S.livekitRoom.disconnect(); }catch(e){} S.livekitRoom=null; }
-  if(S.localStream){ S.localStream.getTracks().forEach(t=>t.stop()); S.localStream=null; }
-  if(S.screenStream){ S.screenStream.getTracks().forEach(t=>t.stop()); S.screenStream=null; }
-  // Unsub chat
-  if(S.chatUnsub){S.chatUnsub();S.chatUnsub=null;}
-  // Save win
-  try{
-    if(S.session?.task){
-      await db.collection('ms_wins').add({
-        userId:S.user.uid, displayName:S.user.displayName||'Anonymous',
-        task:S.session.task, roomId:S.session.roomId, roomName:S.session.roomName,
-        completedAt:FS.FieldValue.serverTimestamp()
-      });
-    }
-    if(S.sessionDocId){
-      db.collection('ms_sessions').doc(S.sessionDocId).update({active:false,endedAt:FS.FieldValue.serverTimestamp()}).catch(()=>{});
-    }
-    if(S.session?.roomId){
-      db.collection('ms_rooms').doc(S.session.roomId).update({online:FS.FieldValue.increment(-1)}).catch(()=>{});
-    }
-  }catch(e){}
-  S.session=null; S.sessionDocId=null;
-  toast('Session complete — great work','ok');
-  navTo('home');
-  loadHomeWins();
-}
 
 // ══ PEOPLE SUBSCRIBE ══
 function subscribePeople(){
@@ -2613,9 +2582,7 @@ async function submitWin(){
   loadHomeWins();
 }
 
-// ══ FINISH SESSION (updated to show win modal) ══
-// Override finishSession to show win-share modal
-const _originalFinish = finishSession;
+// ══ FINISH SESSION ══
 async function finishSession(){
   clearInterval(S.timerInterval); S.timerRunning=false;
   const task=S.session?.task||'';
@@ -2677,7 +2644,7 @@ async function finishSession(){
       const d=Math.hypot(a.x-b.x,a.y-b.y);
       if(d<110){
         ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-        ctx.strokeStyle=`rgba(99,102,241,${dark?.11*(1-d/110):.06*(1-d/110)})`;
+        ctx.strokeStyle=`rgba(99,102,241,${(dark ? 0.11 : 0.06)*(1-d/110)})`;
         ctx.lineWidth=.5; ctx.stroke();
       }
     })});
