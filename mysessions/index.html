@@ -685,7 +685,7 @@ main{padding-top:58px;position:relative;z-index:1}
 <nav class="nav">
   <div class="nav-brand" onclick="goHome()">
     <div class="nav-gem">
-      <svg viewBox="0 0 16 16"><circle cx="8" cy="5" r="2"/><path d="M3 13c0-3.3 2.2-5 5-5s5 1.7 5 5"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     </div>
     <div class="nav-wordmark">
       <span class="nav-title">MySession</span>
@@ -712,7 +712,7 @@ main{padding-top:58px;position:relative;z-index:1}
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
     <div id="navAuth">
-      <button class="btn-nav-primary" id="navJoinBtn" onclick="S.user ? document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'}) : navTo('auth')">Join Free</button>
+      <button class="btn-nav-primary" id="navJoinBtn" onclick="handleHeroCta()">Join Free</button>
     </div>
   </div>
 </nav>
@@ -737,11 +737,11 @@ main{padding-top:58px;position:relative;z-index:1}
       <h1>Work with others.<br><em>Get more done.</em></h1>
       <p class="hero-desc">Live coworking sessions for people who lose focus working alone. Video on, distractions off — join a room and actually finish what you started.</p>
       <div class="hero-cta">
-        <button class="btn-primary" id="heroCtaBtn" onclick="S.user ? document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'}) : navTo('auth')">
+        <button class="btn-primary" id="heroCtaBtn" onclick="handleHeroCta()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <span id="heroCtaLabel">Start a free session</span>
         </button>
-        <button class="btn-secondary" onclick="document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'})">
+        <button class="btn-secondary" onclick="scrollToRooms()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           Browse rooms
         </button>
@@ -887,7 +887,7 @@ main{padding-top:58px;position:relative;z-index:1}
     <div class="aurora"><div class="aurora-orb ao1"></div><div class="aurora-orb ao2"></div></div>
     <div class="auth-card">
       <div class="auth-gem">
-        <svg viewBox="0 0 16 16"><circle cx="8" cy="5" r="2"/><path d="M3 13c0-3.3 2.2-5 5-5s5 1.7 5 5"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
       <h2 class="auth-title" id="authTitle">Join MySession</h2>
       <p class="auth-sub" id="authSub">Work alongside focused people. Actually finish things.</p>
@@ -1143,7 +1143,7 @@ main{padding-top:58px;position:relative;z-index:1}
     <div style="text-align:center;margin-top:56px;padding:48px 24px;background:var(--sur);border:1px solid var(--bdr);border-radius:18px">
       <h3 style="font-family:var(--serif);font-style:italic;font-size:30px;color:var(--tx);margin-bottom:12px">Ready to get started?</h3>
       <p style="font-size:14px;color:var(--tx3);margin-bottom:24px">Join a live session in under 30 seconds — free, always.</p>
-      <button class="btn-primary" onclick="navTo('home');document.getElementById('rooms-anchor').scrollIntoView({behavior:'smooth'})">
+      <button class="btn-primary" onclick="navTo('home');setTimeout(scrollToRooms,100)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         Browse rooms
       </button>
@@ -1346,6 +1346,18 @@ function navTo(v){
 }
 function goHome(){navTo('home')}
 function navToFocus(){navTo('focus')}
+function handleHeroCta(){
+  if(S.user){
+    const el = document.getElementById('rooms-anchor');
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  } else {
+    navTo('auth');
+  }
+}
+function scrollToRooms(){
+  const el = document.getElementById('rooms-anchor');
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
 
 // ══ CLOCK ══
 function startClock(){
@@ -2309,8 +2321,11 @@ auth.onAuthStateChanged(user=>{
   if(user){
     const name=user.displayName||user.email?.split('@')[0]||'User';
     const color=avc(name);
-    el.innerHTML=`<div class="user-chip" onclick="auth.signOut()">
-      <div class="user-av" style="background:${color}">${ini(name)}</div>
+    const avHtml = user.photoURL
+      ? `<img src="${user.photoURL}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0" referrerpolicy="no-referrer"/>`
+      : `<div class="user-av" style="background:${color}">${ini(name)}</div>`;
+    el.innerHTML=`<div class="user-chip" onclick="auth.signOut()" title="Sign out">
+      ${avHtml}
       <span class="user-name">${name}</span>
     </div>`;
     db.collection('ms_users').doc(user.uid).set({
