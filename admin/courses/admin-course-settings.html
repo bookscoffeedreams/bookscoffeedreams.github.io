@@ -187,12 +187,49 @@ select.inp{cursor:pointer;appearance:none}
 .chap-num{font-family:var(--mono);font-size:10px;color:var(--tx4);width:20px;flex-shrink:0;text-align:right}
 .chap-inp{flex:1;background:none;border:none;outline:none;font-size:12px;color:var(--tx3);font-family:var(--sans)}
 .chap-del{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--tx4);transition:all .15s;opacity:0;flex-shrink:0}
+.chap-lec-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--tx3);background:var(--sur3);border:1px solid var(--bdr);flex-shrink:0;transition:all .15s}
+.chap-lec-btn:hover{border-color:var(--bdr2);color:var(--in2)}
+.chap-lec-btn svg{width:11px;height:11px}
+.lec-panel{display:none;flex-direction:column;gap:5px;margin:5px 0 8px 29px;padding:9px 10px;border-left:2px solid var(--bdr2);background:var(--sur3);border-radius:0 7px 7px 0}
+.lec-panel.open{display:flex}
+.lec-item{display:flex;align-items:center;gap:7px}
+.lec-item-inp{flex:1;background:var(--sur4);border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:11.5px;color:var(--tx2);outline:none}
+.lec-item-inp.title{flex:1.3}
+.lec-item-inp.url{flex:1.6}
+.lec-item-inp.dur{width:56px;flex:none;text-align:center}
+.lec-item-del{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--tx4);flex-shrink:0;transition:all .15s}
+.lec-item-del:hover{background:rgba(239,68,68,.12);color:#f87171}
+.lec-item-del svg{width:12px;height:12px}
+.add-lec-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1px dashed var(--bdr2);font-family:var(--mono);font-size:10px;color:var(--tx4);transition:all .15s;align-self:flex-start;margin-top:2px}
+.add-lec-btn:hover{border-color:var(--in2);color:var(--in2)}
+.add-lec-btn svg{width:10px;height:10px}
+.lec-empty{font-size:11px;color:var(--tx4);font-style:italic;padding:2px 0}
 .chap-row:hover .chap-del{opacity:1}
 .chap-del:hover{background:rgba(239,68,68,.12);color:#f87171}
 .chap-del svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .add-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:8px;border:1px dashed var(--bdr2);font-size:12px;color:var(--tx4);transition:all .18s;margin-top:8px;width:100%;justify-content:center}
 .add-btn:hover{border-color:var(--in2);color:var(--in2);background:rgba(99,102,241,.05)}
 .add-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ICON + COLOR PICKERS */
+.subj-icon-btn{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;cursor:pointer;border:1.5px solid var(--bdr2);background:var(--sur4);transition:all .18s;position:relative}
+.subj-icon-btn:hover{border-color:var(--bdr3);background:var(--sur3)}
+.subj-color-btn{width:18px;height:18px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid var(--bdr2);transition:border-color .18s;position:relative}
+.subj-color-btn:hover{border-color:var(--bdr3)}
+.subj-color-btn input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0}
+.chap-icon-btn{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;cursor:pointer;border:1px solid var(--bdr);background:var(--sur3);transition:all .15s}
+.chap-icon-btn:hover{border-color:var(--bdr2)}
+.chap-color-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;cursor:pointer;border:1.5px solid var(--bdr);position:relative;transition:border-color .15s}
+.chap-color-dot:hover{border-color:var(--bdr2)}
+.chap-color-dot input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0}
+
+/* ICON PICKER POPUP */
+.icon-picker-popup{position:fixed;z-index:999;background:var(--sur);border:1px solid var(--bdr2);border-radius:12px;padding:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);display:none;flex-wrap:wrap;gap:4px;width:220px}
+.icon-picker-popup.open{display:flex}
+.icon-opt{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:background .15s}
+.icon-opt:hover{background:var(--sur3)}
+.icon-picker-search{width:100%;padding:6px 9px;background:var(--sur3);border:1px solid var(--bdr);border-radius:7px;color:var(--tx);font-size:12px;outline:none;margin-bottom:6px}
+.icon-picker-search::placeholder{color:var(--tx4)}
 
 /* POINTS GRID */
 .pts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
@@ -576,6 +613,7 @@ select.inp{cursor:pointer;appearance:none}
 </div>
 
 <div class="toast" id="toast"><span class="t-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span id="toast-msg">Saved</span></div>
+<div class="icon-picker-popup" id="iconPickerPopup"></div>
 
 <script>
 firebase.initializeApp({
@@ -631,32 +669,148 @@ function toggleSub(key, on) {
 
 let subjects = {};
 
+// ── ICON PICKER ───────────────────────────────────────────────────────────────
+const SUBJECT_ICONS = ['⚛','🔬','📐','📚','🌍','🧬','💡','📊','🎯','🧮','🖊','🔭','🌊','⚡','🏛','📝','🎨','🌱','🧪','📡'];
+const CHAPTER_ICONS = ['▸','●','◆','★','✦','○','□','◉','①','②','③'];
+const DEFAULT_COLORS = ['#6366f1','#06b6d4','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#3b82f6','#f97316','#14b8a6'];
+
+let activeIconPicker = null; // { sKey, ci (null=subject) }
+
+function openIconPicker(sKey, ci, btnEl) {
+  closeIconPicker();
+  activeIconPicker = { sKey, ci };
+  const popup = document.getElementById('iconPickerPopup');
+  const icons = ci === null ? SUBJECT_ICONS : CHAPTER_ICONS;
+  popup.innerHTML = `
+    <input class="icon-picker-search" placeholder="Type an icon or paste any character…" id="iconSearchInp"
+      oninput="filterIcons(this.value,'${sKey}',${ci})"/>
+    ${icons.map(ic => `<div class="icon-opt" onclick="setIcon('${sKey}',${ci},'${ic}')">${ic}</div>`).join('')}
+  `;
+  const rect = btnEl.getBoundingClientRect();
+  popup.style.top  = (rect.bottom + 6 + window.scrollY) + 'px';
+  popup.style.left = (rect.left + window.scrollX) + 'px';
+  popup.classList.add('open');
+  setTimeout(() => document.getElementById('iconSearchInp')?.focus(), 50);
+}
+
+function filterIcons(val, sKey, ci) {
+  if (!val) return;
+  // Allow typing any character directly as the icon
+  const popup = document.getElementById('iconPickerPopup');
+  const existing = popup.querySelectorAll('.icon-opt');
+  existing.forEach(e => e.style.display = e.textContent.includes(val) ? '' : 'none');
+  // Show a "use this" option for typed value
+  let useBtn = popup.querySelector('.icon-use-typed');
+  if (!useBtn) {
+    useBtn = document.createElement('div');
+    useBtn.className = 'icon-opt icon-use-typed';
+    useBtn.style.cssText = 'border:1px dashed var(--bdr2);color:var(--p6)';
+    popup.appendChild(useBtn);
+  }
+  useBtn.textContent = val[0];
+  useBtn.onclick = () => setIcon(sKey, ci, val[0]);
+}
+
+function setIcon(sKey, ci, icon) {
+  if (ci === null) {
+    subjects[sKey].icon = icon;
+  } else {
+    subjects[sKey].chapters[ci].icon = icon;
+  }
+  closeIconPicker();
+  renderTree();
+}
+
+function setColor(sKey, ci, color) {
+  if (ci === null) {
+    subjects[sKey].color = color;
+  } else {
+    subjects[sKey].chapters[ci].color = color;
+  }
+}
+
+function closeIconPicker() {
+  document.getElementById('iconPickerPopup').classList.remove('open');
+  activeIconPicker = null;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#iconPickerPopup') && !e.target.closest('.subj-icon-btn') && !e.target.closest('.chap-icon-btn')) {
+    closeIconPicker();
+  }
+});
+
+// ── SUBJECT / CHAPTER TREE ────────────────────────────────────────────────────
 function renderTree() {
   const container = document.getElementById('subjectTree');
   container.innerHTML = '';
+
   Object.entries(subjects).forEach(([sKey, subj]) => {
     const item = document.createElement('div');
     item.className = 'subj-item open';
     item.dataset.key = sKey;
 
-    const chapters = (subj.chapters || []).map((ch, ci) => `
-      <div class="chap-row" data-ci="${ci}">
-        <span class="chap-num">${String(ci + 1).padStart(2, '0')}</span>
-        <input class="chap-inp" value="${escHtml(ch.title || '')}" placeholder="Chapter name"
-          onchange="subjects['${sKey}'].chapters[${ci}].title = this.value"/>
-        <label class="tog" style="flex-shrink:0">
-          <input type="checkbox" ${ch.enabled !== false ? 'checked' : ''}
-            onchange="subjects['${sKey}'].chapters[${ci}].enabled = this.checked">
-          <div class="tog-track"><div class="tog-thumb"></div></div>
-        </label>
-        <button class="chap-del" onclick="deleteChapter('${sKey}',${ci})">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>`).join('');
+    const sColor = subj.color || DEFAULT_COLORS[Object.keys(subjects).indexOf(sKey) % DEFAULT_COLORS.length];
+    const sIcon  = subj.icon  || '📚';
+
+    const chapters = (subj.chapters || []).map((ch, ci) => {
+      const cColor = ch.color || sColor;
+      const cIcon  = ch.icon  || '▸';
+      const lectures = ch.lectures || [];
+      const lecItemsHtml = lectures.map((lec, li) => `
+        <div class="lec-item">
+          <input class="lec-item-inp title" value="${escHtml(lec.title || '')}" placeholder="Lecture title"
+            onchange="subjects['${sKey}'].chapters[${ci}].lectures[${li}].title=this.value"/>
+          <input class="lec-item-inp url" value="${escHtml(lec.videoUrl || '')}" placeholder="Video URL"
+            onchange="subjects['${sKey}'].chapters[${ci}].lectures[${li}].videoUrl=this.value"/>
+          <input class="lec-item-inp dur" value="${escHtml(lec.duration || '')}" placeholder="12:30"
+            onchange="subjects['${sKey}'].chapters[${ci}].lectures[${li}].duration=this.value"/>
+          <button class="lec-item-del" onclick="deleteLecture('${sKey}',${ci},${li})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>`).join('');
+      return `
+        <div class="chap-row" data-ci="${ci}">
+          <span class="chap-num">${String(ci + 1).padStart(2, '0')}</span>
+          <div class="chap-icon-btn" onclick="event.stopPropagation();openIconPicker('${sKey}',${ci},this)"
+            title="Change icon">${escHtml(cIcon)}</div>
+          <div class="chap-color-dot" style="background:${cColor}" title="Change color">
+            <input type="color" value="${cColor}"
+              oninput="subjects['${sKey}'].chapters[${ci}].color=this.value;this.parentElement.style.background=this.value"/>
+          </div>
+          <input class="chap-inp" value="${escHtml(ch.title || '')}" placeholder="Chapter name"
+            onchange="subjects['${sKey}'].chapters[${ci}].title = this.value"/>
+          <button class="chap-lec-btn" onclick="toggleLectures('${sKey}',${ci})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            ${lectures.length} lec
+          </button>
+          <label class="tog" style="flex-shrink:0">
+            <input type="checkbox" ${ch.enabled !== false ? 'checked' : ''}
+              onchange="subjects['${sKey}'].chapters[${ci}].enabled = this.checked">
+            <div class="tog-track"><div class="tog-thumb"></div></div>
+          </label>
+          <button class="chap-del" onclick="deleteChapter('${sKey}',${ci})">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="lec-panel" id="lecpanel-${sKey}-${ci}">
+          ${lecItemsHtml || '<div class="lec-empty">No lectures yet — add the first one below.</div>'}
+          <button class="add-lec-btn" onclick="addLecture('${sKey}',${ci})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Lecture
+          </button>
+        </div>`;
+    }).join('');
 
     item.innerHTML = `
       <div class="subj-head" onclick="item_toggleOpen(this)">
         <svg class="subj-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        <div class="subj-icon-btn" onclick="event.stopPropagation();openIconPicker('${sKey}',null,this)"
+          style="border-color:${sColor}40;background:${sColor}18" title="Change icon">${escHtml(sIcon)}</div>
+        <div class="subj-color-btn" style="background:${sColor}" title="Change color">
+          <input type="color" value="${sColor}"
+            oninput="subjects['${sKey}'].color=this.value;this.parentElement.style.background=this.value;this.closest('.subj-item').querySelector('.subj-icon-btn').style.borderColor=this.value+'40';this.closest('.subj-item').querySelector('.subj-icon-btn').style.background=this.value+'18'"/>
+        </div>
         <input class="subj-name-inp" value="${escHtml(subj.title || '')}" placeholder="Subject name"
           onclick="event.stopPropagation()"
           onchange="subjects['${sKey}'].title = this.value"/>
@@ -678,6 +832,12 @@ function renderTree() {
       </div>`;
     container.appendChild(item);
   });
+
+  // Re-apply which lecture panels were left open before this re-render
+  openLecturePanels.forEach(key => {
+    const panel = document.getElementById('lecpanel-' + key);
+    if (panel) panel.classList.add('open');
+  });
 }
 
 function item_toggleOpen(head) {
@@ -685,12 +845,19 @@ function item_toggleOpen(head) {
 }
 
 function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function addSubject() {
   const key = 'subj_' + Date.now();
-  subjects[key] = { title: 'New Subject', enabled: true, chapters: [] };
+  const idx = Object.keys(subjects).length;
+  subjects[key] = {
+    title: 'New Subject',
+    enabled: true,
+    icon: SUBJECT_ICONS[idx % SUBJECT_ICONS.length],
+    color: DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+    chapters: []
+  };
   renderTree();
 }
 
@@ -702,12 +869,43 @@ function deleteSubject(key) {
 
 function addChapter(sKey) {
   if (!subjects[sKey].chapters) subjects[sKey].chapters = [];
-  subjects[sKey].chapters.push({ title: 'New Chapter', enabled: true });
+  const ci = subjects[sKey].chapters.length;
+  subjects[sKey].chapters.push({
+    title: 'New Chapter',
+    enabled: true,
+    icon: CHAPTER_ICONS[ci % CHAPTER_ICONS.length],
+    color: subjects[sKey].color || DEFAULT_COLORS[0]
+  });
   renderTree();
 }
 
 function deleteChapter(sKey, ci) {
   subjects[sKey].chapters.splice(ci, 1);
+  renderTree();
+}
+
+// ── LECTURES (per chapter) ────────────────────────────────────────────────────
+let openLecturePanels = new Set();
+
+function toggleLectures(sKey, ci) {
+  const key = sKey + '-' + ci;
+  const panel = document.getElementById('lecpanel-' + sKey + '-' + ci);
+  if (openLecturePanels.has(key)) { openLecturePanels.delete(key); panel.classList.remove('open'); }
+  else { openLecturePanels.add(key); panel.classList.add('open'); }
+}
+
+function addLecture(sKey, ci) {
+  if (!subjects[sKey].chapters[ci].lectures) subjects[sKey].chapters[ci].lectures = [];
+  subjects[sKey].chapters[ci].lectures.push({
+    id: 'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    title: '', videoUrl: '', duration: ''
+  });
+  openLecturePanels.add(sKey + '-' + ci); // stay open after adding
+  renderTree();
+}
+
+function deleteLecture(sKey, ci, li) {
+  subjects[sKey].chapters[ci].lectures.splice(li, 1);
   renderTree();
 }
 
