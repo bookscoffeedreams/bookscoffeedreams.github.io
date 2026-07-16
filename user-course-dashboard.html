@@ -895,21 +895,23 @@ function isDone(lecId){ return (PROGRESS.completedLectures||[]).includes(lecId);
 // ── HOME CHAPTERS ─────────────────────────────────────────────────────────────
 function renderHomeChapters(){
   const el=document.getElementById('homeChapters');
+  const DEFAULT_COLORS=['#6366f1','#06b6d4','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#3b82f6','#f97316','#14b8a6'];
   const entries=[];
-  Object.values(subjects).forEach(s=>{
+  Object.values(subjects).forEach((s,si)=>{
+    const sc=s.color||DEFAULT_COLORS[si%DEFAULT_COLORS.length];
+    const sIcon=s.icon||'📚';
     (s.chapters||[]).forEach(ch=>{
       const done=(ch.lectures||[]).filter(l=>isDone(l.id||l.title)).length;
-      entries.push({subj:s.title,ch,done,total:(ch.lectures||[]).length});
+      entries.push({subj:s.title,sIcon,sc,ch,done,total:(ch.lectures||[]).length});
     });
   });
-  // Show last 3 chapters with activity
   const recent=entries.slice(0,3);
   el.innerHTML=recent.map(e=>`
     <div class="chap-acc open" style="margin-bottom:10px">
       <div class="chap-head" onclick="this.closest('.chap-acc').classList.toggle('open')">
-        <span class="chap-num">${e.subj[0]}</span>
-        <span class="chap-name">${esc(e.ch.title||'Chapter')}</span>
-        <span class="chap-meta"><span>${e.total} lec</span><span class="chap-prog">${e.done}/${e.total}</span></span>
+        <span style="font-size:14px;line-height:1">${esc(e.ch.icon||e.sIcon)}</span>
+        <span class="chap-name" style="color:${e.ch.color||e.sc}">${esc(e.ch.title||'Chapter')}</span>
+        <span class="chap-meta"><span>${e.total} lec</span><span class="chap-prog" style="color:${e.sc}">${e.done}/${e.total}</span></span>
         <svg class="chap-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
       <div class="chap-body">
@@ -943,9 +945,14 @@ function renderLectures(){
     });
   }
   const el=document.getElementById('lectureList');
+  const DEFAULT_COLORS=['#6366f1','#06b6d4','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#3b82f6','#f97316','#14b8a6'];
   const entries=Object.entries(subjects).filter(([k])=>!filter||k===filter);
-  el.innerHTML=entries.map(([,s])=>{
+  el.innerHTML=entries.map(([sk,s],si)=>{
+    const sc=s.color||DEFAULT_COLORS[si%DEFAULT_COLORS.length];
+    const sIcon=s.icon||'📚';
     const chapHtml=(s.chapters||[]).map((ch,ci)=>{
+      const cColor=ch.color||sc;
+      const cIcon=ch.icon||'▸';
       const done=(ch.lectures||[]).filter(l=>isDone(l.id||l.title)).length;
       const lecHtml=(ch.lectures||[]).map((l,li)=>{
         const lecId=l.id||`${ch.title}_${li}`;
@@ -964,17 +971,19 @@ function renderLectures(){
       }).join('');
       return `<div class="chap-acc open">
         <div class="chap-head" onclick="this.closest('.chap-acc').classList.toggle('open')">
-          <span class="chap-num">${String(ci+1).padStart(2,'0')}</span>
-          <span class="chap-name">${esc(ch.title||'Chapter')}</span>
-          <span class="chap-meta"><span>${(ch.lectures||[]).length} lec</span><span class="chap-prog">${done}/${(ch.lectures||[]).length}</span></span>
+          <span style="font-size:14px;line-height:1;flex-shrink:0">${esc(cIcon)}</span>
+          <span class="chap-name" style="color:${cColor}">${esc(ch.title||'Chapter')}</span>
+          <span class="chap-meta"><span>${(ch.lectures||[]).length} lec</span><span class="chap-prog" style="color:${cColor}">${done}/${(ch.lectures||[]).length}</span></span>
           <svg class="chap-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="chap-body">${lecHtml||'<div style="padding:12px 16px;font-size:13px;color:var(--tx4)">No lectures added yet</div>'}</div>
       </div>`;
     }).join('');
     return `<div style="margin-bottom:6px">
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--p6);padding:8px 0 4px;display:flex;align-items:center;gap:6px">
-        <span style="width:10px;height:1px;background:var(--p6);display:inline-block"></span>${esc(s.title||'Subject')}
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:${sc};padding:8px 0 4px;display:flex;align-items:center;gap:7px">
+        <span style="font-size:15px;line-height:1">${esc(sIcon)}</span>
+        <span style="flex:1">${esc(s.title||'Subject')}</span>
+        <span style="width:24px;height:2px;background:${sc};opacity:.4;border-radius:99px;display:inline-block"></span>
       </div>
       ${chapHtml||'<div style="color:var(--tx4);font-size:13px;padding:8px 0">No chapters</div>'}
     </div>`;
@@ -1010,18 +1019,28 @@ let noteSaveTimer;
 
 function renderNotesNav(){
   const nav=document.getElementById('notesNav');
-  nav.innerHTML=Object.entries(subjects).map(([sk,s])=>`
+  const DEFAULT_COLORS=['#6366f1','#06b6d4','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#3b82f6','#f97316','#14b8a6'];
+  nav.innerHTML=Object.entries(subjects).map(([sk,s],si)=>{
+    const sc=s.color||DEFAULT_COLORS[si%DEFAULT_COLORS.length];
+    const sIcon=s.icon||'📚';
+    return `
     <div class="n-subj open" id="nsubj-${sk}">
       <div class="n-subj-head on" onclick="toggleNSubj('${sk}')">
-        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>${esc(s.title||sk)}
+        <span style="font-size:14px;line-height:1;flex-shrink:0">${esc(sIcon)}</span>
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        <span style="color:${sc};font-weight:700">${esc(s.title||sk)}</span>
       </div>
       <div class="n-chaps">
-        ${(s.chapters||[]).map((ch,ci)=>`
-          <div class="n-chap" id="nchap-${sk}-${ci}" onclick="openNote('${sk}',${ci})">${esc(ch.title||'Chapter')}</div>
-        `).join('')}
+        ${(s.chapters||[]).map((ch,ci)=>{
+          const cIcon=ch.icon||'▸';
+          const cColor=ch.color||sc;
+          return `<div class="n-chap" id="nchap-${sk}-${ci}" onclick="openNote('${sk}',${ci})">
+            <span style="font-size:11px;color:${cColor};margin-right:5px">${esc(cIcon)}</span>${esc(ch.title||'Chapter')}
+          </div>`;
+        }).join('')}
       </div>
-    </div>`).join('');
-  // Also populate doubt chapter selects
+    </div>`;
+  }).join('');
   buildChapterSelects();
 }
 
