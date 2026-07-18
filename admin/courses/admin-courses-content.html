@@ -349,6 +349,9 @@ select.inp{cursor:pointer;appearance:none}
   <button class="btn-primary btn-sm" id="saveContentBtn">
     <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Content
   </button>
+  <a class="btn-ghost btn-sm" id="openSettingsLink" href="#" style="margin-left:8px">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="13" height="13"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>XP, Discord &amp; Access
+  </a>
 </div>
 
 <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;animation:fade-up .5s var(--spring) .05s both">
@@ -552,6 +555,7 @@ window.addEventListener("beforeunload",e=>{if(isDirty){e.preventDefault();e.retu
 async function onAdminReady(){
   courseId=getParam("id");if(!courseId){toast("No course ID","err");return}
   document.getElementById("backToEditor").href="/admin/courses/admin-courses-editor.html?id="+courseId;
+  document.getElementById("openSettingsLink").href="/admin/courses/admin-course-settings.html?id="+courseId;
   const snap=await db.collection("courses").doc(courseId).get();
   if(!snap.exists){toast("Course not found","err");return}
   const d=snap.data();
