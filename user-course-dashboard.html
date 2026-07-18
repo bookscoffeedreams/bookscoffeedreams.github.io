@@ -1057,7 +1057,7 @@ async function openNote(sk,ci){
   // Load note from Firestore or use embedded revision content
   const docId=`${courseId}_${sk}_${ci}`;
   const snap=await db.collection('aiStudyMaterials').doc(docId).get();
-  const content=snap.exists ? snap.data().content : (ch.revisions||[]).map(r=>`<h3>${esc(r.heading||'')}</h3><p>${esc(r.content||'')}</p>`).join('')||'<p>No notes added yet. Click Edit to start writing.</p>';
+  const content=snap.exists ? snap.data().content : renderRevisionBlocks(ch.revisions||[]);
   document.getElementById('notesEditor').innerHTML=`
     <div class="note-title-el" id="noteTitleEl" contenteditable="false" data-placeholder="Note title">${esc(ch.title||'Chapter')}</div>
     <div class="note-meta">${esc((subjects[sk].title)||sk)} · ${snap.exists ? 'Saved' : 'Draft'}</div>
@@ -1065,6 +1065,30 @@ async function openNote(sk,ci){
   `;
   editMode=false;
   document.getElementById('editBtn').classList.remove('active');
+}
+
+// Renders the same block format admin-courses-revision-editor.html actually
+// saves (heading/paragraph/bullets/numbered/formulas/keypoints/warning/
+// example/image/divider) — the previous version expected a totally
+// different {heading,content} shape that the editor never produces, so
+// every note written with the real editor was showing up blank.
+function renderRevisionBlocks(blocks){
+  if(!blocks || !blocks.length) return '<p>No notes added yet. Click Edit to start writing.</p>';
+  return blocks.map(b=>{
+    const d=b.data||{};
+    if(b.type==='heading') return `<h3>${esc(d.text||'')}</h3>`;
+    if(b.type==='paragraph') return `<p>${esc(d.text||'')}</p>`;
+    if(b.type==='bullets') return `<ul>${(d.items||[]).map(it=>`<li>${esc(it)}</li>`).join('')}</ul>`;
+    if(b.type==='numbered') return `<ol>${(d.items||[]).map(it=>`<li>${esc(it)}</li>`).join('')}</ol>`;
+    if(b.type==='formulas') return `<div class="note-formulas">${(d.formulas||[]).map(f=>
+        `<div style="margin-bottom:6px"><strong>${esc(f.label||'')}</strong>: ${esc(f.formula||'')}</div>`).join('')}</div>`;
+    if(b.type==='keypoints') return (d.points||[]).map(p=>`<p><strong>Key point —</strong> ${esc(p)}</p>`).join('');
+    if(b.type==='warning') return `<p style="color:var(--amber)"><strong>Note —</strong> ${esc(d.text||'')}</p>`;
+    if(b.type==='example') return `<div><strong>${esc(d.title||'Example')}</strong><p>${esc(d.body||'')}</p></div>`;
+    if(b.type==='image') return d.url ? `<img src="${esc(d.url)}" alt="${esc(d.caption||'')}" style="max-width:100%;border-radius:8px"/>` : '';
+    if(b.type==='divider') return '<hr/>';
+    return '';
+  }).join('');
 }
 
 function toggleEdit(){
@@ -1186,8 +1210,8 @@ function showFcCard(){
     return;
   }
   const c=fcDeck[fcIdx];
-  document.getElementById('fcCardQ').textContent=c.q||'—';
-  document.getElementById('fcCardA').textContent=c.a||'—';
+  document.getElementById('fcCardQ').textContent=c.front||c.q||'—';
+  document.getElementById('fcCardA').textContent=c.back||c.a||'—';
   document.getElementById('fcCardTag').textContent=c.chapter||'Flashcard';
   document.getElementById('flashCard').classList.remove('flipped');
   document.getElementById('fcRateRow').style.display='none';
