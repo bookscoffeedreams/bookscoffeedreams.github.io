@@ -677,7 +677,7 @@ auth.onAuthStateChanged(async user=>{
           totalLessons = (c.modules||[]).reduce((n,m)=>n+((m.lessons||[]).length),0);
           doneLessons = progSnap.docs.filter(d=>d.data().completed).length;
           pct = totalLessons ? Math.round(doneLessons/totalLessons*100) : 0;
-          detailHref = `course-detail.html?id=${enrolled.id}`;
+          detailHref = `course-dashboard.html?id=${enrolled.id}`;
         } else {
           // From courses_main collection (students[] enrollment)
           c = enrolled.data;
@@ -685,7 +685,7 @@ auth.onAuthStateChanged(async user=>{
           title = c.title || 'Untitled';
           // courses_main has no granular progress — show category & duration as subtitle
           totalLessons = 0; doneLessons = 0; pct = 0;
-          detailHref = `course-content.html?id=${enrolled.id}`;
+          detailHref = `course-dashboard.html?id=${enrolled.id}`;
         }
 
         const fallbackThumb = `https://placehold.co/60x42/2c2a25/d97706?text=${encodeURIComponent(title.slice(0,2))}`;
