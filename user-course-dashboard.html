@@ -173,6 +173,27 @@ input,select,textarea{font-family:var(--sans)}
 .mark-done-btn{padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:9px;border:1px solid var(--bdr2);color:var(--tx4);transition:all .18s;flex-shrink:0}
 .mark-done-btn:hover{border-color:rgba(16,185,129,.4);color:#34d399}
 
+.concept-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;background:var(--sur2);border:1px solid var(--bdr);margin-bottom:8px;cursor:pointer;transition:all .18s}
+.concept-card:hover{border-color:var(--bdr2);transform:translateX(2px)}
+.concept-thumb{width:64px;height:42px;border-radius:7px;object-fit:cover;background:var(--sur4);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--tx4)}
+.concept-info{flex:1;min-width:0}
+.concept-title{font-size:13px;font-weight:600;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.concept-sub{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:2px}
+.concept-play{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s}
+.concept-card:hover .concept-play{border-color:var(--p5);background:rgba(109,40,217,.12)}
+.concept-play svg{width:10px;height:10px;fill:var(--p5);stroke:none;margin-left:2px}
+
+.study-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;background:var(--sur2);border:1px solid var(--bdr);margin-bottom:8px;transition:all .18s}
+.study-row:hover{border-color:var(--bdr2)}
+.study-ico{width:34px;height:34px;border-radius:9px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#ef4444;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.study-info{flex:1;min-width:0}
+.study-title{font-size:13px;font-weight:600;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.study-sub{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:2px}
+.study-open-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;background:var(--sur3);border:1px solid var(--bdr2);color:var(--tx2);transition:all .18s;flex-shrink:0}
+.study-open-btn:hover{border-color:var(--p5);color:var(--p6)}
+
+.concept-empty,.study-empty{text-align:center;padding:40px 20px;color:var(--tx4);font-family:var(--serif);font-size:16px;font-style:italic}
+
 /* ── NOTES ── */
 .notes-layout{display:grid;grid-template-columns:210px 1fr;gap:12px;height:calc(100vh - var(--tb) - 120px);min-height:400px}
 .notes-nav{background:var(--sur);border:1px solid var(--bdr);border-radius:13px;overflow-y:auto;padding:8px}
@@ -459,6 +480,12 @@ input,select,textarea{font-family:var(--sans)}
     <div class="si" data-panel="p-lectures" data-mod="lectures" onclick="setPanel(this)">
       <div class="si-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>Lectures
     </div>
+    <div class="si" data-panel="p-concepts" data-mod="concepts" onclick="setPanel(this)">
+      <div class="si-ic"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>Concepts
+    </div>
+    <div class="si" data-panel="p-study" data-mod="study" onclick="setPanel(this)">
+      <div class="si-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Study Material
+    </div>
     <div class="si" data-panel="p-notes" data-mod="revision" onclick="setPanel(this)">
       <div class="si-ic"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Revision Notes
     </div>
@@ -540,6 +567,24 @@ input,select,textarea{font-family:var(--sans)}
           <select id="lectSubjFilter" class="fc-sel" style="font-size:12px" onchange="renderLectures()"><option value="">All subjects</option></select>
         </div>
         <div id="lectureList"></div>
+      </div>
+
+      <!-- ═══ CONCEPTS ═══ -->
+      <div class="panel" id="p-concepts">
+        <div class="sh">
+          <div><div class="sh-ey">Bite-sized</div><div class="sh-t">Concept <em>Clips</em></div></div>
+          <select id="conceptSubjFilter" class="fc-sel" style="font-size:12px" onchange="renderConceptsPanel()"><option value="">All subjects</option></select>
+        </div>
+        <div id="conceptList"></div>
+      </div>
+
+      <!-- ═══ STUDY MATERIAL ═══ -->
+      <div class="panel" id="p-study">
+        <div class="sh">
+          <div><div class="sh-ey">Downloadable</div><div class="sh-t">Study <em>Material</em></div></div>
+          <select id="studySubjFilter" class="fc-sel" style="font-size:12px" onchange="renderStudyPanel()"><option value="">All subjects</option></select>
+        </div>
+        <div id="studyList"></div>
       </div>
 
       <!-- ═══ REVISION NOTES ═══ -->
@@ -865,6 +910,8 @@ auth.onAuthStateChanged(async user => {
 
   // Load all panels
   renderLectures();
+  renderConceptsPanel();
+  renderStudyPanel();
   renderNotesNav();
   buildFlashDecks();
   buildPracticeFilters();
@@ -988,6 +1035,82 @@ function renderLectures(){
       ${chapHtml||'<div style="color:var(--tx4);font-size:13px;padding:8px 0">No chapters</div>'}
     </div>`;
   }).join('');
+}
+
+// ── CONCEPTS (bite-sized clips, flattened across all chapters) ────────────────
+function renderConceptsPanel(){
+  const filter=document.getElementById('conceptSubjFilter').value;
+  const sel=document.getElementById('conceptSubjFilter');
+  if(sel.options.length<=1){
+    Object.entries(subjects).forEach(([k,s])=>{
+      const o=document.createElement('option');
+      o.value=k; o.textContent=s.title||k;
+      sel.appendChild(o);
+    });
+  }
+  const el=document.getElementById('conceptList');
+  const DEFAULT_COLORS=['#6366f1','#06b6d4','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#3b82f6','#f97316','#14b8a6'];
+  const entries=Object.entries(subjects).filter(([k])=>!filter||k===filter);
+  let html='';
+  entries.forEach(([sk,s],si)=>{
+    const sc=s.color||DEFAULT_COLORS[si%DEFAULT_COLORS.length];
+    const sIcon=s.icon||'📚';
+    (s.chapters||[]).forEach(ch=>{
+      const concepts=ch.concepts||[];
+      if(!concepts.length) return;
+      html+=`<div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:${sc};padding:8px 0 4px;display:flex;align-items:center;gap:7px">
+        <span style="font-size:14px;line-height:1">${esc(ch.icon||sIcon)}</span>
+        <span style="flex:1">${esc(s.title||sk)} · ${esc(ch.title||'Chapter')}</span>
+      </div>`;
+      concepts.forEach(c=>{
+        const url=c.videoUrl||c.url||'';
+        html+=`<a class="concept-card" href="${esc(url)}" target="_blank" style="text-decoration:none">
+          ${c.thumbnailURL?`<img class="concept-thumb" src="${esc(c.thumbnailURL)}" alt=""/>`:`<div class="concept-thumb">🎬</div>`}
+          <div class="concept-info">
+            <div class="concept-title">${esc(c.title||'Concept')}</div>
+            <div class="concept-sub">${esc(s.title||sk)} · ${esc(ch.title||'')}</div>
+          </div>
+          <div class="concept-play"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </a>`;
+      });
+    });
+  });
+  el.innerHTML = html || '<div class="concept-empty">No concept clips added for this course yet.</div>';
+}
+
+// ── STUDY MATERIAL (PDFs/downloads, flattened across all chapters) ────────────
+function renderStudyPanel(){
+  const filter=document.getElementById('studySubjFilter').value;
+  const sel=document.getElementById('studySubjFilter');
+  if(sel.options.length<=1){
+    Object.entries(subjects).forEach(([k,s])=>{
+      const o=document.createElement('option');
+      o.value=k; o.textContent=s.title||k;
+      sel.appendChild(o);
+    });
+  }
+  const el=document.getElementById('studyList');
+  let html='';
+  Object.entries(subjects).filter(([k])=>!filter||k===filter).forEach(([sk,s])=>{
+    (s.chapters||[]).forEach(ch=>{
+      const items=ch.study||[];
+      if(!items.length) return;
+      html+=`<div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx4);padding:8px 0 4px">
+        ${esc(s.title||sk)} · ${esc(ch.title||'Chapter')}
+      </div>`;
+      items.forEach(st=>{
+        html+=`<div class="study-row">
+          <div class="study-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="study-info">
+            <div class="study-title">${esc(st.title||'Study material')}</div>
+            <div class="study-sub">${esc(s.title||sk)} · ${esc(ch.title||'')}</div>
+          </div>
+          <a class="study-open-btn" href="${esc(st.url||'#')}" target="_blank">Open</a>
+        </div>`;
+      });
+    });
+  });
+  el.innerHTML = html || '<div class="study-empty">No study material added for this course yet.</div>';
 }
 
 async function markLectureDone(lecId){
