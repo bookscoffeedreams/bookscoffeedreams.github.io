@@ -642,8 +642,8 @@ async function handleEnroll(){
     return;
   }
   const free=!(courseData.isPaid||(Number(courseData.price||0)>0));
-  if(free){ location.href=`lesson-player.html?courseId=${courseId}&module=0&lesson=0`; return; }
-  if(hasAccess){ location.href=`lesson-player.html?courseId=${courseId}&module=0&lesson=0`; return; }
+  if(free){ location.href=`course-dashboard.html?id=${courseId}`; return; }
+  if(hasAccess){ location.href=`course-dashboard.html?id=${courseId}`; return; }
 
   const amount=Number(courseData.price||0);
   const {isConfirmed,value:orderResp}=await Swal.fire({
