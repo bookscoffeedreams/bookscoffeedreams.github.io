@@ -176,6 +176,10 @@ body::after{
 
 /* Action buttons — right side */
 .identity-actions{display:flex;flex-direction:column;gap:9px;align-items:flex-end;flex-shrink:0}
+.private-gate{max-width:1100px;margin:60px auto;padding:0 24px;text-align:center}
+.private-gate-icon{width:52px;height:52px;margin:0 auto 18px;color:var(--tx4)}
+.private-gate-title{font-family:var(--serif);font-style:italic;font-size:26px;color:var(--tx);margin-bottom:8px}
+.private-gate-sub{font-size:14px;color:var(--tx4);max-width:360px;margin:0 auto}
 .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:11px;background:linear-gradient(135deg,#92400e,#d97706);color:#fff;font-size:13px;font-weight:600;transition:all .22s;box-shadow:0 4px 16px rgba(217,119,6,.3);position:relative;overflow:hidden}
 .btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%);opacity:0;transition:.2s}
 .btn-primary:hover::after{opacity:1}
@@ -413,7 +417,7 @@ body::after{
             </div>
           </div>
         </div>
-        <div class="identity-actions">
+        <div class="identity-actions" id="identityActions">
           <a href="settings.html" class="btn-primary">
             <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Edit Profile
@@ -433,6 +437,7 @@ body::after{
 </div>
 
 <!-- ═══ STATS ═══ -->
+<div id="profileMainContent">
 <div class="stats-row">
   <div class="stats-inner">
     <div class="stat"><div class="stat-n" id="sXP">0</div><div class="stat-l">XP Earned</div></div>
@@ -540,6 +545,14 @@ body::after{
   </div>
 </div>
 
+</div><!-- #profileMainContent -->
+
+<div class="private-gate" id="privateGate" style="display:none">
+  <svg class="private-gate-icon" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  <div class="private-gate-title">The rest of this profile is <em>private</em></div>
+  <div class="private-gate-sub">This member has chosen to keep their activity, badges, and details private.</div>
+</div>
+
 </div><!-- .page -->
 
 <script>
@@ -582,62 +595,72 @@ function timeAgo(ms) {
   return new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+const params = new URLSearchParams(location.search);
+const targetUid = params.get('uid'); // absent = viewing your own profile
+
 auth.onAuthStateChanged(async user => {
   if (!user) return location.href = 'login.html';
 
-  // Avatar
+  const isSelf = !targetUid || targetUid === user.uid;
+  const viewUid = isSelf ? user.uid : targetUid;
+
+  // Self-only chrome: edit/community/logout buttons, settings shortcut, page title
+  if (!isSelf) {
+    document.getElementById('identityActions').style.display = 'none';
+    const settingsLink = document.querySelector('.tb-settings-link');
+    if (settingsLink) settingsLink.style.display = 'none';
+    document.querySelector('.tb-page-title').textContent = 'Profile';
+  }
+
+  // Firestore is the single source of truth here — it's the only place
+  // another person's data can come from at all (we can't call Firebase
+  // Auth to look up someone else client-side), so self and other-viewing
+  // both read the same way for consistency.
+  const snap = await db.collection('users').doc(viewUid).get();
+  if (!snap.exists) {
+    document.querySelector('.private-gate-title').textContent = 'Member not found';
+    document.querySelector('.private-gate-sub').textContent = "This profile doesn't exist or may have been removed.";
+    document.getElementById('privateGate').style.display = 'block';
+    document.getElementById('profileMainContent').style.display = 'none';
+    return;
+  }
+  const d = snap.data();
+  const priv = d.privacy || {};
+  // Undefined = treat as visible, matching settings.html's own default (checked=true)
+  const showProfile = priv.showProfile !== false;
+  const showXP = priv.showXP !== false;
+  const showOnline = priv.showOnline !== false;
+  const isPrivateToViewer = !isSelf && !showProfile;
+
+  // Avatar — always visible, private or not
   const av = document.getElementById('avatar');
-  av.src = user.photoURL || DEFAULT_AV;
+  av.src = (isSelf ? user.photoURL : d.photoURL) || DEFAULT_AV;
   av.onerror = () => av.src = DEFAULT_AV;
 
-  // Timestamps
-  if (user.metadata?.creationTime)
+  // Timestamps — Auth metadata for self (slightly richer), Firestore for others
+  const createdMs = isSelf && user.metadata?.creationTime
+    ? new Date(user.metadata.creationTime).getTime()
+    : (d.createdAt?.seconds ? d.createdAt.seconds * 1000 : null);
+  if (createdMs)
     document.getElementById('joinDate').textContent =
-      new Date(user.metadata.creationTime).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  if (user.metadata?.lastSignInTime)
+      new Date(createdMs).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  if (isSelf && user.metadata?.lastSignInTime)
     document.getElementById('lastActive').textContent =
       timeAgo(new Date(user.metadata.lastSignInTime).getTime());
+  else
+    document.getElementById('lastActive').textContent = '—';
 
-  // Firestore
-  const snap = await db.collection('users').doc(user.uid).get();
-  const d = snap.exists ? snap.data() : {};
-
-  // Name
-  const name = d.name || user.displayName || 'Reader';
+  // Name — always visible, private or not
+  const name = d.name || (isSelf ? user.displayName : null) || 'Reader';
   const words = name.trim().split(/\s+/);
-  // Italic last name in Instrument Serif style
   document.getElementById('idName').innerHTML =
     words.length > 1
       ? `${words[0]} <em>${words.slice(1).join(' ')}</em>`
       : `<em>${words[0]}</em>`;
-  document.getElementById('idHandle').textContent = user.email || '';
+  document.getElementById('idHandle').textContent = isSelf ? (user.email || '') : '';
   document.getElementById('bannerDeco').textContent = name;
 
-  // Role
-  const role = d.role || 'user';
-  const rp = document.getElementById('rolePill');
-  rp.textContent = role.charAt(0).toUpperCase() + role.slice(1);
-  rp.className = 'id-pill role ' + role;
-
-  // Status
-  const SC = { online: 'var(--green)', idle: 'var(--amber)', dnd: 'var(--red)', invisible: 'var(--tx4)' };
-  const SL = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', invisible: 'Offline' };
-  const st = d.status?.availability || 'online';
-  document.getElementById('avStatus').style.background = SC[st].startsWith('var') ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : SC[st];
-  const stColors = { online: '#16a34a', idle: '#d97706', dnd: '#dc2626', invisible: '#78716c' };
-  document.getElementById('avStatus').style.background = stColors[st] || stColors.online;
-  document.getElementById('memberStatus').style.color = stColors[st] || stColors.online;
-  document.getElementById('memberStatus').textContent = `● ${SL[st]}`;
-
-  // Status message pill
-  if (d.status?.message) {
-    const sp = document.createElement('span');
-    sp.className = 'id-pill';
-    sp.innerHTML = `<span class="id-pill-dot" style="background:${stColors[st]}"></span>${d.status.message}`;
-    document.getElementById('idPills').appendChild(sp);
-  }
-
-  // Banner
+  // Banner — always visible, private or not
   if (d.banner?.type === 'image' && d.banner.value) {
     const l = document.getElementById('bannerImgLayer');
     l.style.backgroundImage = `url(${d.banner.value})`;
@@ -647,20 +670,62 @@ auth.onAuthStateChanged(async user => {
     document.getElementById('bannerInner').style.animation = 'none';
   }
 
-  // XP
+  // Role — shown unless this profile is private to us
+  if (!isPrivateToViewer) {
+    const role = d.role || 'user';
+    const rp = document.getElementById('rolePill');
+    rp.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+    rp.className = 'id-pill role ' + role;
+  } else {
+    document.getElementById('rolePill').style.display = 'none';
+  }
+
+  // Status — respects the "Show online status" privacy toggle individually
+  if (showOnline && !isPrivateToViewer) {
+    const stColors = { online: '#16a34a', idle: '#d97706', dnd: '#dc2626', invisible: '#78716c' };
+    const SL = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', invisible: 'Offline' };
+    const st = d.status?.availability || 'online';
+    document.getElementById('avStatus').style.background = stColors[st] || stColors.online;
+    document.getElementById('memberStatus').style.color = stColors[st] || stColors.online;
+    document.getElementById('memberStatus').textContent = `● ${SL[st]}`;
+    if (d.status?.message) {
+      const sp = document.createElement('span');
+      sp.className = 'id-pill';
+      sp.innerHTML = `<span class="id-pill-dot" style="background:${stColors[st]}"></span>${d.status.message}`;
+      document.getElementById('idPills').appendChild(sp);
+    }
+  } else {
+    document.getElementById('avStatus').style.display = 'none';
+    document.getElementById('memberStatus').style.display = 'none';
+  }
+
+  // Everything below this line is the gated "rest of the profile" —
+  // hidden entirely if this member has chosen showProfile:false and
+  // we're not looking at our own page.
+  if (isPrivateToViewer) {
+    document.getElementById('profileMainContent').style.display = 'none';
+    document.getElementById('privateGate').style.display = 'block';
+    return;
+  }
+
+  // XP — individually gated by the "Show XP publicly" toggle
   const xp = d.xp || 0;
   const level = Math.floor(xp / 500) + 1;
   const prog = xp % 500;
-  document.getElementById('sXP').textContent = xp;
-  document.getElementById('sLevel').textContent = level;
-  document.getElementById('xpBig').textContent = xp;
-  document.getElementById('xpEyebrow').textContent = `Level ${level}`;
-  document.getElementById('xpSub').textContent = `${prog} / 500 XP · ${500 - prog} XP remaining`;
-  document.getElementById('xpCard').setAttribute('data-level', `Lv ${level}`);
-  setTimeout(() => {
-    document.getElementById('xpFill').style.width = Math.min(100, Math.round(prog / 500 * 100)) + '%';
-  }, 400);
-
+  if (showXP || isSelf) {
+    document.getElementById('sXP').textContent = xp;
+    document.getElementById('sLevel').textContent = level;
+    document.getElementById('xpBig').textContent = xp;
+    document.getElementById('xpEyebrow').textContent = `Level ${level}`;
+    document.getElementById('xpSub').textContent = `${prog} / 500 XP · ${500 - prog} XP remaining`;
+    document.getElementById('xpCard').setAttribute('data-level', `Lv ${level}`);
+    setTimeout(() => {
+      document.getElementById('xpFill').style.width = Math.min(100, Math.round(prog / 500 * 100)) + '%';
+    }, 400);
+  } else {
+    const xpCard = document.getElementById('xpCard');
+    if (xpCard) xpCard.style.display = 'none';
+  }
   // Bio
   if (d.bio) {
     document.getElementById('bioBlock').style.display = 'block';
@@ -715,7 +780,7 @@ auth.onAuthStateChanged(async user => {
   // Posts
   try {
     const ps = await db.collection('communityPosts')
-      .where('uid','==', user.uid)
+      .where('uid','==', viewUid)
       .orderBy('createdAt','desc')
       .limit(5)
       .get();
