@@ -664,6 +664,7 @@ auth.onAuthStateChanged(async user => {
   if (d.banner?.type === 'image' && d.banner.value) {
     const l = document.getElementById('bannerImgLayer');
     l.style.backgroundImage = `url(${d.banner.value})`;
+    l.style.opacity = '1';
     l.style.display = 'block';
   } else if (d.banner?.type === 'gradient' && d.banner.value) {
     document.getElementById('bannerInner').style.background = d.banner.value;
