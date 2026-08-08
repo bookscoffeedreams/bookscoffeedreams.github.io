@@ -450,10 +450,12 @@ db.collection('communityChat').orderBy('createdAt','asc').onSnapshot(snap=>{
     const isOwn=currentUser&&d.uid===currentUser.uid;
     const wrap=document.createElement('div');wrap.className='msg'+(isOwn?' msg-own':'');
     const img=document.createElement('img');img.className='msg-av';img.src=DEFAULT_AVATAR;
+    if(d.uid){img.style.cursor='pointer';img.onclick=()=>location.href='profile.html?uid='+d.uid;}
     if(!isOwn)wrap.appendChild(img);
     const body=document.createElement('div');body.className='msg-body';
     const header=document.createElement('div');header.className='msg-header';
     const nameEl=document.createElement('span');nameEl.className='msg-name';nameEl.textContent=d.by||'User';
+    if(d.uid){nameEl.style.cursor='pointer';nameEl.onclick=()=>location.href='profile.html?uid='+d.uid;}
     const timeEl=document.createElement('span');timeEl.className='msg-time';timeEl.textContent=d.createdAt?timeAgo(new Date(d.createdAt.seconds*1000)):'';
     header.appendChild(nameEl);header.appendChild(timeEl);
     if(currentUserRole==='admin'){
@@ -537,9 +539,11 @@ db.collection('communityPosts').orderBy('createdAt','desc').onSnapshot(snap=>{
     const inner=document.createElement('div');inner.className='post-inner';
     const hdr=document.createElement('div');hdr.className='post-hdr';
     const av=document.createElement('img');av.className='post-hdr-av';av.id=`post_img_${id}`;av.src=DEFAULT_AVATAR;
+    if(d.uid){av.style.cursor='pointer';av.onclick=()=>location.href='profile.html?uid='+d.uid;}
     const hinfo=document.createElement('div');hinfo.style.flex='1';
     const hrow=document.createElement('div');hrow.style.cssText='display:flex;align-items:center;gap:8px';
     const aname=document.createElement('span');aname.className='post-author';aname.textContent=d.by||'User';
+    if(d.uid){aname.style.cursor='pointer';aname.onclick=()=>location.href='profile.html?uid='+d.uid;}
     const atime=document.createElement('span');atime.className='post-time';atime.textContent=d.createdAt?timeAgo(new Date(d.createdAt.seconds*1000)):'';
     hrow.appendChild(aname);hrow.appendChild(atime);
     if(currentUserRole==='admin'){const del=document.createElement('button');del.className='admin-del';del.textContent='Del';del.onclick=async()=>{if(!confirm('Delete post?'))return;try{await db.collection('communityPosts').doc(id).delete()}catch(e){alert('Could not delete')}};hrow.appendChild(del)}
@@ -564,7 +568,7 @@ db.collection('communityPosts').orderBy('createdAt','desc').onSnapshot(snap=>{
     });
     db.collection('communityPosts').doc(id).collection('comments').orderBy('createdAt','asc').onSnapshot(csnap=>{
       const area=document.getElementById('comments_area_'+id);if(!area)return;area.innerHTML='';
-      csnap.forEach(cDoc=>{const cd=cDoc.data();const cdiv=document.createElement('div');cdiv.className='comment-item';cdiv.innerHTML=`<div class="comment-author">${escapeHtml(cd.by||'User')}</div><div class="comment-text">${escapeHtml(cd.content)}</div><div class="comment-time">${cd.createdAt?timeAgo(new Date(cd.createdAt.seconds*1000)):''}</div>`;area.appendChild(cdiv)});
+      csnap.forEach(cDoc=>{const cd=cDoc.data();const cdiv=document.createElement('div');cdiv.className='comment-item';cdiv.innerHTML=`<div class="comment-author"${cd.uid?` style="cursor:pointer" data-uid="${cd.uid}"`:''}>${escapeHtml(cd.by||'User')}</div><div class="comment-text">${escapeHtml(cd.content)}</div><div class="comment-time">${cd.createdAt?timeAgo(new Date(cd.createdAt.seconds*1000)):''}</div>`;const cAuthorEl=cdiv.querySelector('.comment-author');if(cAuthorEl&&cd.uid)cAuthorEl.onclick=()=>location.href='profile.html?uid='+cd.uid;area.appendChild(cdiv)});
       const cc=document.getElementById('commentsCount_'+id);if(cc)cc.textContent=String(area.childElementCount);
     });
     const reactBtns=reactEl.querySelectorAll('.reaction-btn');
