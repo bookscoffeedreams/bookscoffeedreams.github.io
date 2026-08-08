@@ -761,6 +761,7 @@ auth.onAuthStateChanged(async user=>{
     const isMe=d.id===user.uid;
     const row=document.createElement('div');
     row.className='lb-row'+(isMe?' lb-me':'');
+    if(!isMe){ row.style.cursor='pointer'; row.onclick=()=>location.href='profile.html?uid='+d.id; }
     row.innerHTML=`
       <span class="lb-rank ${rankCls[rank]||''}">${rank<=3?rankLabels[rank]:rank}</span>
       <img class="lb-av" src="${u.photoURL||DEF_AV}" alt="" onerror="this.src='${DEF_AV}'"/>
