@@ -666,6 +666,12 @@ async function loadBlog(){
     document.getElementById('authorAv').src=authorImg;
     document.getElementById('authorName').textContent=blogData.author||'BCD Team';
     document.getElementById('authorDate').textContent=formatDate(blogData.createdAt||blogData.date);
+    if(blogData.authorId){
+      const authorAvEl=document.getElementById('authorAv');
+      const authorNameEl=document.getElementById('authorName');
+      authorAvEl.style.cursor='pointer';authorAvEl.onclick=()=>location.href='profile.html?uid='+blogData.authorId;
+      authorNameEl.style.cursor='pointer';authorNameEl.onclick=()=>location.href='profile.html?uid='+blogData.authorId;
+    }
 
     // Stats
     const views=blogData.views||0;
