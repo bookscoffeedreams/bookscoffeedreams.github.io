@@ -292,6 +292,57 @@ input,select,textarea{font-family:var(--sans)}
 .prac-opt-key{width:24px;height:24px;border-radius:6px;background:var(--sur4);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--tx4);flex-shrink:0}
 .prac-action-row{display:flex;align-items:center;gap:10px;margin-top:14px}
 .prac-timer{font-family:var(--mono);font-size:13px;color:var(--tx3);padding:7px 14px;border-radius:8px;background:var(--sur3);border:1px solid var(--bdr);margin-right:auto}
+
+/* ═══ EXAM ENGINE ═══ */
+.exam-overlay{position:fixed;inset:0;z-index:500;background:var(--bg);display:none;flex-direction:column}
+.exam-overlay.open{display:flex}
+.exam-top{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:1px solid var(--bdr);background:var(--sur);flex-shrink:0}
+.exam-title{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exam-timer{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:15px;font-weight:600;color:var(--tx2);padding:8px 16px;border-radius:10px;background:var(--sur3);border:1px solid var(--bdr)}
+.exam-timer.warn{color:#fcd34d;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.exam-timer.danger{color:#f87171;border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);animation:exam-pulse 1s infinite}
+@keyframes exam-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.exam-timer svg{width:14px;height:14px}
+.exam-submit-btn{padding:9px 20px;border-radius:10px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-size:13px;font-weight:600;transition:all .18s}
+.exam-submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(220,38,38,.4)}
+.exam-body{flex:1;display:flex;overflow:hidden}
+.exam-nav{width:260px;flex-shrink:0;border-right:1px solid var(--bdr);background:var(--sur2);padding:18px;overflow-y:auto}
+.exam-nav-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;font-size:10.5px;color:var(--tx4)}
+.exam-nav-legend-item{display:flex;align-items:center;gap:5px}
+.exam-nav-legend-dot{width:9px;height:9px;border-radius:3px}
+.exam-nav-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.exam-nav-btn{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;background:var(--sur4);border:1.5px solid var(--bdr);color:var(--tx4);transition:all .15s}
+.exam-nav-btn.answered{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.35);color:#34d399}
+.exam-nav-btn.current{border-color:var(--p5);box-shadow:0 0 0 2px rgba(109,40,217,.2)}
+.exam-main{flex:1;overflow-y:auto;padding:32px 40px;display:flex;flex-direction:column;align-items:center}
+.exam-q-wrap{width:100%;max-width:680px}
+.exam-q-meta{font-family:var(--mono);font-size:11px;color:var(--tx4);margin-bottom:14px}
+.exam-q-text{font-family:var(--serif);font-size:20px;color:var(--tx);line-height:1.5;margin-bottom:24px}
+.exam-opt{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:11px;border:1.5px solid var(--bdr);background:var(--sur2);cursor:pointer;transition:all .18s;font-size:14.5px;color:var(--tx2);margin-bottom:10px}
+.exam-opt:hover{border-color:var(--bdr2)}
+.exam-opt.selected{border-color:var(--p5);background:rgba(109,40,217,.1);color:var(--p6)}
+.exam-opt-key{width:26px;height:26px;border-radius:7px;background:var(--sur4);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11.5px;color:var(--tx4);flex-shrink:0}
+.exam-opt.selected .exam-opt-key{background:var(--p5);border-color:var(--p5);color:#fff}
+.exam-footer-nav{display:flex;justify-content:space-between;width:100%;max-width:680px;margin-top:20px}
+
+/* Results / Analysis */
+.result-hero{text-align:center;padding:40px 20px 24px}
+.result-score{font-family:var(--serif);font-style:italic;font-size:60px;color:var(--p6);line-height:1}
+.result-score-sub{font-size:13px;color:var(--tx4);margin-top:4px}
+.result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:600px;margin:20px auto 0}
+.result-stat{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center}
+.result-stat-n{font-family:var(--serif);font-size:22px;font-style:italic}
+.result-stat-l{font-family:var(--mono);font-size:9.5px;color:var(--tx4);margin-top:3px;text-transform:uppercase;letter-spacing:.08em}
+.analysis-q{background:var(--sur);border:1px solid var(--bdr);border-radius:13px;padding:18px 20px;margin-bottom:12px}
+.analysis-q-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:var(--mono);font-size:10.5px}
+.analysis-badge{padding:3px 9px;border-radius:99px;font-weight:600}
+.analysis-badge.correct{background:rgba(16,185,129,.12);color:#34d399}
+.analysis-badge.wrong{background:rgba(239,68,68,.12);color:#f87171}
+.analysis-badge.skipped{background:var(--sur4);color:var(--tx4)}
+.analysis-q-text{font-size:14.5px;color:var(--tx2);margin-bottom:12px;line-height:1.5}
+.analysis-opt{padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:6px;border:1px solid var(--bdr);color:var(--tx3)}
+.analysis-opt.was-correct{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06);color:#34d399}
+.analysis-opt.was-wrong{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.06);color:#f87171}
 .prac-timer.warn{color:#fcd34d;border-color:rgba(245,158,11,.3)}
 .prac-timer.danger{color:#f87171;border-color:rgba(239,68,68,.3);animation:blink 1s infinite}
 .prac-next-btn{padding:9px 20px;border-radius:10px;background:linear-gradient(135deg,var(--p3),var(--p5));color:#fff;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 4px 14px rgba(109,40,217,.35)}
@@ -1530,6 +1581,7 @@ async function loadTests(){
       const type=isDone?'done':isUpcoming?'upcoming':'avail';
       const card=document.createElement('div');
       card.className='tc';
+      const myResult = (PROGRESS.testResults||{})[doc.id];
       card.innerHTML=`
         <div class="tc-s ${type}"></div>
         <div class="tc-b">
@@ -1541,7 +1593,7 @@ async function loadTests(){
           <div class="tc-sub">${esc(t.description||'')}${schAt?` · ${schAt.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}`:''}</div>
           <div class="tc-meta">
             <div class="tc-meta-item"><div class="tc-meta-n">${t.totalQuestions||'—'}</div><div class="tc-meta-l">Questions</div></div>
-            ${isDone&&t.userScore!=null?`<div class="tc-meta-item"><div class="tc-meta-n" style="color:#34d399">${t.userScore}</div><div class="tc-meta-l">Your Score</div></div>`:''}
+            ${isDone&&myResult?`<div class="tc-meta-item"><div class="tc-meta-n" style="color:#34d399">${myResult.score}/${myResult.totalMarks}</div><div class="tc-meta-l">Your Score</div></div>`:''}
             ${t.maxMarks?`<div class="tc-meta-item"><div class="tc-meta-n">${t.maxMarks}</div><div class="tc-meta-l">Max Marks</div></div>`:''}
           </div>
           ${isAvail?`<button class="tc-btn start" onclick="startTest('${doc.id}')">Start Test</button>`:''}
@@ -1556,8 +1608,215 @@ async function loadTests(){
   } catch(e){ showToast('Tests: '+e.message,'err'); }
 }
 
-function startTest(id){ showToast('Launching test '+id+'… (wire up test engine here)','ok'); }
-function viewAnalysis(id){ showToast('Loading analysis for '+id+'…','ok'); }
+// ═══════════════════════════════════════════════════════════════════════════
+// EXAM ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+let examState = null; // { test, testId, answers:[], qIndex, timeLeftSec, timerHandle }
+
+async function startTest(id){
+  const existing = (PROGRESS.testResults||{})[id];
+  if(existing){ viewAnalysis(id); return; }
+
+  const snap = await db.collection('testSchedule').doc(id).get();
+  if(!snap.exists){ showToast('Test not found','err'); return; }
+  const test = snap.data();
+  const questions = test.questions || [];
+  if(!questions.length){ showToast('This test has no questions yet','err'); return; }
+
+  examState = {
+    testId: id,
+    test,
+    answers: new Array(questions.length).fill(null),
+    qIndex: 0,
+    timeLeftSec: (test.duration||60) * 60,
+    startedAt: Date.now()
+  };
+
+  document.getElementById('examTitle').textContent = test.title || 'Test';
+  document.getElementById('examOverlay').classList.add('open');
+  renderExamNav();
+  renderExamQuestion();
+  examState.timerHandle = setInterval(examTick, 1000);
+  updateExamTimerDisplay();
+}
+
+function examTick(){
+  examState.timeLeftSec--;
+  updateExamTimerDisplay();
+  if(examState.timeLeftSec <= 0){
+    clearInterval(examState.timerHandle);
+    showToast('Time\'s up — submitting automatically','ok');
+    submitExam();
+  }
+}
+
+function updateExamTimerDisplay(){
+  const s = Math.max(0, examState.timeLeftSec);
+  const m = Math.floor(s/60), sec = s%60;
+  document.getElementById('examTimerText').textContent = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  const el = document.getElementById('examTimer');
+  el.classList.toggle('warn', s <= 300 && s > 60);
+  el.classList.toggle('danger', s <= 60);
+}
+
+function renderExamNav(){
+  const grid = document.getElementById('examNavGrid');
+  grid.innerHTML = examState.test.questions.map((q,i) => `
+    <div class="exam-nav-btn ${examState.answers[i]!==null?'answered':''} ${i===examState.qIndex?'current':''}"
+      onclick="jumpToExamQ(${i})">${i+1}</div>
+  `).join('');
+}
+
+function jumpToExamQ(i){
+  examState.qIndex = i;
+  renderExamQuestion();
+  renderExamNav();
+}
+function examNextQ(){
+  if(examState.qIndex < examState.test.questions.length-1){ examState.qIndex++; renderExamQuestion(); renderExamNav(); }
+}
+function examPrevQ(){
+  if(examState.qIndex > 0){ examState.qIndex--; renderExamQuestion(); renderExamNav(); }
+}
+
+function renderExamQuestion(){
+  const q = examState.test.questions[examState.qIndex];
+  const total = examState.test.questions.length;
+  document.getElementById('examQMeta').textContent = `Question ${examState.qIndex+1} of ${total} · ${q.marks||1} mark${(q.marks||1)!==1?'s':''}`;
+  document.getElementById('examQText').textContent = q.q || '';
+  const selected = examState.answers[examState.qIndex];
+  document.getElementById('examOpts').innerHTML = (q.options||[]).map((opt,oi) => {
+    if(!opt) return '';
+    return `<div class="exam-opt ${selected===oi?'selected':''}" onclick="selectExamOpt(${oi})">
+      <div class="exam-opt-key">${String.fromCharCode(65+oi)}</div>
+      <div>${esc(opt)}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectExamOpt(oi){
+  examState.answers[examState.qIndex] = oi;
+  renderExamQuestion();
+  renderExamNav();
+}
+
+function confirmSubmitExam(){
+  const unanswered = examState.answers.filter(a => a===null).length;
+  const msg = unanswered > 0
+    ? `You have ${unanswered} unanswered question${unanswered!==1?'s':''}. Submit anyway?`
+    : 'Submit this test? You cannot change your answers after submitting.';
+  if(confirm(msg)) submitExam();
+}
+
+async function submitExam(){
+  clearInterval(examState.timerHandle);
+  const { test, testId, answers } = examState;
+  const questions = test.questions || [];
+  let correctCount = 0, wrongCount = 0, unansweredCount = 0, score = 0;
+  const totalMarks = questions.reduce((s,q) => s + (Number(q.marks)||1), 0);
+
+  questions.forEach((q,i) => {
+    if(answers[i] === null){ unansweredCount++; }
+    else if(answers[i] === q.correct){ correctCount++; score += (Number(q.marks)||1); }
+    else { wrongCount++; }
+  });
+
+  const timeSpentSec = Math.round((Date.now() - examState.startedAt) / 1000);
+  const resultPayload = {
+    uid: USER.uid, testId, courseId,
+    title: test.title || 'Test',
+    answers, correctCount, wrongCount, unansweredCount,
+    score, totalMarks,
+    timeSpentSec,
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try{
+    await db.collection('testResults').doc(testId+'_'+USER.uid).set(resultPayload);
+    const testResultsMap = { ...(PROGRESS.testResults||{}), [testId]: { score, totalMarks, correctCount, wrongCount, unansweredCount } };
+    PROGRESS.testResults = testResultsMap;
+    PROGRESS.completedTests = [...new Set([...(PROGRESS.completedTests||[]), testId])];
+    await db.collection('userCourseProgress').doc(USER.uid+'_'+courseId).set({
+      uid: USER.uid, courseId,
+      completedTests: PROGRESS.completedTests,
+      testResults: testResultsMap,
+      lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge:true });
+
+    const xpVal = (SETTINGS.xp||{}).testComplete || 25;
+    await db.collection('users').doc(USER.uid).update({
+      xp: firebase.firestore.FieldValue.increment(xpVal)
+    });
+    showToast(`Test submitted · +${xpVal} XP`, 'ok');
+  }catch(e){
+    showToast('Could not save result: '+e.message, 'err');
+  }
+
+  document.getElementById('examOverlay').classList.remove('open');
+  examState = null;
+  loadTests();
+  showResultsOverlay(testId, resultPayload, questions, answers);
+}
+
+async function viewAnalysis(id){
+  const cached = (PROGRESS.testResults||{})[id];
+  let resultData;
+  if(cached){
+    const snap = await db.collection('testResults').doc(id+'_'+USER.uid).get();
+    resultData = snap.exists ? snap.data() : null;
+  }
+  if(!resultData){ showToast('Could not load your result for this test','err'); return; }
+
+  const testSnap = await db.collection('testSchedule').doc(id).get();
+  const questions = testSnap.exists ? (testSnap.data().questions||[]) : [];
+  showResultsOverlay(id, resultData, questions, resultData.answers||[]);
+}
+
+function showResultsOverlay(testId, result, questions, answers){
+  document.getElementById('resultsTitle').textContent = result.title || 'Results';
+  const pct = result.totalMarks ? Math.round((result.score/result.totalMarks)*100) : 0;
+
+  let html = `
+    <div class="result-hero">
+      <div class="result-score">${result.score}<span style="font-size:26px;color:var(--tx4)">/${result.totalMarks}</span></div>
+      <div class="result-score-sub">${pct}% score</div>
+      <div class="result-stats">
+        <div class="result-stat"><div class="result-stat-n" style="color:#34d399">${result.correctCount}</div><div class="result-stat-l">Correct</div></div>
+        <div class="result-stat"><div class="result-stat-n" style="color:#f87171">${result.wrongCount}</div><div class="result-stat-l">Wrong</div></div>
+        <div class="result-stat"><div class="result-stat-n" style="color:var(--tx4)">${result.unansweredCount}</div><div class="result-stat-l">Skipped</div></div>
+        <div class="result-stat"><div class="result-stat-n">${Math.round((result.timeSpentSec||0)/60)}m</div><div class="result-stat-l">Time taken</div></div>
+      </div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx4);margin:24px 0 12px">Answer Review</div>
+  `;
+
+  html += questions.map((q,i) => {
+    const given = answers[i];
+    const status = given === null ? 'skipped' : (given === q.correct ? 'correct' : 'wrong');
+    const statusLabel = status === 'skipped' ? 'Skipped' : (status === 'correct' ? 'Correct' : 'Incorrect');
+    return `<div class="analysis-q">
+      <div class="analysis-q-meta">
+        <span class="analysis-badge ${status}">${statusLabel}</span>
+        <span style="color:var(--tx4)">Question ${i+1} · ${q.marks||1} mark${(q.marks||1)!==1?'s':''}</span>
+      </div>
+      <div class="analysis-q-text">${esc(q.q||'')}</div>
+      ${(q.options||[]).map((opt,oi) => {
+        if(!opt) return '';
+        let cls='';
+        if(oi===q.correct) cls='was-correct';
+        else if(oi===given && given!==q.correct) cls='was-wrong';
+        return `<div class="analysis-opt ${cls}">${String.fromCharCode(65+oi)}. ${esc(opt)}</div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+
+  document.getElementById('resultsContent').innerHTML = html;
+  document.getElementById('resultsOverlay').classList.add('open');
+}
+
+function closeResultsOverlay(){
+  document.getElementById('resultsOverlay').classList.remove('open');
+}
 
 // ── LEADERBOARD ───────────────────────────────────────────────────────────────
 let lbCurrentTab='weekly';
@@ -1746,5 +2005,54 @@ async function generatePlan(){
 // ── UTILITY ───────────────────────────────────────────────────────────────────
 function esc(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 </script>
+<!-- ═══ EXAM ENGINE OVERLAY ═══ -->
+<div class="exam-overlay" id="examOverlay">
+  <div class="exam-top">
+    <div class="exam-title" id="examTitle">Test</div>
+    <div class="exam-timer" id="examTimer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span id="examTimerText">60:00</span>
+    </div>
+    <button class="exam-submit-btn" onclick="confirmSubmitExam()">Submit Test</button>
+  </div>
+  <div class="exam-body">
+    <div class="exam-nav">
+      <div class="exam-nav-legend">
+        <div class="exam-nav-legend-item"><div class="exam-nav-legend-dot" style="background:rgba(16,185,129,.35)"></div>Answered</div>
+        <div class="exam-nav-legend-item"><div class="exam-nav-legend-dot" style="background:var(--sur4);border:1px solid var(--bdr)"></div>Unanswered</div>
+      </div>
+      <div class="exam-nav-grid" id="examNavGrid"></div>
+    </div>
+    <div class="exam-main">
+      <div class="exam-q-wrap">
+        <div class="exam-q-meta" id="examQMeta">Question 1 of 10</div>
+        <div class="exam-q-text" id="examQText"></div>
+        <div id="examOpts"></div>
+      </div>
+      <div class="exam-footer-nav">
+        <button class="btn-outline" onclick="examPrevQ()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Previous
+        </button>
+        <button class="btn-outline" onclick="examNextQ()">
+          Next
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULTS / ANALYSIS OVERLAY ═══ -->
+<div class="exam-overlay" id="resultsOverlay">
+  <div class="exam-top">
+    <div class="exam-title" id="resultsTitle">Results</div>
+    <button class="btn-outline" onclick="closeResultsOverlay()" style="margin-left:auto">Close</button>
+  </div>
+  <div class="exam-body" style="display:block;overflow-y:auto;padding:20px 40px 60px">
+    <div id="resultsContent" style="max-width:720px;margin:0 auto"></div>
+  </div>
+</div>
+
 </body>
 </html>
