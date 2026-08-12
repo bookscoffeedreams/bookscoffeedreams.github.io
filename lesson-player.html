@@ -1,271 +1,924 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lesson Player • Books Coffee and Dreams</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lesson Player · Books Coffee and Dreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────────────────────── */
+:root{
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --red:#dc2626;--green:#16a34a;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-mode="dark"]{
+  --bg:#100f0e;--bg2:#181614;--bg3:#1f1d1a;
+  --sur:#1a1917;--sur2:#222018;--sur3:#2c2a25;--sur4:#363330;
+  --bdr:rgba(217,119,6,.14);--bdr2:rgba(217,119,6,.28);--bdr3:rgba(217,119,6,.55);
+  --tx:#f5f0e8;--tx2:#e8e0d0;--tx3:#b8aa98;--tx4:#7a6e60;
+  --sh:0 2px 20px rgba(0,0,0,.8);--sh2:0 12px 48px rgba(0,0,0,.9);
+  --scr:rgba(217,119,6,.25);--vbg:#000;
+}
+[data-mode="light"]{
+  --bg:#faf7f2;--bg2:#f4efe6;--bg3:#ede5d8;
+  --sur:#fff;--sur2:#fdf9f4;--sur3:#f5f0e8;--sur4:#ede5d8;
+  --bdr:rgba(120,83,32,.1);--bdr2:rgba(120,83,32,.2);--bdr3:rgba(120,83,32,.45);
+  --tx:#1c1410;--tx2:#3d2e1e;--tx3:#7a6248;--tx4:#b09880;
+  --sh:0 2px 16px rgba(120,83,32,.08);--sh2:0 12px 40px rgba(120,83,32,.12);
+  --scr:rgba(217,119,6,.2);--vbg:#0f0d0b;
+}
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);height:100vh;
+  overflow:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:var(--sans);color:inherit}
 
-  <style>
-    :root{--bg:#f6f8ff;--muted:#6b7280;--accent1:#6542F4;--accent2:#9A4DFF}
-    body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;background:var(--bg);margin:0;color:#0f172a}
-    .container{max-width:1200px;margin:20px auto;padding:18px}
-    .layout{display:grid;grid-template-columns:340px 1fr;gap:18px}
-    .sidebar{background:#fff;border-radius:12px;padding:14px;border:1px solid #eef2ff;max-height:80vh;overflow:auto}
-    .player{background:#fff;border-radius:12px;padding:14px;border:1px solid #eef2ff;min-height:60vh}
-    .lesson-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;cursor:pointer}
-    .lesson-item:hover{background:linear-gradient(90deg,#fbfdff,#f6f7ff)}
-    .lesson-item.active{background:linear-gradient(90deg,#eef2ff,#f7f9ff);border:1px solid #c7d2fe}
-    .btn{padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
-    .btn-primary{background:linear-gradient(90deg,#6542F4,#9A4DFF);color:white}
-    .btn-outline{border:1px solid #c7d2fe;background:#fff}
-    .thumb{width:84px;height:52px;border-radius:6px;object-fit:cover}
-    .small{font-size:13px;color:var(--muted)}
-    @media (max-width:900px){ .layout{grid-template-columns:1fr;} .sidebar{max-height:220px;overflow:auto} }
-  </style>
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23c8a870' stroke-width='.3' stroke-opacity='.08'/%3E%3C/svg%3E");
+  background-size:60px 60px}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 7px rgba(217,119,6,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slide-in{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;display:flex;align-items:center;
+  background:rgba(16,15,14,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr)}
+[data-mode="light"] .nav{background:rgba(250,247,242,.94)}
+.nav-inner{padding:0 20px;width:100%;display:flex;align-items:center;gap:14px}
+.nav-logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#92400e,#d97706);
+  display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
+.nav-logo svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav-brand{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--tx);white-space:nowrap}
+.nav-brand em{color:var(--amber)}
+.nav-div{width:1px;height:18px;background:var(--bdr);flex-shrink:0}
+.nav-crumb{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--tx4);min-width:0}
+.nav-crumb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.nav-crumb .sep{opacity:.4;flex-shrink:0}
+.nav-crumb .cur{color:var(--tx3)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mode-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:99px;
+  background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);
+  font-size:11px;font-family:var(--mono);transition:all .2s}
+.mode-btn:hover{border-color:var(--bdr2);color:var(--amber)}
+.mode-btn svg{width:12px;height:12px}
+[data-mode="dark"] .i-sun{display:none}[data-mode="dark"] .i-moon{display:block}
+[data-mode="light"] .i-sun{display:block}[data-mode="light"] .i-moon{display:none}
+.nav-av{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--amber2);cursor:pointer;background:var(--sur3)}
+.back-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:99px;
+  background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:12px;font-weight:500;transition:all .2s}
+.back-btn:hover{border-color:var(--bdr2);color:var(--tx)}
+.back-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── MAIN LAYOUT ── */
+.shell{position:relative;z-index:2;display:grid;grid-template-columns:320px 1fr;height:100vh;padding-top:56px}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--sur);border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;overflow:hidden}
+.sb-course-head{padding:14px 16px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--sur2)}
+.sb-course-label{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:4px}
+.sb-course-title{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--tx);
+  line-height:1.2;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-prog-wrap{margin-top:8px}
+.sb-prog-bar{height:3px;background:var(--sur4);border-radius:99px;overflow:hidden}
+.sb-prog-fill{height:100%;background:linear-gradient(90deg,#92400e,var(--amber2),var(--amber3));
+  border-radius:99px;transition:width .8s var(--ease);width:0%}
+.sb-prog-txt{font-family:var(--mono);font-size:9px;color:var(--tx4);margin-top:4px}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0 20px}
+.module-block{margin-bottom:2px}
+.mod-head{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;
+  transition:background .15s;position:relative}
+.mod-head:hover{background:var(--sur2)}
+.mod-head.open{background:var(--sur2)}
+.mod-num{font-family:var(--mono);font-size:9px;color:var(--tx4);flex-shrink:0;width:18px}
+.mod-title{font-size:12px;font-weight:700;color:var(--tx2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mod-count{font-family:var(--mono);font-size:9px;color:var(--tx4);flex-shrink:0}
+.mod-chev{width:13px;height:13px;flex-shrink:0;transition:transform .2s;color:var(--tx4);
+  fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mod-head.open .mod-chev{transform:rotate(90deg)}
+.lesson-list{display:none;padding:0 0 4px}
+.mod-head.open + .lesson-list{display:block;animation:slide-in .2s var(--ease) both}
+.lesson-item{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 32px;
+  cursor:pointer;transition:all .15s;position:relative;border-left:2px solid transparent}
+.lesson-item:hover{background:var(--sur2)}
+.lesson-item.active{background:linear-gradient(90deg,rgba(217,119,6,.08),transparent);
+  border-left-color:var(--amber2)}
+.lesson-item.active .li-title{color:var(--amber2)}
+.li-status{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bdr2)}
+.li-status.done{background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.3)}
+.li-status.done svg{color:#22c55e}
+.li-status.active{border-color:var(--amber2);background:rgba(217,119,6,.1)}
+.li-status svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;color:var(--tx4)}
+.li-info{flex:1;min-width:0}
+.li-title{font-size:12px;font-weight:500;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .15s}
+.li-meta{font-family:var(--mono);font-size:10px;color:var(--tx4);margin-top:1px}
+.li-lock{width:12px;height:12px;flex-shrink:0;color:var(--tx4);
+  fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mod-subject-tag{padding:8px 16px 3px 16px;font-family:var(--mono);font-size:8px;
+  letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.mod-subject-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ── PLAYER AREA ── */
+.player-area{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+.video-wrap{background:var(--vbg);flex-shrink:0;position:relative;overflow:hidden}
+.video-wrap video{width:100%;display:block;max-height:calc(100vh - 56px - 200px)}
+.video-empty{display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:200px;gap:10px;color:var(--tx4)}
+.video-empty svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.4}
+.video-empty p{font-family:var(--serif);font-size:16px;font-style:italic;opacity:.5}
+
+.lesson-info{flex:1;overflow-y:auto;padding:16px 22px 24px;border-top:1px solid var(--bdr)}
+.li-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.li-title-area{flex:1;min-width:0}
+.li-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.li-eyebrow::before{content:'';display:block;width:10px;height:1px;background:var(--amber)}
+.li-name{font-family:var(--serif);font-size:20px;color:var(--tx);letter-spacing:-.01em;line-height:1.2;margin-bottom:4px}
+.li-desc{font-size:13px;color:var(--tx3);line-height:1.6}
+.li-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-primary{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;
+  background:linear-gradient(135deg,#92400e,var(--amber));color:#fff;font-size:13px;font-weight:600;
+  transition:all .22s;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(217,119,6,.3)}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12) 50%,transparent);
+  background-size:200%;animation:shimmer 2.5s linear infinite}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(217,119,6,.5)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-primary.done-state{background:linear-gradient(135deg,#14532d,#16a34a);box-shadow:0 4px 14px rgba(22,163,74,.3)}
+.btn-primary svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-sec{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:10px;
+  background:var(--sur3);border:1px solid var(--bdr);color:var(--tx3);font-size:13px;transition:all .2s}
+.btn-sec:hover{border-color:var(--bdr2);color:var(--tx)}
+.btn-sec svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── BOTTOM META BAR ── */
+.meta-bar{display:flex;align-items:center;gap:14px;padding:12px 22px;
+  border-top:1px solid var(--bdr);background:var(--sur);flex-shrink:0}
+.meta-pill{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;
+  color:var(--tx4);padding:4px 9px;border-radius:99px;background:var(--sur3);border:1px solid var(--bdr)}
+.meta-pill svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.meta-pill.green{background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.2);color:#22c55e}
+.nav-prev-next{margin-left:auto;display:flex;gap:6px}
+.nav-arrow{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9px;
+  background:var(--sur3);border:1px solid var(--bdr);font-size:12px;font-weight:600;
+  color:var(--tx3);transition:all .2s}
+.nav-arrow:hover:not(:disabled){border-color:var(--bdr2);color:var(--amber)}
+.nav-arrow:disabled{opacity:.35;cursor:not-allowed}
+.nav-arrow svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── TABS (Notes / Resources) ── */
+.tabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--bdr);flex-shrink:0;background:var(--sur)}
+.tab-btn{padding:10px 14px;font-size:12px;font-weight:600;color:var(--tx4);
+  border-bottom:2px solid transparent;transition:all .18s;cursor:pointer;margin-bottom:-1px}
+.tab-btn:hover{color:var(--tx3)}
+.tab-btn.on{color:var(--amber);border-bottom-color:var(--amber)}
+.tab-pane{display:none;flex:1;overflow-y:auto;padding:16px 22px}
+.tab-pane.on{display:block}
+
+/* ── NOTES TAB ── */
+.notes-editor-area{width:100%;min-height:100px;background:var(--sur3);border:1px solid var(--bdr);
+  border-radius:10px;padding:12px 14px;color:var(--tx);font-size:13px;line-height:1.7;
+  outline:none;resize:none;font-family:var(--sans);transition:border-color .2s}
+.notes-editor-area:focus{border-color:var(--bdr2)}
+.notes-editor-area::placeholder{color:var(--tx4)}
+.notes-save-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.notes-saved{font-family:var(--mono);font-size:10px;color:var(--green);opacity:0;transition:opacity .3s}
+.notes-saved.show{opacity:1}
+
+/* ── RESOURCES TAB ── */
+.resource-row{display:flex;align-items:center;gap:11px;padding:11px 14px;
+  background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;margin-bottom:8px;
+  cursor:pointer;transition:all .2s}
+.resource-row:hover{border-color:var(--bdr2);transform:translateX(3px)}
+.resource-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.resource-ico.pdf{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#ef4444}
+.resource-ico.link{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#60a5fa}
+.resource-ico svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.resource-name{font-size:13px;font-weight:500;color:var(--tx2);flex:1}
+.resource-size{font-family:var(--mono);font-size:10px;color:var(--tx4)}
+
+/* ── PROGRESS TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--sur);border:1px solid var(--bdr2);border-radius:10px;
+  padding:11px 18px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);
+  z-index:999;opacity:0;transition:all .3s var(--spring);display:flex;align-items:center;
+  gap:9px;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok .t-ico{color:var(--green)}.toast.err .t-ico{color:var(--red)}
+.toast.warn .t-ico{color:var(--amber)}
+.t-ico svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── LOCKED OVERLAY ── */
+.locked-overlay{position:absolute;inset:0;background:rgba(16,15,14,.88);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;z-index:10;backdrop-filter:blur(8px)}
+.locked-icon{width:56px;height:56px;border-radius:16px;background:rgba(217,119,6,.1);
+  border:1px solid rgba(217,119,6,.2);display:flex;align-items:center;justify-content:center}
+.locked-icon svg{width:24px;height:24px;fill:none;stroke:var(--amber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.locked-title{font-family:var(--serif);font-size:22px;color:var(--tx);font-style:italic}
+.locked-sub{font-size:13px;color:var(--tx3);text-align:center;max-width:300px;line-height:1.6}
+.unlock-btn{padding:11px 28px;border-radius:11px;background:linear-gradient(135deg,#92400e,var(--amber));
+  color:#fff;font-size:14px;font-weight:700;transition:all .22s;box-shadow:0 4px 14px rgba(217,119,6,.4)}
+.unlock-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(217,119,6,.6)}
+
+/* ── LOADING ── */
+.loading-screen{position:fixed;inset:0;background:var(--bg);z-index:500;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-ring{width:36px;height:36px;border:3px solid rgba(217,119,6,.2);
+  border-top-color:var(--amber2);border-radius:50%;animation:spin .7s linear infinite}
+.loading-txt{font-family:var(--mono);font-size:12px;color:var(--tx4);letter-spacing:.1em}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="layout">
-      <aside class="sidebar">
-        <div id="courseTitle" class="font-semibold text-lg">Course</div>
-        <div id="moduleTitle" class="small text-gray-600 mt-1">Module</div>
-        <div id="modulesList" class="mt-4 space-y-2"></div>
-      </aside>
 
-      <main class="player">
-        <div class="flex justify-between items-start">
-          <div>
-            <div id="lessonTitle" style="font-weight:700;font-size:20px">Lesson</div>
-            <div id="lessonDesc" class="small mt-1"></div>
-          </div>
-          <div class="text-right">
-            <div id="progressText" class="small">Progress 0/0</div>
-            <div id="statusNote" class="small mt-2"></div>
-          </div>
-        </div>
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-ring"></div>
+  <div class="loading-txt">Loading lesson…</div>
+</div>
 
-        <div id="videoWrap" style="margin-top:14px;background:#000;border-radius:10px;overflow:hidden">
-          <video id="videoPlayer" controls style="width:100%;height:auto;background:#000"></video>
-        </div>
-
-        <div style="margin-top:12px;display:flex;gap:12px;align-items:center">
-          <button id="markBtn" class="btn btn-primary">Mark as completed</button>
-          <button id="notesBtn" class="btn btn-outline">Download Notes (PDF)</button>
-          <button id="backBtn" class="btn btn-outline">Back to course</button>
-        </div>
-
-        <div id="meta" class="small muted mt-4"></div>
-      </main>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <span class="nav-brand">Books Coffee <em>&</em> Dreams</span>
+    <div class="nav-div"></div>
+    <div class="nav-crumb">
+      <span id="navCourse">Course</span>
+      <span class="sep">/</span>
+      <span class="cur" id="navLesson">Lesson</span>
+    </div>
+    <div class="nav-r">
+      <button class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button class="mode-btn" onclick="toggleMode()">
+        <svg class="i-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="i-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+        Mode
+      </button>
+      <img class="nav-av" id="navAv" src="" alt="" onclick="location.href='profile.html'"/>
     </div>
   </div>
+</nav>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- SHELL -->
+<div class="shell">
 
-  // config
-  const firebaseConfig = {
-    apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
-    authDomain: "bcd-discord.firebaseapp.com",
-    projectId: "bcd-discord",
-    storageBucket: "bcd-discord.appspot.com",
-    messagingSenderId: "278895155371",
-    appId: "1:278895155371:web:177a468f5fa3f0abfe3fee"
-  };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-course-head">
+      <div class="sb-course-label">Now learning</div>
+      <div class="sb-course-title" id="sbCourseTitle">Loading…</div>
+      <div class="sb-prog-wrap">
+        <div class="sb-prog-bar"><div class="sb-prog-fill" id="sbProgFill"></div></div>
+        <div class="sb-prog-txt" id="sbProgTxt">0 of 0 lessons complete</div>
+      </div>
+    </div>
+    <div class="sb-scroll" id="sbScroll"></div>
+  </aside>
 
-  // UI refs
-  const modulesList = document.getElementById('modulesList');
-  const courseTitle = document.getElementById('courseTitle');
-  const moduleTitle = document.getElementById('moduleTitle');
-  const lessonTitle = document.getElementById('lessonTitle');
-  const lessonDesc = document.getElementById('lessonDesc');
-  const videoPlayer = document.getElementById('videoPlayer');
-  const markBtn = document.getElementById('markBtn');
-  const notesBtn = document.getElementById('notesBtn');
-  const backBtn = document.getElementById('backBtn');
-  const progressText = document.getElementById('progressText');
-  const meta = document.getElementById('meta');
+  <!-- PLAYER AREA -->
+  <div class="player-area">
 
-  // state
-  let courseId = null;
-  let modules = [];
-  let courseData = null;
-  let currentUser = null;
-  let mi = 0, li = 0;
-  let progressMap = {}; // 'mi:li' -> {lastTime, completed}
-  let autosaveInterval = null;
+    <!-- VIDEO -->
+    <div class="video-wrap" id="videoWrap">
+      <video id="videoEl" controls preload="metadata" style="width:100%;display:block"></video>
+      <div class="video-empty" id="videoEmpty">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <p>No video for this lesson</p>
+      </div>
+      <div class="locked-overlay" id="lockedOverlay" style="display:none">
+        <div class="locked-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="locked-title">Lesson Locked</div>
+        <div class="locked-sub">Purchase this course to unlock all lessons and continue learning.</div>
+        <button class="unlock-btn" id="unlockBtn">Get Access</button>
+      </div>
+    </div>
 
-  function getParam(n){ const s = new URLSearchParams(location.search); return s.get(n); }
-  courseId = getParam('courseId') || getParam('id') || null;
-  mi = Number(getParam('module')||0);
-  li = Number(getParam('lesson')||0);
-  if(!courseId){ Swal.fire('Missing','courseId required','error'); throw new Error('missing id'); }
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab-btn on" onclick="setTab(this,'t-info')">About</div>
+      <div class="tab-btn" onclick="setTab(this,'t-notes')">My Notes</div>
+      <div class="tab-btn" onclick="setTab(this,'t-res')">Resources</div>
+    </div>
 
-  onAuthStateChanged(auth, async user => {
-    currentUser = user;
-    await loadCourseAndProgress();
-    renderSidebar();
-    await loadLesson(mi,li);
-  });
+    <!-- TAB: INFO -->
+    <div class="tab-pane on" id="t-info">
+      <div class="li-top">
+        <div class="li-title-area">
+          <div class="li-eyebrow" id="liEyebrow">Module 1</div>
+          <div class="li-name" id="liName">Loading lesson…</div>
+          <div class="li-desc" id="liDesc"></div>
+        </div>
+        <div class="li-actions">
+          <button class="btn-sec" id="notesBtn" onclick="openNotes()">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Notes PDF
+          </button>
+          <button class="btn-primary" id="markBtn" onclick="markComplete()">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="markBtnTxt">Mark Complete</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
-  async function loadCourseAndProgress(){
-    const snap = await getDoc(doc(db,'courses',courseId));
-    if(!snap.exists()){ Swal.fire('Not found','Course not found','error'); throw new Error('not found'); }
-    courseData = snap.data();
-    modules = courseData.modules || [];
-    courseTitle.textContent = courseData.title || 'Untitled';
+    <!-- TAB: NOTES -->
+    <div class="tab-pane" id="t-notes">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span style="width:10px;height:1px;background:var(--amber);display:inline-block"></span>
+        Personal notes for this lesson
+      </div>
+      <textarea class="notes-editor-area" id="notesTA" placeholder="Write your notes here…" rows="8" oninput="scheduleNotesSave()"></textarea>
+      <div class="notes-save-row">
+        <div class="notes-saved" id="notesSaved">Saved</div>
+      </div>
+    </div>
 
-    progressMap = {};
-    if(currentUser){
-      try{
-        const q = query(collection(db,'userCourseProgress'), where('uid','==',currentUser.uid), where('courseId','==',courseId));
-        const snaps = await getDocs(q);
-        snaps.forEach(d => {
-          const dd = d.data();
-          progressMap[`${dd.moduleIndex}:${dd.lessonIndex}`] = { lastTime: dd.lastTime || 0, completed: !!dd.completed };
-        });
-      } catch(err){ console.error('progress load err', err); }
-    }
+    <!-- TAB: RESOURCES -->
+    <div class="tab-pane" id="t-res">
+      <div id="resourceList">
+        <div style="color:var(--tx4);font-family:var(--serif);font-size:15px;font-style:italic;padding:20px 0;text-align:center">
+          No resources attached to this lesson
+        </div>
+      </div>
+    </div>
+
+    <!-- META BAR -->
+    <div class="meta-bar">
+      <div class="meta-pill" id="metaModule">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Module —
+      </div>
+      <div class="meta-pill" id="metaDur">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        —
+      </div>
+      <div class="meta-pill green" id="metaStatus" style="display:none">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Completed
+      </div>
+      <div class="nav-prev-next">
+        <button class="nav-arrow" id="prevBtn" onclick="navigate(-1)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Prev
+        </button>
+        <button class="nav-arrow" id="nextBtn" onclick="navigate(1)">
+          Next
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /player-area -->
+</div><!-- /shell -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="t-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+firebase.initializeApp({
+  apiKey:'AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A',
+  authDomain:'bcd-discord.firebaseapp.com',
+  projectId:'bcd-discord',
+  storageBucket:'bcd-discord.appspot.com',
+  messagingSenderId:'278895155371',
+  appId:'1:278895155371:web:177a468f5fa3f0abfe3fee'
+});
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const P = new URLSearchParams(location.search);
+let courseId  = P.get('courseId') || P.get('id');
+let curMi     = Number(P.get('module') || 0);
+let curLi     = Number(P.get('lesson') || 0);
+let courseData= null, modules=[], subjects={};
+let USER      = null;
+let progressMap = {}; // key: "mi:li" → {lastTime, completed}
+let autosaveTimer = null, notesSaveTimer = null;
+let hasAccess = false;
+
+const DEFAULT_COLORS=['#d97706','#06b6d4','#8b5cf6','#ec4899','#f59e0b','#10b981','#ef4444','#3b82f6','#f97316','#14b8a6'];
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+const H = document.documentElement;
+H.setAttribute('data-mode', localStorage.getItem('bcd-settings-mode') || 'dark');
+function toggleMode(){
+  const n = H.getAttribute('data-mode')==='dark'?'light':'dark';
+  H.setAttribute('data-mode', n);
+  localStorage.setItem('bcd-settings-mode', n);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type='ok'){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast show '+type;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function setTab(btn, paneId){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(paneId).classList.add('on');
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+if(!courseId){ showToast('No course ID in URL', 'err'); }
+
+auth.onAuthStateChanged(async user => {
+  USER = user;
+  if(user){
+    const ud = (await db.collection('users').doc(user.uid).get()).data()||{};
+    const av = document.getElementById('navAv');
+    av.src = ud.photoURL || user.photoURL || '';
+    av.style.display = av.src ? 'block' : 'none';
   }
+  await loadCourse();
+  await loadProgress();
+  renderSidebar();
+  await loadLesson(curMi, curLi);
+  document.getElementById('loadingScreen').style.display='none';
+});
 
-  function renderSidebar(){
-    modulesList.innerHTML = '';
-    modules.forEach((m, idx) => {
-      const block = document.createElement('div');
-      block.innerHTML = `<div style="font-weight:700">${idx+1}. ${m.title || 'Untitled Module'}</div><div id="ml-${idx}" style="margin-top:8px"></div>`;
-      modulesList.appendChild(block);
-      const list = block.querySelector(`#ml-${idx}`);
-      (m.lessons||[]).forEach((l, j) => {
-        const key = `${idx}:${j}`;
-        const done = progressMap[key]?.completed;
-        const item = document.createElement('div');
-        item.className = 'lesson-item' + ((idx===mi && j===li)? ' active' : '');
-        item.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><img class="thumb" src="${l.thumbnail || 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/main/assets/images/account_logo_default.png'}"><div style="min-width:0"><div style="font-weight:700">${j+1}. ${l.title||'Untitled'}</div><div class="small">${l.description||''}</div></div></div><div style="min-width:80px;text-align:right">${done? '<span style="color:#10b981;font-weight:800">Done</span>' : ''}</div>`;
-        item.onclick = () => navigateTo(idx,j);
-        list.appendChild(item);
+// ── LOAD COURSE ───────────────────────────────────────────────────────────────
+async function loadCourse(){
+  if(!courseId) return;
+  const snap = await db.collection('courses').doc(courseId).get();
+  if(!snap.exists){ showToast('Course not found','err'); return; }
+  courseData = snap.data();
+  modules    = courseData.modules || [];
+  subjects   = courseData.subjects || {};
+
+  document.getElementById('sbCourseTitle').textContent = courseData.title || 'Course';
+  document.getElementById('navCourse').textContent     = courseData.title || 'Course';
+
+  // Access check
+  const price = Number(courseData.price||0);
+  const isPaid = courseData.isPaid===true || price>0;
+  if(!isPaid){ hasAccess=true; return; }
+  if(!USER){ hasAccess=false; return; }
+  try {
+    const q = await db.collection('purchases')
+      .where('courseId','==',courseId)
+      .where('uid','==',USER.uid).get();
+    hasAccess = !q.empty;
+  } catch(e){ hasAccess=false; }
+}
+
+// ── LOAD PROGRESS ─────────────────────────────────────────────────────────────
+async function loadProgress(){
+  if(!USER||!courseId) return;
+  try {
+    const snaps = await db.collection('userCourseProgress')
+      .where('uid','==',USER.uid)
+      .where('courseId','==',courseId).get();
+    snaps.forEach(d=>{
+      const dd=d.data();
+      progressMap[`${dd.moduleIndex}:${dd.lessonIndex}`]={
+        lastTime:dd.lastTime||0, completed:!!dd.completed
+      };
+    });
+  } catch(e){ console.error('progress load',e); }
+}
+
+// ── SAVE PROGRESS ─────────────────────────────────────────────────────────────
+async function saveProgress(mi, li, lastTime=0, completed=false){
+  if(!USER||!courseId) return;
+  const docId=`${USER.uid}_${courseId}_${mi}_${li}`;
+  try {
+    await db.collection('userCourseProgress').doc(docId).set({
+      uid:USER.uid, courseId,
+      moduleIndex:mi, lessonIndex:li,
+      lastTime:Number(lastTime||0), completed:!!completed,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    progressMap[`${mi}:${li}`]={lastTime:Number(lastTime||0),completed:!!completed};
+  } catch(e){ console.error('saveProgress',e); }
+}
+
+// ── RENDER SIDEBAR ────────────────────────────────────────────────────────────
+function renderSidebar(){
+  const sb = document.getElementById('sbScroll');
+  sb.innerHTML='';
+  let totalLessons=0, doneLessons=0;
+
+  // Build from the new subjects structure if available, else fall back to old modules[]
+  if(Object.keys(subjects).length > 0){
+    Object.entries(subjects).forEach(([sk,subj],si)=>{
+      const sc = subj.color || DEFAULT_COLORS[si%DEFAULT_COLORS.length];
+      const sIcon = subj.icon || '📚';
+
+      // Subject label
+      const subjTag = document.createElement('div');
+      subjTag.className='mod-subject-tag';
+      subjTag.style.color=sc;
+      subjTag.innerHTML=`<span style="font-size:12px">${esc(sIcon)}</span><span style="flex:1">${esc(subj.title||sk)}</span><div class="mod-subject-dot" style="background:${sc}"></div>`;
+      sb.appendChild(subjTag);
+
+      (subj.chapters||[]).forEach((ch,ci)=>{
+        const cColor = ch.color||sc;
+        const cIcon  = ch.icon||'▸';
+        const lectures = ch.lectures||[];
+        totalLessons += lectures.length;
+
+        // Chapter head (acts like module head)
+        const chapBlock = document.createElement('div');
+        chapBlock.className='module-block';
+
+        const chapDone = lectures.filter((_,li2)=>progressMap[`${si*100+ci}:${li2}`]?.completed).length;
+        doneLessons += chapDone;
+
+        chapBlock.innerHTML=`
+          <div class="mod-head ${ci===0?'open':''}" onclick="toggleMod(this)" data-sk="${sk}" data-ci="${ci}">
+            <span class="mod-num" style="color:${cColor};font-size:14px">${esc(cIcon)}</span>
+            <span class="mod-title" style="color:${cColor}">${esc(ch.title||'Chapter')}</span>
+            <span class="mod-count">${chapDone}/${lectures.length}</span>
+            <svg class="mod-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="lesson-list">
+            ${lectures.map((l,li2)=>{
+              const key=`${si*100+ci}:${li2}`;
+              const done=!!progressMap[key]?.completed;
+              const isActive=false;
+              return `<div class="lesson-item ${isActive?'active':''}" id="li-${si*100+ci}-${li2}"
+                onclick="loadLessonFromSubjects('${sk}',${ci},${li2})">
+                <div class="li-status ${done?'done':''}">
+                  ${done?`<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`
+                       :`<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`}
+                </div>
+                <div class="li-info">
+                  <div class="li-title">${esc(l.title||'Lecture')}</div>
+                  <div class="li-meta">${l.duration||''}</div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>`;
+        sb.appendChild(chapBlock);
       });
+    });
+  } else {
+    // Fallback: old modules[] structure
+    modules.forEach((m,mi2)=>{
+      const lessons=m.lessons||[];
+      totalLessons += lessons.length;
+      const chapDone=lessons.filter((_,li2)=>progressMap[`${mi2}:${li2}`]?.completed).length;
+      doneLessons += chapDone;
+
+      const block=document.createElement('div');
+      block.className='module-block';
+      block.innerHTML=`
+        <div class="mod-head ${mi2===0?'open':''}" onclick="toggleMod(this)">
+          <span class="mod-num">${mi2+1}</span>
+          <span class="mod-title">${esc(m.title||'Module')}</span>
+          <span class="mod-count">${chapDone}/${lessons.length}</span>
+          <svg class="mod-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="lesson-list">
+          ${lessons.map((l,li2)=>{
+            const done=!!progressMap[`${mi2}:${li2}`]?.completed;
+            const isActive=mi2===curMi&&li2===curLi;
+            return `<div class="lesson-item ${isActive?'active':''}" id="li-${mi2}-${li2}"
+              onclick="navigateTo(${mi2},${li2})">
+              <div class="li-status ${done?'done':isActive?'active':''}">
+                ${done?`<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`
+                     :`<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`}
+              </div>
+              <div class="li-info">
+                <div class="li-title">${esc(l.title||'Lesson')}</div>
+                <div class="li-meta">${l.description||''}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+      sb.appendChild(block);
     });
   }
 
-  function navigateTo(mIdx, lIdx){
-    mi = mIdx; li = lIdx;
-    history.replaceState({}, '', `${location.pathname}?courseId=${encodeURIComponent(courseId)}&module=${mi}&lesson=${li}`);
-    loadLesson(mi,li);
-    // highlight active item
-    document.querySelectorAll('.lesson-item').forEach((el, i) => el.classList.toggle('active', false));
-    // quick highlight: simpler to just rerender
-    renderSidebar();
-  }
+  // Update progress bar
+  const pct=totalLessons>0?Math.round(doneLessons/totalLessons*100):0;
+  document.getElementById('sbProgFill').style.width=pct+'%';
+  document.getElementById('sbProgTxt').textContent=`${doneLessons} of ${totalLessons} lessons complete`;
+}
 
-  function formatTime(s){ s = Number(s) || 0; const mm = Math.floor(s/60); const ss = Math.floor(s%60); return `${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
+function toggleMod(head){
+  head.classList.toggle('open');
+  const list=head.nextElementSibling;
+  if(list) list.style.display=head.classList.contains('open')?'block':'none';
+}
 
-  async function loadLesson(mIndex, lIndex){
-    const module = modules[mIndex];
-    const lesson = module?.lessons?.[lIndex];
-    if(!lesson){ Swal.fire('Lesson not found','Invalid lesson','error'); return; }
+// ── LOAD LESSON (old modules[] structure) ─────────────────────────────────────
+async function navigateTo(mi2, li2){
+  curMi=mi2; curLi=li2;
+  history.replaceState({},'',`${location.pathname}?courseId=${encodeURIComponent(courseId)}&module=${mi2}&lesson=${li2}`);
+  await loadLesson(mi2,li2);
+  renderSidebar();
+  setActiveItem(`li-${mi2}-${li2}`);
+}
 
-    // HARD LOCK CHECK (server-side in rules should also block progress)
-    const priceNumber = Number(courseData?.price ?? 0);
-    const isPaidFlag = courseData?.isPaid === true || String(courseData?.isPaid).toLowerCase() === 'true';
-    const courseIsPaid = isPaidFlag || (Number.isFinite(priceNumber) && priceNumber > 0);
-    let userHasAccess = false;
-    if(!courseIsPaid) userHasAccess = true;
-    else if(currentUser){
-      try{
-        const q = query(collection(db,'purchases'), where('courseId','==',courseId), where('uid','==',currentUser.uid));
-        const snaps = await getDocs(q);
-        if(!snaps.empty) userHasAccess = true;
-      } catch(err){ console.error('purchase check err', err); userHasAccess = false; }
-    }
+async function loadLesson(mi2, li2){
+  const m=modules[mi2];
+  const lesson=m?.lessons?.[li2];
+  if(!lesson&&modules.length>0){ showToast('Lesson not found','err'); return; }
+  if(!lesson) return; // subjects mode handles separately
 
-    if(courseIsPaid && !userHasAccess){
-      await Swal.fire({title:'Locked', text:'Purchase this course to unlock lessons.', icon:'warning'});
-      window.location.href = `course.html?id=${encodeURIComponent(courseId)}`;
-      return;
-    }
+  await loadLessonData({
+    title:lesson.title,
+    description:lesson.description,
+    videoURL:lesson.videoURL,
+    notesURL:lesson.notesURL,
+    duration:lesson.duration,
+    resources:lesson.resources||[],
+    moduleLabel:`Module ${mi2+1} · ${m.title||''}`,
+    progressKey:`${mi2}:${li2}`,
+    mi:mi2, li:li2
+  });
+}
 
-    // UI populate
-    moduleTitle.textContent = `Module ${mIndex+1} • ${module.title||''}`;
-    lessonTitle.textContent = lesson.title || 'Untitled';
-    lessonDesc.textContent = lesson.description || '';
+// ── LOAD LESSON (new subjects structure) ──────────────────────────────────────
+async function loadLessonFromSubjects(sk, ci, li2){
+  const subj=subjects[sk];
+  if(!subj) return;
+  const ch=(subj.chapters||[])[ci];
+  if(!ch) return;
+  const lecture=(ch.lectures||[])[li2];
+  if(!lecture) return;
 
-    // load video if present
-    if(lesson.videoURL){
-      videoPlayer.src = lesson.videoURL;
-    } else {
-      videoPlayer.removeAttribute('src');
-    }
+  // Use compound key for subjects mode
+  const si=Object.keys(subjects).indexOf(sk);
+  const mi2=si*100+ci;
+  // Same fallback convention course-dashboard.html uses for completedLectures,
+  // so a lecture marked done here and marked done there refer to the same entry.
+  const lecId = lecture.id || `${ch.title}_${li2}`;
 
-    // notes
-    notesBtn.onclick = () => {
-      if(!lesson.notesURL){ Swal.fire('No notes','No PDF attached to this lesson','info'); return; }
-      if(courseIsPaid && !userHasAccess){ Swal.fire('Locked','Purchase to unlock notes','warning'); return; }
-      const url = lesson.notesURL.split('?')[0];
-      window.open(`pdf-viewer.html?url=${encodeURIComponent(url)}`, '_blank');
-    };
-
-    // progress counts
-    const totals = modules.reduce((acc,m)=> acc + (m.lessons? m.lessons.length:0), 0);
-    const completedCount = Object.values(progressMap).reduce((acc,v)=> acc + (v.completed?1:0), 0);
-    progressText.textContent = `Progress ${completedCount}/${totals}`;
-
-    // mark completed UI
-    const key = `${mIndex}:${lIndex}`;
-    if(progressMap[key]?.completed){ markBtn.textContent='Completed ✓'; markBtn.disabled=true; markBtn.style.opacity=0.7; } else { markBtn.textContent='Mark as completed'; markBtn.disabled=false; markBtn.style.opacity=1; }
-    markBtn.onclick = async () => {
-      await saveProgress(mIndex,lIndex, Math.floor(videoPlayer.currentTime||0), true);
-      markBtn.textContent='Completed ✓'; markBtn.disabled=true;
-      await loadCourseAndProgress();
-      renderSidebar();
-    };
-
-    // resume prompt
-    const prev = progressMap[key];
-    if(prev && prev.lastTime && prev.lastTime > 5){
-      const res = await Swal.fire({ title:'Resume video?', text:`Resume from ${formatTime(prev.lastTime)}?`, showCancelButton:true, confirmButtonText:'Resume', cancelButtonText:'Start from beginning' });
-      if(res.isConfirmed) videoPlayer.currentTime = Math.max(0, Number(prev.lastTime)-1);
-    }
-
-    // autosave interval (every 5s)
-    if(autosaveInterval) clearInterval(autosaveInterval);
-    autosaveInterval = setInterval(()=> {
-      if(currentUser && lesson.videoURL){
-        saveProgress(mIndex,lIndex, Math.floor(videoPlayer.currentTime||0), progressMap[key]?.completed || false).catch(e=>console.error('autosave err', e));
-      }
-    }, 5000);
-
-    meta.textContent = `Module ${mIndex+1} • Lesson ${lIndex+1} ${lesson.duration ? ' • ' + lesson.duration : ''}`;
-  }
-
-  async function saveProgress(mIndex, lIndex, lastTime=0, completed=false){
-    if(!currentUser) return;
-    const docId = `${currentUser.uid}_${courseId}_${mIndex}_${lIndex}`;
-    const ref = doc(db,'userCourseProgress',docId);
-    const payload = { uid: currentUser.uid, courseId, moduleIndex: mIndex, lessonIndex: lIndex, lastTime: Number(lastTime||0), completed: !!completed, updatedAt: serverTimestamp() };
-    try{
-      await setDoc(ref, payload, { merge: true });
-      progressMap[`${mIndex}:${lIndex}`] = { lastTime: payload.lastTime, completed: payload.completed };
-    }catch(err){ console.error('saveProgress err', err); }
-  }
-
-  window.addEventListener('beforeunload', ()=> {
-    try {
-      if(currentUser && videoPlayer){
-        saveProgress(mi, li, Math.floor(videoPlayer.currentTime||0), progressMap[`${mi}:${li}`]?.completed || false);
-      }
-    }catch(e){}
+  await loadLessonData({
+    title:lecture.title,
+    description:lecture.description||'',
+    videoURL:lecture.videoUrl||lecture.videoURL||'',
+    notesURL:lecture.notesURL||'',
+    duration:lecture.duration||'',
+    resources:lecture.resources||[],
+    moduleLabel:`${subj.icon||''}  ${subj.title||sk} · ${ch.title||'Chapter'}`,
+    progressKey:`${mi2}:${li2}`,
+    mi:mi2, li:li2, lecId
   });
 
-  backBtn.onclick = () => window.location.href = `course.html?id=${encodeURIComponent(courseId)}`;
+  setActiveItem(`li-${mi2}-${li2}`);
+  history.replaceState({},'',`${location.pathname}?courseId=${encodeURIComponent(courseId)}&sk=${sk}&ci=${ci}&li=${li2}`);
+}
 
+// ── CORE LESSON LOAD ──────────────────────────────────────────────────────────
+async function loadLessonData({title,description,videoURL,notesURL,duration,resources,moduleLabel,progressKey,mi:mi2,li:li2,lecId}){
+
+  // Stop autosave for previous lesson
+  clearInterval(autosaveTimer);
+
+  // Access gate
+  const locked = !hasAccess && courseData && (courseData.isPaid===true || Number(courseData.price||0)>0);
+  document.getElementById('lockedOverlay').style.display = locked ? 'flex' : 'none';
+  document.getElementById('unlockBtn').onclick = ()=>location.href=`course-detail.html?id=${courseId}`;
+
+  // Video
+  const vid=document.getElementById('videoEl');
+  const empty=document.getElementById('videoEmpty');
+  if(videoURL && !locked){
+    vid.src=videoURL;
+    vid.style.display='block';
+    empty.style.display='none';
+    // Resume prompt
+    const prev=progressMap[progressKey];
+    if(prev?.lastTime>5){
+      vid.currentTime=prev.lastTime;
+      showToast(`Resumed from ${fmt(prev.lastTime)}`,'ok');
+    }
+  } else if(!videoURL){
+    vid.style.display='none';
+    empty.style.display='flex';
+  }
+
+  // Info
+  document.getElementById('liEyebrow').textContent=moduleLabel;
+  document.getElementById('liName').textContent=title||'Lesson';
+  document.getElementById('liDesc').textContent=description||'';
+  document.getElementById('navLesson').textContent=title||'Lesson';
+  document.getElementById('metaModule').innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${esc(moduleLabel)}`;
+  document.getElementById('metaDur').innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${esc(duration||'—')}`;
+
+  // Mark complete button state
+  const done=!!progressMap[progressKey]?.completed;
+  const markBtn=document.getElementById('markBtn');
+  const markTxt=document.getElementById('markBtnTxt');
+  if(done){
+    markBtn.classList.add('done-state');
+    markTxt.textContent='Completed';
+    markBtn.disabled=true;
+    document.getElementById('metaStatus').style.display='flex';
+  } else {
+    markBtn.classList.remove('done-state');
+    markTxt.textContent='Mark Complete';
+    markBtn.disabled=false;
+    document.getElementById('metaStatus').style.display='none';
+  }
+
+  // Store current for markComplete / autosave
+  markBtn._mi=mi2; markBtn._li=li2; markBtn._key=progressKey; markBtn._lecId=lecId||null;
+
+  // Notes PDF button
+  const notesBtn=document.getElementById('notesBtn');
+  notesBtn.style.display=notesURL?'flex':'none';
+  notesBtn.onclick=()=>window.open(`pdf-viewer.html?url=${encodeURIComponent(notesURL)}`, '_blank');
+
+  // Resources tab
+  renderResources(resources);
+
+  // Load personal notes
+  await loadNotes(progressKey);
+
+  // Autosave every 5s
+  if(videoURL && !locked){
+    autosaveTimer=setInterval(()=>{
+      if(USER) saveProgress(mi2, li2, Math.floor(vid.currentTime||0), progressMap[progressKey]?.completed||false);
+    }, 5000);
+  }
+
+  // Prev / Next arrows
+  updateNavArrows(mi2, li2);
+}
+
+// ── MARK COMPLETE ─────────────────────────────────────────────────────────────
+async function markComplete(){
+  const btn=document.getElementById('markBtn');
+  const mi2=btn._mi, li2=btn._li, key=btn._key, lecId=btn._lecId;
+  const vid=document.getElementById('videoEl');
+  await saveProgress(mi2, li2, Math.floor(vid.currentTime||0), true);
+  btn.classList.add('done-state');
+  document.getElementById('markBtnTxt').textContent='Completed';
+  btn.disabled=true;
+
+  // Mirror into the shared course-progress doc so completion shows up
+  // consistently on course-dashboard.html's Lectures tab too — both pages
+  // read/write the same completedLectures array, keyed the same way.
+  if(lecId && USER && courseId){
+    try{
+      const sharedRef = db.collection('userCourseProgress').doc(USER.uid+'_'+courseId);
+      const sharedSnap = await sharedRef.get();
+      const already = (sharedSnap.exists && (sharedSnap.data().completedLectures||[]).includes(lecId));
+      const updated = [...new Set([...(sharedSnap.exists ? (sharedSnap.data().completedLectures||[]) : []), lecId])];
+      await sharedRef.set({
+        uid:USER.uid, courseId,
+        completedLectures:updated,
+        lastUpdated:firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+      if(!already){
+        // Only award XP the first time this lecture is completed anywhere —
+        // avoids double-awarding if it's later (or was already) marked done
+        // from course-dashboard.html's own Lectures tab too.
+        const courseSnap = await db.collection('courses').doc(courseId).get();
+        const xpVal = (courseSnap.exists && courseSnap.data().courseSettings?.xp?.lectureComplete) || 5;
+        await db.collection('users').doc(USER.uid).update({
+          xp: firebase.firestore.FieldValue.increment(xpVal)
+        });
+      }
+    }catch(e){ console.error('shared progress mirror failed', e); }
+  }
+  document.getElementById('metaStatus').style.display='flex';
+  showToast('Lesson marked complete!','ok');
+  // Award XP
+  if(USER){
+    try {
+      await db.collection('users').doc(USER.uid).update({
+        xp:firebase.firestore.FieldValue.increment(5)
+      });
+    } catch(e){}
+  }
+  renderSidebar();
+}
+
+// ── NOTES ─────────────────────────────────────────────────────────────────────
+async function loadNotes(key){
+  if(!USER||!courseId) return;
+  try {
+    const snap=await db.collection('lessonNotes').doc(`${USER.uid}_${courseId}_${key}`).get();
+    document.getElementById('notesTA').value=snap.exists?(snap.data().content||''):'';
+  } catch(e){}
+}
+
+function scheduleNotesSave(){
+  clearTimeout(notesSaveTimer);
+  notesSaveTimer=setTimeout(saveNotes, 1500);
+}
+
+async function saveNotes(){
+  if(!USER||!courseId) return;
+  const btn=document.getElementById('markBtn');
+  const key=btn._key;
+  const content=document.getElementById('notesTA').value;
+  try {
+    await db.collection('lessonNotes').doc(`${USER.uid}_${courseId}_${key}`).set({
+      uid:USER.uid, courseId, lessonKey:key,
+      content, updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    const el=document.getElementById('notesSaved');
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 2000);
+  } catch(e){}
+}
+
+// ── RESOURCES ─────────────────────────────────────────────────────────────────
+function renderResources(resources){
+  const el=document.getElementById('resourceList');
+  if(!resources||!resources.length){
+    el.innerHTML='<div style="color:var(--tx4);font-family:var(--serif);font-size:15px;font-style:italic;padding:20px 0;text-align:center">No resources attached to this lesson</div>';
+    return;
+  }
+  el.innerHTML=resources.map(r=>`
+    <div class="resource-row" onclick="window.open('${esc(r.url)}','_blank')">
+      <div class="resource-ico ${r.type==='pdf'?'pdf':'link'}">
+        ${r.type==='pdf'
+          ?'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+          :'<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'}
+      </div>
+      <div class="resource-name">${esc(r.name||'Resource')}</div>
+      <div class="resource-size">${esc(r.size||'')}</div>
+    </div>`).join('');
+}
+
+// ── PREV / NEXT NAVIGATION ────────────────────────────────────────────────────
+function updateNavArrows(mi2, li2){
+  const hasPrev = mi2>0||li2>0;
+  const m=modules[mi2];
+  const hasNext=m&&li2<(m.lessons||[]).length-1||mi2<modules.length-1;
+  document.getElementById('prevBtn').disabled=!hasPrev;
+  document.getElementById('nextBtn').disabled=!hasNext;
+}
+
+function navigate(dir){
+  const m=modules[curMi];
+  if(!m) return;
+  const lessons=m.lessons||[];
+  if(dir===1){
+    if(curLi<lessons.length-1){ navigateTo(curMi,curLi+1); }
+    else if(curMi<modules.length-1){ navigateTo(curMi+1,0); }
+  } else {
+    if(curLi>0){ navigateTo(curMi,curLi-1); }
+    else if(curMi>0){ const pm=modules[curMi-1]; navigateTo(curMi-1,(pm.lessons||[]).length-1); }
+  }
+}
+
+function setActiveItem(id){
+  document.querySelectorAll('.lesson-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el){ el.classList.add('active'); el.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+}
+
+// ── MISC ──────────────────────────────────────────────────────────────────────
+function openNotes(){
+  setTab(document.querySelectorAll('.tab-btn')[1], 't-notes');
+}
+
+function goBack(){
+  if(courseId) location.href=`course-detail.html?id=${encodeURIComponent(courseId)}`;
+  else location.href='courses.html';
+}
+
+function fmt(s){ s=Number(s)||0; return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
+function esc(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Save on page leave
+window.addEventListener('beforeunload',()=>{
+  const btn=document.getElementById('markBtn');
+  const vid=document.getElementById('videoEl');
+  if(USER&&btn._mi!=null) saveProgress(btn._mi,btn._li,Math.floor(vid.currentTime||0),progressMap[btn._key]?.completed||false);
+});
 </script>
 </body>
 </html>
