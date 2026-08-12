@@ -427,6 +427,12 @@ function makeFeatured(b) {
   document.getElementById('featuredDesc').textContent = b.description || '';
   document.getElementById('featuredAuthor').textContent = b.author || 'BCD Team';
   document.getElementById('featuredAuthorAv').textContent = (b.author||'B')[0].toUpperCase();
+  const featAuthorEl = document.getElementById('featuredAuthor');
+  const featAuthorAvEl = document.getElementById('featuredAuthorAv');
+  if(b.authorId){
+    featAuthorEl.style.cursor='pointer'; featAuthorEl.onclick=()=>location.href='profile.html?uid='+b.authorId;
+    featAuthorAvEl.style.cursor='pointer'; featAuthorAvEl.onclick=()=>location.href='profile.html?uid='+b.authorId;
+  }
   document.getElementById('featuredDate').textContent = formatDateFrom(b);
   document.getElementById('featuredViews').innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${b.views||0} views`;
   const tagsEl = document.getElementById('featuredTags');
@@ -453,7 +459,7 @@ function makeCard(b) {
       <div class="bcard-title">${b.title||'Untitled'}</div>
       <div class="bcard-desc">${b.description||''}</div>
       <div class="bcard-footer">
-        <span class="bcard-author">${b.author||'BCD Team'}</span>
+        <span class="bcard-author"${b.authorId?` style="cursor:pointer" data-author-uid="${b.authorId}"`:''}>${b.author||'BCD Team'}</span>
         <div class="bcard-right">
           <span class="bcard-views">
             <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -464,6 +470,8 @@ function makeCard(b) {
       </div>
     </div>`;
   card.addEventListener('click', () => { incrementViews(b.id); location.href=`blog-detail.html?id=${b.id}`; });
+  const cardAuthorEl = card.querySelector('[data-author-uid]');
+  if(cardAuthorEl) cardAuthorEl.onclick = (e) => { e.stopPropagation(); location.href = 'profile.html?uid=' + cardAuthorEl.dataset.authorUid; };
   return card;
 }
 
