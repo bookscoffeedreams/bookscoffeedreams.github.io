@@ -51,8 +51,6 @@ input,select,textarea{font-family:var(--sans)}
   background:linear-gradient(90deg,transparent,var(--p3),var(--p5),var(--p7),var(--p5),var(--p3),transparent);
   background-size:300%;animation:shimmer 6s linear infinite}
 .tb-brand{width:var(--sb);flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 16px;border-right:1px solid var(--bdr);height:100%}
-.tb-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--p2),var(--p5));display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.tb-logo svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tb-site{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tb-mid{flex:1;padding:0 18px;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--tx4)}
 .tb-cur{color:var(--p6)}.tb-sep{opacity:.4}
@@ -496,10 +494,9 @@ input,select,textarea{font-family:var(--sans)}
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="tb-brand">
-      <div class="tb-logo"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-      <span class="tb-site">Books, Coffee &amp; Dreams</span>
-    </div>
+    <a class="tb-brand" href="index.html">
+      <span class="tb-site">Books Coffee &amp; Dreams</span>
+    </a>
     <div class="tb-mid">
       <span>Courses</span><span class="tb-sep">/</span><span class="tb-cur" id="tbCourse">Loading…</span>
     </div>
