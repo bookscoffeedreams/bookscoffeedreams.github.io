@@ -688,7 +688,7 @@ function ago(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return s+'s ag
 <script>
 firebase.initializeApp({apiKey:'AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A',authDomain:'bcd-discord.firebaseapp.com',projectId:'bcd-discord',storageBucket:'bcd-discord.appspot.com',messagingSenderId:'278895155371',appId:'1:278895155371:web:177a468f5fa3f0abfe3fee'});
 const auth=firebase.auth(),db=firebase.firestore();
-const DEF='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEF='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 auth.onAuthStateChanged(async user=>{
   if(!user){location.href='/login.html';return}
