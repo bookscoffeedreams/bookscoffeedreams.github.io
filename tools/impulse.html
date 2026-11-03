@@ -73,8 +73,6 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 .nav-inner{max-width:100%;padding:0 0 0 16px;width:100%;display:flex;align-items:center;gap:0}
 
 .nav-brand{display:flex;align-items:center;gap:8px;padding:0 12px 0 0;border-right:1px solid var(--bdr);margin-right:0;flex-shrink:0}
-.nav-logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
-.nav-logo svg{width:14px;height:14px}
 .nav-site-name{font-family:var(--serif);font-size:16px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .nav-site-name em{color:var(--amber);font-style:italic}
 
@@ -604,13 +602,8 @@ table.notion-table tr:hover td{background:var(--editor-hover)}
 <!-- ═══════════ NAV ═══════════ -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="index.html" class="nav-brand">
-      <div class="nav-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:#fff">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-        </svg>
-      </div>
-      <span class="nav-site-name">Books Coffee <em>&</em> Dreams</span>
+    <a href="../index.html" class="nav-brand">
+      <span class="nav-site-name">Books Coffee <em>&amp;</em> Dreams</span>
     </a>
 
     <div class="nav-breadcrumb">
@@ -750,33 +743,33 @@ table.notion-table tr:hover td{background:var(--editor-hover)}
       <!-- BCD Tools -->
       <div class="sb-section">
         <div class="sb-section-label"><span>BCD Tools</span></div>
-        <a href="tools/todolist.html" class="sb-item">
+        <a href="todolist.html" class="sb-item">
           <span class="sb-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
           <span class="sb-item-label">Smart To-do List</span>
         </a>
-        <a href="tools/pomodoro.html" class="sb-item">
+        <a href="pomodoro.html" class="sb-item">
           <span class="sb-item-icon">🍅</span>
           <span class="sb-item-label">Pomodoro Timer</span>
         </a>
-        <a href="tools/memory-map.html" class="sb-item">
+        <a href="memory-map.html" class="sb-item">
           <span class="sb-item-icon">🧠</span>
           <span class="sb-item-label">Memory Map</span>
         </a>
-        <a href="tools/ai-study.html" class="sb-item">
+        <a href="ai-study.html" class="sb-item">
           <span class="sb-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--amber)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
           <span class="sb-item-label">AI Study Buddy</span>
           <span class="sb-item-new">AI</span>
         </a>
-        <a href="tools/forest.html" class="sb-item">
+        <a href="forest.html" class="sb-item">
           <span class="sb-item-icon">🌳</span>
           <span class="sb-item-label">Focus Forest</span>
         </a>
-        <a href="tools/ai-planner.html" class="sb-item">
+        <a href="ai-planner.html" class="sb-item">
           <span class="sb-item-icon">🗓️</span>
           <span class="sb-item-label">AI Planner</span>
           <span class="sb-item-new">AI</span>
         </a>
-        <a href="tools/recaller.html" class="sb-item">
+        <a href="recaller.html" class="sb-item">
           <span class="sb-item-icon">🔁</span>
           <span class="sb-item-label">Recaller</span>
         </a>
@@ -1845,7 +1838,7 @@ function signInWithGoogle() {
 
 function signInWithEmail() {
   // Redirect to your existing login page
-  location.href = 'login.html?redirect=' + encodeURIComponent(location.pathname + location.search);
+  location.href = '../login.html?redirect=' + encodeURIComponent(location.pathname + location.search);
 }
 
 function signOutUser() {
@@ -1873,7 +1866,7 @@ function showUserMenu() {
       <div style="font-size:11px;color:var(--tx4);font-family:var(--mono)">${email}</div>
       <div style="margin-top:6px"><span style="font-size:10px;padding:2px 8px;border-radius:99px;${isPro?'background:rgba(22,163,74,.15);color:#16a34a':'background:rgba(217,119,6,.12);color:var(--amber)'}font-family:var(--mono)">${isPro?'✓ Dreamer Pro':'Free plan'}</span></div>
     </div>
-    <div onclick="window.location.href='profile.html'" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--tx3)" onmouseover="this.style.background='var(--sur2)'" onmouseout="this.style.background=''">👤 My Profile</div>
+    <div onclick="window.location.href='../profile.html'" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--tx3)" onmouseover="this.style.background='var(--sur2)'" onmouseout="this.style.background=''">👤 My Profile</div>
     <div onclick="openPricing()" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--amber)" onmouseover="this.style.background='var(--sur2)'" onmouseout="this.style.background=''">⚡ ${isPro?'Manage Plan':'Upgrade to Pro'}</div>
     <div style="border-top:1px solid var(--bdr);margin:4px 0"></div>
     <div onclick="signOutUser();this.closest('[id]').remove()" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--tx4)" onmouseover="this.style.background='var(--sur2)'" onmouseout="this.style.background=''">🚪 Sign Out</div>
