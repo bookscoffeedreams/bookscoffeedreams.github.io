@@ -81,9 +81,7 @@ body::after{
 .tb-back:hover{color:var(--amber);border-color:var(--bdr2);transform:translateX(-2px)}
 .tb-back svg{width:16px;height:16px}
 .tb-brand{display:flex;align-items:center;gap:10px}
-.tb-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#92400e,#d97706);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(217,119,6,.4);animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
 @keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 8px rgba(217,119,6,0)}}
-.tb-logo svg{width:16px;height:16px}
 .tb-site-name{font-family:var(--serif);font-size:17px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .tb-site-name em{color:var(--amber);font-style:italic}
 .tb-divider{width:1px;height:20px;background:var(--bdr);margin:0 4px;flex-shrink:0}
@@ -370,9 +368,6 @@ body::after{
       <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
     <a class="tb-brand" href="index.html">
-      <div class="tb-logo">
-        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      </div>
       <span class="tb-site-name">Books Coffee <em>&amp;</em> Dreams</span>
     </a>
     <div class="tb-divider"></div>
@@ -585,7 +580,7 @@ firebase.initializeApp(FC);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const DEFAULT_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEFAULT_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 function timeAgo(ms) {
   const s = Math.floor((Date.now() - ms) / 1000);
