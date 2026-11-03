@@ -21,7 +21,7 @@ export async function requirePermission(permissionName) {
     onAuthStateChanged(auth, async (user) => {
 
       if (!user) {
-        window.location.href = "/admin/login.html";
+        window.location.href = "/login.html";
         return reject("User not logged in");
       }
 
@@ -93,7 +93,7 @@ export async function requireAnyPermission() {
     onAuthStateChanged(auth, async (user) => {
 
       if (!user) {
-        window.location.href = "/admin/login.html";
+        window.location.href = "/login.html";
         return reject("Not logged in");
       }
 
