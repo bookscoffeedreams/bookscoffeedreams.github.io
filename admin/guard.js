@@ -23,7 +23,7 @@ async function requirePermission(permissionName) {
     firebase.auth().onAuthStateChanged(async (user) => {
 
       if (!user) {
-        window.location.href = "/admin/login.html";
+        window.location.href = "/login.html";
         return reject("User not logged in");
       }
 
