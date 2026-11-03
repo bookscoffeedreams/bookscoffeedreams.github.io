@@ -441,7 +441,7 @@ function toast(msg,type='ok'){
 // Sidebar init
 firebase.initializeApp({apiKey:'AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A',authDomain:'bcd-discord.firebaseapp.com',projectId:'bcd-discord',storageBucket:'bcd-discord.appspot.com',messagingSenderId:'278895155371',appId:'1:278895155371:web:177a468f5fa3f0abfe3fee'});
 const auth=firebase.auth(),db=firebase.firestore();
-const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 auth.onAuthStateChanged(async user=>{
   if(!user){location.href='/login.html';return}
@@ -489,7 +489,7 @@ function renderUsers(rows){
     tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--tx4);font-family:var(--mono);font-size:12px">No users found</td></tr>`;return;
   }
   filtered.forEach((u,i)=>{
-    const img=u.photoURL||u.profileURL||"https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png";
+    const img=u.photoURL||u.profileURL||"https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png";
     const opts=allRoles.map(r=>`<option value="${esc(r.id)}"${r.id===(u.roleId||"")?" selected":""}>${esc(r.name)}</option>`).join("");
     const tr=document.createElement("tr");
     tr.innerHTML=`
