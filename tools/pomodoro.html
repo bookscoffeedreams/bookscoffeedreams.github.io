@@ -747,7 +747,7 @@ html[data-theme="dark"] .heatmap-cell[data-level="4"]{ background:var(--tomato);
   <!-- ============ MAIN ============ -->
   <main class="main">
 
-    <a class="account-pill" id="accountPill" href="profile.html" title="Account">
+    <a class="account-pill" id="accountPill" href="../profile.html" title="Account">
       <span class="account-av" id="accountAvatar"><img alt="" id="accountAvatarImg"></span>
     </a>
 
@@ -4050,7 +4050,7 @@ const FIREBASE_CONFIG = {
   measurementId: "G-6Q46Z9ZF0D"
 };
 
-const DEF_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEF_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 let app, auth, db;
 let currentUser = null;
@@ -4087,7 +4087,7 @@ function init(){
   auth.onAuthStateChanged(user=>{
     if(!user){
       // not signed in to Books Coffee and Dreams — send to login
-      location.href = 'login.html';
+      location.href = '../login.html';
       return;
     }
     currentUser = user;
