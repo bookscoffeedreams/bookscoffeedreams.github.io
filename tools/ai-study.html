@@ -63,8 +63,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .nav{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--bdr);height:64px;display:flex;align-items:center;padding:0 36px;position:relative}
 .nav::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--p4),var(--p6),var(--p7),var(--p6),var(--p4),transparent);background-size:300% 100%;animation:shimmer 7s linear infinite}
 .nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
-.nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--p2),var(--p5));display:flex;align-items:center;justify-content:center;animation:ring 3s ease-in-out infinite}
-.nav-logo svg{width:16px;height:16px}
 .nav-name{font-family:var(--serif);font-size:17px;color:var(--tx)}
 .nav-name em{color:var(--p6);font-style:italic}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -322,17 +320,16 @@ input[type="file"]{display:none}
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-brand" onclick="location.href='index.html'">
-    <div class="nav-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+  <a class="nav-brand" href="../index.html">
     <span class="nav-name">Books Coffee <em>&amp;</em> Dreams</span>
-  </div>
+  </a>
   <div class="nav-right">
     <div class="nav-pill">AI Study Engine</div>
     <button class="nav-ib" id="modeBtn">
       <span class="icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
       <span class="icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
     </button>
-    <div class="nav-av" id="navAv" onclick="location.href='profile.html'">A</div>
+    <div class="nav-av" id="navAv" onclick="location.href='../profile.html'">A</div>
   </div>
 </nav>
 
