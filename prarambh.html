@@ -72,9 +72,6 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 .nav-back:hover{color:var(--amber);border-color:var(--bdr2);transform:translateX(-2px)}
 .nav-back svg{width:15px;height:15px}
 .nav-brand{display:flex;align-items:center;gap:10px}
-.nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#92400e,#d97706);
-  display:flex;align-items:center;justify-content:center;animation:logo-pulse 3s ease-in-out infinite;flex-shrink:0}
-.nav-logo svg{width:16px;height:16px}
 .nav-site-name{font-family:var(--serif);font-size:17px;color:var(--tx);letter-spacing:-.01em}
 .nav-site-name em{color:var(--amber);font-style:italic}
 .nav-divider{width:1px;height:20px;background:var(--bdr);flex-shrink:0}
@@ -314,12 +311,9 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
       <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       Dashboard
     </a>
-    <div class="nav-brand">
-      <div class="nav-logo">
-        <svg fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      </div>
+    <a class="nav-brand" href="index.html">
       <span class="nav-site-name">Books Coffee <em>&amp;</em> Dreams</span>
-    </div>
+    </a>
     <div class="nav-divider"></div>
     <span class="nav-page-title">Prarambh Leaderboard</span>
     <div class="nav-right">
@@ -422,7 +416,7 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 <!-- Footer -->
 <footer class="footer">
   <div class="footer-inner">
-    <div class="footer-copy">© 2025 Books Coffee and Dreams — All rights reserved</div>
+    <div class="footer-copy">© 2025–2026 Books Coffee and Dreams — All rights reserved</div>
     <div class="footer-love">Made with <em>love</em> for curious minds</div>
   </div>
 </footer>
@@ -451,11 +445,11 @@ function showToast(msg){
 
 // Prarambh badge URLs
 const BADGES=[
-  {day:1, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_1.png', label:'Day 1'},
-  {day:5, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_2.png', label:'Day 5'},
-  {day:10,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_3.png', label:'Day 10'},
-  {day:15,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_4.png', label:'Day 15'},
-  {day:21,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_5.png', label:'Day 21'},
+  {day:1, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_1.png', label:'Day 1'},
+  {day:5, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_2.png', label:'Day 5'},
+  {day:10,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_3.png', label:'Day 10'},
+  {day:15,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_4.png', label:'Day 15'},
+  {day:21,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_5.png', label:'Day 21'},
 ];
 function getBadges(day=0){ return BADGES.filter(b=>day>=b.day); }
 function badgeImgsSmall(day){
@@ -500,7 +494,7 @@ firebase.initializeApp({
 });
 const auth=firebase.auth();
 const db=firebase.firestore();
-const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 let allUsers=[], currentUid=null;
 let searchQ='', roleQ='', versionQ='';
