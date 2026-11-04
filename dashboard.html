@@ -277,8 +277,6 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 .footer-love em{color:var(--amber)}
 
 /* ═══════════ RESPONSIVE ═══════════ */
-/* header fit: keeps all links + account controls on one line between 900px and 1240px */
-@media(max-width:1240px){.nav-inner{gap:14px}.nav-links{margin-left:6px;gap:0}.nav-link{padding:6px 9px;font-size:13px}.nav-user-name{display:none}.nav-user{padding:5px}#modeLabel{display:none}.mode-toggle{padding:7px 10px}}
 @media(max-width:900px){
   .main-grid{grid-template-columns:1fr}
   .stats-row{grid-template-columns:repeat(3,1fr)}
@@ -307,12 +305,9 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
     <span class="nav-page-title">Dashboard</span>
     <div class="nav-links">
       <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="content.html">Content</a>
       <a class="nav-link" href="courses.html">Courses</a>
-      <a class="nav-link" href="blogs.html">Blogs</a>
       <a class="nav-link" href="community.html">Community</a>
-      <a class="nav-link" href="partners.html">Partners</a>
-      <a class="nav-link" href="staff-application.html">Apply</a>
+      <a class="nav-link" href="blogs.html">Blogs</a>
     </div>
     <div class="nav-right">
       <button class="mode-toggle" id="modeToggle">
@@ -500,7 +495,7 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
-    <div class="footer-copy">© 2025–2026 Books Coffee and Dreams — All rights reserved</div>
+    <div class="footer-copy">© 2025 Books Coffee and Dreams — All rights reserved</div>
     <div class="footer-love">Made with <em>love</em> for curious minds</div>
   </div>
 </footer>
@@ -536,7 +531,7 @@ firebase.initializeApp({
 });
 const auth=firebase.auth();
 const db=firebase.firestore();
-const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
 const DISCORD_API='https://discord-login-backend.vercel.app/api/profile';
 
 function timeAgo(ms){
