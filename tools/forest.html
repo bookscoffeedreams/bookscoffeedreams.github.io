@@ -1,669 +1,1828 @@
 <!DOCTYPE html>
-<html lang="en" data-mode="dark">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Study Planner · Books Coffee and Dreams</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@300;400;500&family=Caveat:wght@600;700&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Grove — A Focus Forest</title>
+<meta name="description" content="Plant a tree, stay focused, watch it grow. A focus forest for Books Coffee and Dreams — strict or relaxed mode, your own grove, and a shared Community Grove with everyone at BCD.">
+<link rel="icon" href="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&amp;family=IBM+Plex+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet">
+
+<!-- Firebase (Books Coffee and Dreams — bcd-discord project) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<!-- Lucide Icons — premium, consistent icon set -->
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+
 <style>
-/* ═══════════════════════════════
-   TOKENS — identical to ai-study.html, do not drift
-═══════════════════════════════ */
+/* ============================================================
+   GROVE — A Focus Forest for Books Coffee and Dreams
+   Rebranded onto the same tokens as the rest of the site and
+   The Nook — amber/coffee palette, Instrument Serif for hero
+   moments, DM Sans everywhere else, IBM Plex Mono for labels.
+   Every variable keeps its original NAME — vine still means
+   growth/success, tomato still means withering/distracted —
+   only the hues moved to sit in the amber family.
+   ============================================================ */
 :root{
-  --p1:#2d0a6e;--p2:#4a1d96;--p3:#6d28d9;--p4:#7c3aed;
-  --p5:#8b5cf6;--p6:#a78bfa;--p7:#c4b5fd;
+  --paper:#faf7f2;
+  --surface:#ffffff;
+  --surface-2:#f4efe6;
+  --ink:#1c1410;
+  --ink-soft:#7a6248;
+  --ink-faint:#b09880;
+  --line:rgba(120,83,32,.14);
+  --line-strong:rgba(120,83,32,.28);
+
+  --tomato:#c2410c;
+  --tomato-deep:#9a3412;
+  --tomato-soft:#fde4d0;
+  --tomato-soft-2:#fbceac;
+
+  --vine:#6b8e6f;
+  --vine-deep:#4a6b4f;
+  --vine-bright:#7fa383;
+  --vine-soft:#e8efe6;
+  --vine-soft-2:#d2e3d3;
+
+  --amber:#d97706;
+  --amber-deep:#92400e;
+  --amber-soft:#fef3c7;
+
+  --bark:#8a6a48;
+  --bark-deep:#5c4530;
+  --sky-day:#fdf1d8;
+  --sky-dusk:#f7dcb0;
+  --sky-night:#1a140c;
+
+  --shadow-sm:0 1px 2px rgba(120,83,32,.08);
+  --shadow:0 1px 2px rgba(120,83,32,.06),0 10px 26px -12px rgba(60,40,15,.16);
+  --shadow-lg:0 6px 20px rgba(60,40,15,.10),0 28px 64px -22px rgba(40,25,10,.22);
+
+  --radius:14px;--radius-sm:9px;--radius-lg:22px;--radius-pill:999px;
+
   --serif:'Instrument Serif',serif;
-  --sans:'DM Sans',sans-serif;
-  --mono:'IBM Plex Mono',monospace;
-  --hand:'Caveat',cursive;
-  --ease:cubic-bezier(.4,0,.2,1);
-  --spring:cubic-bezier(.34,1.56,.64,1);
+  --display:'DM Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'DM Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono','Cascadia Code','Roboto Mono',Consolas,monospace;
+
+  --sidebar-w:236px;
 }
-[data-mode="dark"]{
-  --bg:#07040f;--bg2:#0b0718;
-  --sur:#120d22;--sur2:#18122e;--sur3:#201839;--sur4:#2a2047;
-  --bdr:rgba(109,40,217,.15);--bdr2:rgba(109,40,217,.3);--bdr3:rgba(109,40,217,.58);
-  --tx:#f0ecff;--tx2:#ddd6fe;--tx3:#a89fd4;--tx4:#6b5fa0;
-  --sh:0 4px 24px rgba(0,0,0,.65);--sh2:0 16px 56px rgba(0,0,0,.82);
-  --glow:0 0 36px rgba(109,40,217,.22);--scr:rgba(109,40,217,.28);
-  --good:#4ade80;--warn:#fbbf24;--bad:#f87171;
+
+html[data-theme="dark"]{
+  --paper:#100f0e;
+  --surface:#1a1917;
+  --surface-2:#222018;
+  --ink:#f5f0e8;
+  --ink-soft:#b8aa98;
+  --ink-faint:#7a6e60;
+  --line:rgba(217,119,6,.16);
+  --line-strong:rgba(217,119,6,.3);
+
+  --tomato:#e35d2f;
+  --tomato-deep:#f4844f;
+  --tomato-soft:#2e1c12;
+  --tomato-soft-2:#42281a;
+
+  --vine:#7fa383;
+  --vine-deep:#9ec2a3;
+  --vine-bright:#9ec2a3;
+  --vine-soft:#1c2620;
+  --vine-soft-2:#28382c;
+
+  --amber:#f59e0b;
+  --amber-deep:#fbbf24;
+  --amber-soft:#2c2410;
+
+  --bark:#a8895f;
+  --bark-deep:#6b5238;
+  --sky-day:#241c10;
+  --sky-dusk:#2e2010;
+  --sky-night:#0a0806;
+
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px -12px rgba(0,0,0,.7);
+  --shadow-lg:0 6px 20px rgba(0,0,0,.5),0 28px 64px -22px rgba(0,0,0,.8);
 }
-[data-mode="light"]{
-  --bg:#f4f1ff;--bg2:#ede8ff;
-  --sur:#fff;--sur2:#f9f7ff;--sur3:#f0ebff;--sur4:#e5dcff;
-  --bdr:rgba(109,40,217,.1);--bdr2:rgba(109,40,217,.22);--bdr3:rgba(109,40,217,.5);
-  --tx:#150836;--tx2:#2a1060;--tx3:#6b4fa0;--tx4:#9d80cc;
-  --sh:0 4px 16px rgba(109,40,217,.09);--sh2:0 16px 48px rgba(109,40,217,.16);
-  --glow:0 0 28px rgba(109,40,217,.1);--scr:rgba(109,40,217,.18);
-  --good:#16a34a;--warn:#d97706;--bad:#dc2626;
-}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-a{text-decoration:none;color:inherit}
-button{cursor:pointer;border:none;background:none;font-family:var(--sans);color:inherit}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scr);border-radius:99px}
-
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(109,40,217,.055) 1px,transparent 1px);
-  background-size:26px 26px}
-.amb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;
-  width:600px;height:600px;background:rgba(74,29,150,.07);top:-8%;right:0}
-
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes fade-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes bar-grow{from{width:0}to{width:var(--to,100%)}}
-@keyframes ring{0%,100%{box-shadow:0 0 0 0 rgba(109,40,217,.4)}50%{box-shadow:0 0 0 8px rgba(109,40,217,0)}}
-@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
-@keyframes check-pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
-
-/* ── NAV (identical pattern to ai-study.html) ── */
-.nav{position:sticky;top:0;z-index:100;background:var(--sur);border-bottom:1px solid var(--bdr);height:64px;display:flex;align-items:center;padding:0 36px;position:relative}
-.nav::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--p4),var(--p6),var(--p7),var(--p6),var(--p4),transparent);background-size:300% 100%;animation:shimmer 7s linear infinite}
-.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
-.nav-name{font-family:var(--serif);font-size:17px;color:var(--tx)}
-.nav-name em{color:var(--p6);font-style:italic}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.nav-pill{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:5px 12px;border-radius:99px;background:rgba(109,40,217,.12);border:1px solid var(--bdr2);color:var(--p6)}
-.nav-ib{width:34px;height:34px;border-radius:9px;background:var(--sur3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;color:var(--tx3);cursor:pointer;transition:all .2s}
-.nav-ib:hover{border-color:var(--bdr2);color:var(--p6)}
-.nav-ib svg{width:15px;height:15px}
-.nav-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--p2),var(--p5));border:2px solid var(--p6);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:15px;color:#fff}
-.nav-av img{width:100%;height:100%;object-fit:cover}
-.icon-sun,.icon-moon{display:none}
-[data-mode="dark"] .icon-moon{display:block}[data-mode="light"] .icon-sun{display:block}
-
-/* ── PAGE ── */
-.page{max-width:1100px;margin:0 auto;padding:40px 28px 80px;position:relative;z-index:1}
-
-/* ── HERO ── */
-.hero{text-align:center;margin-bottom:40px;animation:fade-up .5s var(--spring) .05s both}
-.hero-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--p6);margin-bottom:14px}
-.hero-tag::before,.hero-tag::after{content:'';display:block;width:20px;height:1px;background:var(--p6)}
-.hero-h{font-family:var(--serif);font-size:clamp(36px,5vw,58px);color:var(--tx);font-weight:400;letter-spacing:-.03em;line-height:.97;margin-bottom:10px}
-.hero-h em{font-style:italic;color:var(--p6)}
-.hero-sub{font-size:15px;color:var(--tx3);max-width:520px;margin:0 auto;line-height:1.7}
-.hero-hand{font-family:var(--hand);font-size:18px;color:var(--tx4);font-weight:600;margin-top:6px;display:block}
-
-/* ── ENGINE BAR (same component as ai-study.html) ── */
-.engine-bar{display:flex;align-items:center;gap:10px;background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:10px 18px;margin-bottom:28px;animation:fade-up .45s var(--spring) .1s both;flex-wrap:wrap}
-.engine-item{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--tx4);letter-spacing:.06em}
-.engine-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.engine-dot.active{background:#4ade80;box-shadow:0 0 6px #4ade80;animation:pulse-dot 2s ease-in-out infinite}
-.engine-dot.standby{background:var(--p5);box-shadow:0 0 6px var(--p5);animation:pulse-dot 2.5s ease-in-out infinite}
-.engine-dot.off{background:var(--tx4)}
-.engine-sep{width:1px;height:16px;background:var(--bdr)}
-.engine-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.keys-btn{font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:8px;background:rgba(109,40,217,.1);border:1px solid var(--bdr2);color:var(--p6);cursor:pointer;transition:all .18s;letter-spacing:.06em}
-.keys-btn:hover{border-color:var(--bdr3);background:rgba(109,40,217,.18)}
-
-/* ── KEYS PANEL ── */
-.keys-panel{background:var(--sur);border:1px solid var(--bdr2);border-radius:16px;padding:22px 24px;margin-bottom:28px;display:none;animation:fade-up .3s var(--spring) both}
-.keys-panel.open{display:block}
-.keys-panel-title{font-family:var(--serif);font-size:18px;color:var(--tx);margin-bottom:4px}
-.keys-panel-sub{font-size:12px;color:var(--tx4);margin-bottom:18px;line-height:1.6}
-.keys-panel-sub a{color:var(--p6)}
-.keys-panel-sub strong{color:var(--tx2)}
-.key-row{display:flex;align-items:center;gap:8px;background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;padding:9px 14px;margin-bottom:10px}
-.key-inp{flex:1;background:none;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--tx);min-width:0}
-.key-inp::placeholder{color:var(--tx4)}
-.grok-row{display:flex;gap:8px}
-.grok-inp{flex:1;background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;padding:9px 14px;font-family:var(--mono);font-size:12px;color:var(--tx);outline:none}
-.grok-inp:focus{border-color:var(--bdr3)}
-.save-btn{padding:9px 20px;border-radius:10px;background:linear-gradient(135deg,var(--p3),var(--p5));color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.08em;cursor:pointer;transition:all .2s;white-space:nowrap}
-.save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,.4)}
-.demo-note{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;border-radius:10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);font-size:11.5px;color:var(--warn);line-height:1.5}
-
-/* ── ONBOARD CARD (first run, no profile yet) ── */
-.onboard{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;padding:32px;margin-bottom:28px;animation:fade-up .45s var(--spring) .15s both}
-.onboard-h{font-family:var(--serif);font-size:22px;margin-bottom:4px}
-.onboard-sub{font-size:13px;color:var(--tx3);margin-bottom:22px}
-.onboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4)}
-.field select,.field input{background:var(--sur3);border:1px solid var(--bdr);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--tx);outline:none;font-family:var(--sans)}
-.field select:focus,.field input:focus{border-color:var(--bdr3)}
-.chip-row{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:7px 14px;border-radius:99px;border:1px solid var(--bdr);background:var(--sur3);font-size:12px;color:var(--tx3);cursor:pointer;transition:all .15s;user-select:none}
-.chip.on{background:rgba(109,40,217,.18);border-color:var(--bdr3);color:var(--p6)}
-.gen-btn{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;border-radius:12px;background:linear-gradient(135deg,var(--p3),var(--p5));color:#fff;font-size:13.5px;font-weight:600;transition:all .2s;margin-top:8px}
-.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(109,40,217,.4)}
-.gen-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
-.gen-btn svg{width:15px;height:15px}
-.spin{animation:spin .8s linear infinite}
-
-/* ── TODAY PLAN ── */
-.plan-wrap{display:none}
-.plan-wrap.show{display:block;animation:fade-up .4s var(--spring) both}
-.plan-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
-.plan-date{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--p6);margin-bottom:6px}
-.plan-title{font-family:var(--serif);font-size:30px;color:var(--tx);font-weight:400}
-.plan-meta{display:flex;gap:18px;flex-wrap:wrap}
-.plan-stat{text-align:right}
-.plan-stat-n{font-family:var(--serif);font-size:22px;color:var(--p6)}
-.plan-stat-l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx4)}
-
-.weak-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:22px}
-.weak-chip{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);font-size:11.5px;color:#fca5a5;white-space:nowrap}
-.weak-chip svg{width:12px;height:12px;flex-shrink:0}
-
-.task-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-.task{display:flex;align-items:flex-start;gap:14px;background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:18px 20px;transition:all .2s}
-.task:hover{border-color:var(--bdr2)}
-.task.done{opacity:.55}
-.task.done .task-title{text-decoration:line-through}
-.task-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--bdr3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
-.task-check:hover{border-color:var(--p5)}
-.task-check.checked{background:var(--good);border-color:var(--good)}
-.task-check.checked svg{animation:check-pop .25s var(--spring) both}
-.task-check svg{width:13px;height:13px;color:#06210f;display:none}
-.task-check.checked svg{display:block}
-.task-body{flex:1;min-width:0}
-.task-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
-.task-tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;flex-shrink:0}
-.task-tag.weak{background:rgba(248,113,113,.15);color:#fca5a5}
-.task-tag.review{background:rgba(167,139,250,.15);color:var(--p6)}
-.task-tag.new{background:rgba(74,222,128,.12);color:var(--good)}
-.task-tag.practice{background:rgba(251,191,36,.12);color:var(--warn)}
-.task-title{font-size:14.5px;color:var(--tx);font-weight:500;line-height:1.4}
-.task-sub{font-size:12px;color:var(--tx4);margin-top:3px;line-height:1.5}
-.task-why{font-size:11.5px;color:var(--tx3);margin-top:7px;padding-top:7px;border-top:1px solid var(--bdr);line-height:1.5;font-style:italic}
-.task-time{font-family:var(--mono);font-size:11px;color:var(--p6);flex-shrink:0;white-space:nowrap;margin-top:2px}
-
-.plan-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
-.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:11px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx2);font-size:13px;transition:all .18s}
-.btn-ghost:hover{border-color:var(--bdr2);background:var(--sur4)}
-.btn-ghost svg{width:14px;height:14px}
-
-/* ── PROGRESS NOTE ── */
-.engine-note{display:flex;gap:12px;align-items:flex-start;background:var(--sur2);border:1px solid var(--bdr);border-radius:14px;padding:16px 18px;margin-bottom:26px}
-.engine-note svg{width:16px;height:16px;color:var(--p6);flex-shrink:0;margin-top:1px}
-.engine-note-t{font-size:12.5px;color:var(--tx3);line-height:1.6}
-.engine-note-t strong{color:var(--tx2);font-weight:600}
-
-/* ── STREAK / LOG STRIP ── */
-.log-strip{display:flex;gap:6px;margin-bottom:30px;flex-wrap:wrap}
-.log-day{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;background:var(--sur3);border:1px solid var(--bdr);color:var(--tx4)}
-.log-day.hit{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.4);color:var(--good)}
-.log-day.partial{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:var(--warn)}
-.log-day.miss{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.25);color:#fca5a5}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sur);border:1px solid var(--bdr2);border-radius:12px;padding:12px 22px;font-size:13px;color:var(--tx);box-shadow:var(--sh2);opacity:0;transition:all .3s var(--spring);z-index:999;white-space:nowrap;display:flex;align-items:center;gap:9px;pointer-events:none}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.toast-dot.ok{background:#4ade80}
-.toast-dot.err{background:#f87171}
-.toast-dot.info{background:var(--p5)}
-
-@media(max-width:700px){
-  .onboard-grid{grid-template-columns:1fr}
-  .plan-head{flex-direction:column;align-items:flex-start}
-  .task{flex-direction:row}
-  .weak-strip{flex-wrap:wrap;overflow-x:visible}
+html{-webkit-text-size-adjust:100%;color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark}
+html,body{height:100%}
+body{
+  font-family:var(--body);background:var(--paper);color:var(--ink);
+  -webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden;
+  transition:background-color .25s,color .25s;
 }
+
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:42px 42px;opacity:.5;
+}
+html[data-theme="dark"] body::before{opacity:.3}
+
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;color:inherit;font-size:inherit}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+h1,h2,h3,h4{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
+
+.icon{width:18px!important;height:18px!important;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* Lucide replaces <i data-lucide> with <svg class="icon"> — these ensure
+   our sizing wins over Lucide's inline width/height="24" attributes */
+i[data-lucide]{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon.filled{fill:currentColor;stroke:none}
+
+::selection{background:var(--vine-soft-2)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-faint)}
+:focus-visible{outline:2px solid var(--vine);outline-offset:2px;border-radius:4px}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+}
+/* ============ APP SHELL ============ */
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;background:var(--paper);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;
+  height:100vh;position:fixed;left:0;top:0;overflow-y:auto;z-index:40;
+}
+.brand{display:flex;align-items:center;gap:11px;padding:22px 18px 18px}
+.brand-mark{width:36px;height:36px;flex-shrink:0;object-fit:contain;border-radius:8px}
+.brand-name{font-family:var(--serif);font-style:italic;font-size:19px;font-weight:400;line-height:1.1}
+.brand-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase;margin-top:1px}
+
+.nav{flex:0 0 auto;padding:6px 12px;display:flex;flex-direction:column;gap:1px}
+.nav-section-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding:14px 10px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:500;color:var(--ink-soft);transition:background .15s,color .15s;text-align:left;width:100%;
+}
+.nav-item:hover{background:var(--surface-2);color:var(--ink)}
+.nav-item.active{background:var(--vine-soft);color:var(--vine-deep);font-weight:600}
+.nav-item .icon{width:17px;height:17px}
+.nav-item .count{
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-left:auto;
+  background:var(--surface-2);padding:1px 6px;border-radius:var(--radius-pill);
+}
+.nav-item.active .count{background:var(--vine-soft-2);color:var(--vine-deep)}
+
+.sidebar-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.streak-box{display:flex;align-items:center;gap:9px;background:var(--surface-2);border-radius:var(--radius-sm);padding:9px 11px}
+.streak-box .icon{width:15px;height:15px;color:var(--vine)}
+.streak-box-text{display:flex;flex-direction:column;line-height:1.2}
+.streak-num{font-family:var(--mono);font-weight:700;font-size:13px}
+.streak-label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+.sidebar-version{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);text-align:center;letter-spacing:.04em}
+
+/* ============ MAIN ============ */
+.main{flex:1;margin-left:var(--sidebar-w);min-width:0;padding:38px 46px 90px;max-width:1240px;position:relative}
+
+.account-pill{
+  position:absolute;top:38px;right:46px;z-index:10;
+  display:block;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);transition:border-color .15s,background .15s;
+  box-shadow:var(--shadow-sm);
+}
+.account-pill:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.account-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--surface-2);border:2px solid var(--vine-soft-2);overflow:hidden;display:block;margin:auto}
+.account-av img{width:100%;height:100%;object-fit:cover;display:block}
+.account-av img:not([src]),.account-av img[src=""]{display:none}
+
+.view{display:none}
+.view.active{display:block;animation:viewIn .25s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap;padding-right:148px}
+@media (max-width:760px){.view-head{padding-right:0}}
+.view-title{font-family:var(--serif);font-style:italic;font-weight:400;font-size:34px;line-height:1.1}
+.view-sub{color:var(--ink-soft);font-size:13px;margin-top:6px;max-width:540px}
+.view-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.meta-chip{
+  font-family:var(--mono);font-size:11.5px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius-pill);
+  padding:7px 14px;display:flex;align-items:center;gap:6px;color:var(--ink-soft);
+}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:26px;box-shadow:var(--shadow-sm)}
+.card + .card{margin-top:20px}
+
+.topbar-mobile{display:none}
+@media (max-width:760px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--shadow-lg)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:84px 18px 90px}
+  .topbar-mobile{
+    display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;height:60px;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:0 14px;z-index:180;
+  }
+  .menu-btn{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+  .menu-btn:hover{background:var(--surface-2)}
+  .topbar-mobile .brand-mark{width:26px;height:26px}
+  .topbar-mobile .brand-name{font-size:15px}
+  .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:39}
+  .sidebar-backdrop.show{display:block}
+  .account-pill{
+    position:fixed;top:11px;right:14px;left:auto;z-index:200;
+    width:38px;height:38px;border:none;background:transparent;box-shadow:none;
+  }
+  .account-pill:hover{background:transparent;border:none}
+  .account-av{width:38px;height:38px}
+}
+/* ============================================================
+   SIGNATURE: the planting card
+   A sky-gradient backdrop that shifts with real time of day,
+   framing a generative SVG tree that grows stage by stage as
+   the session progresses. This is Grove's equivalent of
+   Ripen's dial and Sprout's torn-paper edge.
+   ============================================================ */
+.plant-card{
+  position:relative;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);
+  box-shadow:var(--shadow);min-height:420px;display:flex;flex-direction:column;
+  background:linear-gradient(180deg, var(--sky-day) 0%, var(--surface) 78%);
+  transition:background 1.2s ease;
+}
+.plant-card[data-daytime="dusk"]{background:linear-gradient(180deg, var(--sky-dusk) 0%, var(--surface) 78%)}
+.plant-card[data-daytime="night"]{background:linear-gradient(180deg, var(--sky-night) 0%, var(--surface) 78%)}
+.plant-card[data-daytime="night"] .view-title,
+.plant-card[data-daytime="night"] .plant-state-label{color:#f5f0e8}
+
+.plant-ground{
+  position:absolute;left:0;right:0;bottom:0;height:120px;
+  background:linear-gradient(180deg, transparent, var(--vine-soft) 40%, var(--vine-soft-2));
+  opacity:.7;
+}
+
+.plant-stage-wrap{
+  flex:1;display:flex;align-items:flex-end;justify-content:center;position:relative;padding:30px 30px 0;
+}
+.plant-svg{width:260px;height:260px;position:relative;z-index:2;transition:filter 1.5s ease}
+.plant-svg.withering{filter:saturate(.35) brightness(.85)}
+.plant-svg.dead{filter:saturate(.15) brightness(.7) sepia(.3)}
+
+.plant-stars{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;pointer-events:none}
+.plant-card[data-daytime="night"] .plant-stars{opacity:1}
+.plant-star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.7}
+
+.plant-info{padding:22px 30px 28px;position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:14px}
+.plant-state-label{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--vine-deep);display:flex;align-items:center;gap:7px}
+.plant-state-label .dot{width:6px;height:6px;border-radius:50%;background:var(--vine);animation:plantPulse 2s ease infinite}
+.plant-state-label.warning{color:var(--tomato-deep)}
+.plant-state-label.warning .dot{background:var(--tomato);animation:plantPulseFast .6s ease infinite}
+@keyframes plantPulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes plantPulseFast{0%,100%{opacity:1}50%{opacity:.15}}
+
+.plant-timer{font-family:var(--mono);font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.plant-species-name{font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink-soft)}
+
+.plant-controls{display:flex;align-items:center;gap:12px}
+.duration-picker{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.duration-opt{
+  padding:9px 16px;border-radius:var(--radius-pill);border:1px solid var(--line);font-size:12.5px;font-weight:600;
+  color:var(--ink-soft);background:var(--surface);transition:background .15s,border-color .15s,color .15s;
+}
+.duration-opt:hover{border-color:var(--line-strong)}
+.duration-opt.active{background:var(--vine);border-color:var(--vine);color:#fff}
+
+.plant-btn{
+  display:flex;align-items:center;gap:9px;padding:13px 28px;border-radius:var(--radius-pill);
+  background:var(--vine);color:#fff;font-size:14px;font-weight:700;box-shadow:var(--shadow-sm);
+  transition:background .15s,transform .1s;
+}
+.plant-btn:hover{background:var(--vine-deep)}
+.plant-btn:active{transform:scale(.98)}
+.plant-btn.danger{background:var(--tomato)}
+.plant-btn.danger:hover{background:var(--tomato-deep)}
+.plant-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.mode-toggle-row{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-faint)}
+.mode-toggle-row .switch{transform:scale(.85)}
+/* ============ STAT STRIP ============ */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.stat-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.stat-tile .icon{width:15px;height:15px;color:var(--ink-faint);margin-bottom:8px}
+.stat-num{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.stat-label{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:5px}
+@media (max-width:900px){.stat-strip{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ MY GROVE — history grid ============ */
+.grove-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:14px}
+.grove-tree-tile{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:border-color .15s,transform .15s;cursor:pointer;
+}
+.grove-tree-tile:hover{border-color:var(--vine-soft-2);transform:translateY(-2px)}
+.grove-tree-tile.withered{opacity:.55}
+.grove-tree-tile-svg{width:54px;height:54px}
+.grove-tree-tile-date{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint)}
+.grove-tree-tile-dur{font-family:var(--mono);font-size:10px;color:var(--ink-soft);font-weight:600}
+
+/* ============ COMMUNITY GROVE — shared canvas ============ */
+.community-canvas-wrap{
+  position:relative;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);
+  background:linear-gradient(180deg, var(--sky-day) 0%, var(--vine-soft) 85%, var(--vine-soft-2));
+  min-height:480px;box-shadow:var(--shadow);
+}
+.community-canvas{position:relative;width:100%;height:480px;overflow:hidden}
+.community-tree{position:absolute;bottom:0;transition:transform .2s ease;cursor:default}
+.community-tree.mine{filter:drop-shadow(0 0 10px var(--vine-bright))}
+.community-tree-tooltip{
+  position:absolute;background:var(--ink);color:var(--paper);font-size:11px;padding:6px 10px;border-radius:7px;
+  white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;transform:translate(-50%,-110%);font-family:var(--mono);
+  z-index:20;
+}
+html[data-theme="dark"] .community-tree-tooltip{background:#f5f0e8;color:#100f0e}
+.community-tree:hover .community-tree-tooltip{opacity:1}
+
+.community-stats-bar{
+  display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+  background:var(--surface);border-top:1px solid var(--line);flex-wrap:wrap;gap:10px;
+}
+.community-stats-bar .stat-inline{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+.community-stats-bar .stat-inline strong{font-family:var(--mono);color:var(--ink);font-size:13.5px}
+
+/* ============ BUTTONS / FORMS (shared) ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;
+}
+.btn .icon{width:15px;height:15px}
+.btn-primary{background:var(--vine);color:#fff}
+.btn-primary:hover{background:var(--vine-deep)}
+.btn-secondary{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.btn-secondary:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.btn-ghost{color:var(--ink-soft)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn-danger{color:var(--tomato)}
+.btn-danger:hover{background:var(--tomato-soft)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.input,.select,.textarea{
+  font-family:inherit;font-size:13.5px;padding:10px 13px;border:1px solid var(--line-strong);
+  border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);
+  transition:border-color .15s,box-shadow .15s;width:100%;color-scheme:light;
+}
+html[data-theme="dark"] .input,html[data-theme="dark"] .select,html[data-theme="dark"] .textarea{color-scheme:dark}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--vine);box-shadow:0 0 0 3px var(--vine-soft)}
+.select{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a6248' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:32px;
+}
+html[data-theme="dark"] .select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b8aa98' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.switch{width:38px;height:22px;border-radius:var(--radius-pill);background:var(--line-strong);position:relative;transition:background .15s;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:var(--shadow-sm)}
+.switch.on{background:var(--vine)}
+.switch.on::after{transform:translateX(16px)}
+
+.sound-row{padding:12px 0}
+.sound-row + .sound-row{border-top:1px solid var(--line)}
+.sound-row-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:3px}
+.si-name{font-weight:600;font-size:13.5px}
+.si-desc{font-size:11.5px;color:var(--ink-soft);line-height:1.45}
+.tab{transition:background .15s,color .15s}
+.tab:not(:last-child){border-right:1px solid var(--line)}
+
+.divider{height:1px;background:var(--line);margin:20px 0}
+
+.empty-state{padding:60px 20px;text-align:center}
+.empty-state .icon{width:38px;height:38px;color:var(--line-strong);margin:0 auto 14px}
+.empty-state-title{font-family:var(--serif);font-style:italic;font-weight:400;font-size:20px;margin-bottom:6px}
+.empty-state-desc{font-size:12.5px;color:var(--ink-soft);max-width:280px;margin:0 auto}
+
+.species-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:var(--radius-pill);
+  background:var(--vine-soft);color:var(--vine-deep);font-size:11px;font-weight:600;
+}
+.species-badge.locked{background:var(--surface-2);color:var(--ink-faint)}
+/* ============ MODALS ============ */
+.modal-backdrop{position:fixed;inset:0;background:rgba(20,18,14,.32);z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:420px;max-width:100%;max-height:86vh;overflow-y:auto;transform:scale(.96);transition:transform .18s}
+.modal-backdrop.show .modal{transform:scale(1)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:16.5px}
+.modal-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink-faint)}
+.modal-close:hover{background:var(--surface-2);color:var(--ink)}
+.modal-body{padding:22px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--line)}
+.modal-danger-box{background:var(--tomato-soft);border-radius:var(--radius-sm);padding:14px 16px;margin-top:4px}
+.modal-danger-box p{font-size:12.5px;color:var(--tomato-deep);line-height:1.5}
+.modal-success-box{background:var(--vine-soft);border-radius:var(--radius-sm);padding:18px 16px;text-align:center}
+
+.wither-modal-tree{width:120px;height:120px;margin:0 auto 14px;display:block;filter:saturate(.3) brightness(.85)}
+
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:160;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:var(--radius-pill);
+  font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);
+  animation:toastIn .2s ease;
+}
+html[data-theme="dark"] .toast{background:#f5f0e8;color:#100f0e}
+.toast .icon{width:15px;height:15px;color:var(--vine-deep)}
+.toast-undo{font-weight:700;color:var(--amber-deep);margin-left:4px}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+html[data-theme="dark"] .switch::after{background:#100f0e}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:var(--line-strong)}
+html[data-theme="dark"] .toast .icon{color:var(--vine)}
+
 </style>
 </head>
 <body>
-<div class="amb"></div>
 
-<div class="toast" id="toast"><div class="toast-dot ok" id="toastDot"></div><span id="toastMsg"></span></div>
-
-<!-- NAV -->
-<nav class="nav">
-  <a class="nav-brand" href="../index.html">
-    <span class="nav-name">Books Coffee <em>&amp;</em> Dreams</span>
-  </a>
-  <div class="nav-right">
-    <div class="nav-pill">AI Study Planner</div>
-    <button class="nav-ib" id="modeBtn">
-      <span class="icon-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
-      <span class="icon-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-    </button>
-    <div class="nav-av" id="navAv" onclick="location.href='../profile.html'">A</div>
-  </div>
-</nav>
-
-<div class="page">
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-tag">Powered by Gemini</div>
-    <h1 class="hero-h">Today's <em>plan,</em><br>built for you.</h1>
-    <p class="hero-sub">Every morning the engine looks at what you've covered, what you're still shaky on, and how much time you actually have — then builds today's plan from scratch.</p>
-    <span class="hero-hand">Not a syllabus. A plan that knows where you are.</span>
-  </div>
-
-  <!-- ENGINE STATUS BAR -->
-  <div class="engine-bar">
-    <div class="engine-item"><div class="engine-dot active" id="keyDot"></div><span id="engineModeLabel">Demo mode</span></div>
-    <div class="engine-sep"></div>
-    <div class="engine-item"><div class="engine-dot standby" id="grokDot"></div>Grok fallback</div>
-    <div class="engine-sep"></div>
-    <div class="engine-item" id="currentKeyLabel" style="color:var(--p6)">No key active</div>
-    <div class="engine-right">
-      <div class="keys-btn" onclick="toggleKeysPanel()">Manage Keys</div>
-    </div>
-  </div>
-
-  <!-- KEYS PANEL -->
-  <div class="keys-panel" id="keysPanel">
-    <div class="keys-panel-title">Connect the engine</div>
-    <div class="keys-panel-sub">
-      Add a free <strong>Gemini key</strong> from <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> to generate real plans. A <strong>Grok (xAI)</strong> key is used automatically if Gemini is rate-limited. Without a key, the planner runs in demo mode with a realistic sample plan so you can see the full flow.
-    </div>
-    <div class="key-row"><input class="key-inp" id="geminiKeyInp" type="password" placeholder="AIza… (Gemini key)"/></div>
-    <div class="grok-row">
-      <input class="grok-inp" id="grokKeyInp" type="password" placeholder="xai-… (Grok key, optional)"/>
-      <div class="save-btn" onclick="saveKeys()">Save</div>
-    </div>
-    <div class="demo-note">
-      <span>⚠</span>
-      <span>Demo mode is for previewing the product only. It is not connected to a live AI call and should not be used as AI-operation evidence for the submission — only plans generated with a real key write to the production log below.</span>
-    </div>
-  </div>
-
-  <!-- ONBOARD -->
-  <div class="onboard" id="onboardCard">
-    <div class="onboard-h">Set up your plan</div>
-    <div class="onboard-sub">Takes 30 seconds. The engine re-asks nothing after this — it learns from what you finish.</div>
-    <div class="onboard-grid">
-      <div class="field">
-        <label>Exam</label>
-        <select id="examSel">
-          <option value="JEE">JEE (Main + Advanced)</option>
-          <option value="NEET">NEET</option>
-          <option value="UPSC">UPSC</option>
-          <option value="CAT">CAT</option>
-          <option value="CBSE12">CBSE Class 12</option>
-          <option value="CUET">CUET</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Hours available today</label>
-        <input id="hoursInp" type="number" min="1" max="14" value="4" step="0.5"/>
-      </div>
-    </div>
-    <div class="field" style="margin-bottom:18px">
-      <label>Topics you find hardest right now (pick a few)</label>
-      <div class="chip-row" id="weakChips"></div>
-    </div>
-    <button class="gen-btn" id="genBtn" onclick="generatePlan()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-      <span id="genBtnLabel">Build today's plan</span>
-    </button>
-  </div>
-
-  <!-- TODAY'S PLAN -->
-  <div class="plan-wrap" id="planWrap">
-
-    <div class="plan-head">
-      <div>
-        <div class="plan-date" id="planDate">TODAY</div>
-        <div class="plan-title">Your plan for today</div>
-      </div>
-      <div class="plan-meta">
-        <div class="plan-stat"><div class="plan-stat-n" id="statHours">—</div><div class="plan-stat-l">hours</div></div>
-        <div class="plan-stat"><div class="plan-stat-n" id="statTasks">—</div><div class="plan-stat-l">tasks</div></div>
-        <div class="plan-stat"><div class="plan-stat-n" id="statStreak">—</div><div class="plan-stat-l">day streak</div></div>
-      </div>
-    </div>
-
-    <div class="weak-strip" id="weakStrip"></div>
-
-    <div class="engine-note">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <div class="engine-note-t" id="engineReason">—</div>
-    </div>
-
-    <div class="task-list" id="taskList"></div>
-
-    <div class="plan-actions">
-      <button class="btn-ghost" onclick="markAllAndAdapt()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Finish day &amp; adapt tomorrow
-      </button>
-      <button class="btn-ghost" onclick="regenerate()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        Regenerate
-      </button>
-    </div>
-
-    <div class="plan-date" style="margin-bottom:10px">LAST 14 DAYS</div>
-    <div class="log-strip" id="logStrip"></div>
-
-  </div>
-
+<div class="topbar-mobile">
+  <button class="menu-btn" id="menuBtn"><i data-lucide="menu" class="icon"></i></button>
+  <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="26" height="26">
+  <div class="brand-name">Grove</div>
 </div>
 
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img class="brand-mark" src="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/pomodoro.png" alt="" width="36" height="36">
+      <div>
+        <div class="brand-name">Grove</div>
+        <div class="brand-tag">A Focus Forest</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section-label">Grow</div>
+      <button class="nav-item active" data-view="plant">
+        <i data-lucide="sprout" class="icon"></i><span>Plant</span>
+      </button>
+      <button class="nav-item" data-view="mygrove">
+        <i data-lucide="tree-deciduous" class="icon"></i><span>My Grove</span>
+        <span class="count" id="countMyTrees">0</span>
+      </button>
+      <button class="nav-item" data-view="community">
+        <i data-lucide="globe" class="icon"></i><span>Community Grove</span>
+      </button>
+    </nav>
+
+    <nav class="nav">
+      <div class="nav-section-label">&nbsp;</div>
+      <button class="nav-item" data-view="settings">
+        <i data-lucide="settings" class="icon"></i><span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="streak-box">
+        <i data-lucide="flame" class="icon"></i>
+        <div class="streak-box-text">
+          <span class="streak-num" id="sidebarStreak">0</span>
+          <span class="streak-label">Day streak</span>
+        </div>
+      </div>
+      <div class="sidebar-version">GROVE · BCD FOCUS FOREST</div>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="main">
+
+    <a class="account-pill" id="accountPill" href="../profile.html" title="Account">
+      <span class="account-av" id="accountAvatar"><img alt="" id="accountAvatarImg"></span>
+    </a>
+    <!-- ============ PLANT ============ -->
+    <div class="view active" id="view-plant" data-view="plant">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Plant</h1>
+          <p class="view-sub">Choose a duration, plant a seed, and stay with it. Leave a strict session and your tree withers.</p>
+        </div>
+        <div class="view-meta">
+          <span class="meta-chip" id="modeChip"><i data-lucide="shield-check" class="icon" style="width:13px;height:13px"></i><span id="modeChipLabel">Strict mode</span></span>
+        </div>
+      </div>
+
+      <div class="plant-card" id="plantCard" data-daytime="day">
+        <div class="plant-stars" id="plantStars"></div>
+        <div class="plant-ground"></div>
+        <div class="plant-stage-wrap">
+          <svg class="plant-svg" id="plantSvg" viewBox="0 0 200 200"></svg>
+        </div>
+        <div class="plant-info">
+          <div class="plant-state-label" id="plantStateLabel">
+            <span class="dot"></span><span id="plantStateText">Choose a duration to begin</span>
+          </div>
+          <div class="plant-timer" id="plantTimer">25:00</div>
+          <div class="plant-species-name" id="plantSpeciesName" style="display:none"></div>
+
+          <div class="plant-controls" id="plantControlsIdle">
+            <div class="duration-picker" id="durationPicker">
+              <button class="duration-opt" data-min="10">10 min</button>
+              <button class="duration-opt active" data-min="25">25 min</button>
+              <button class="duration-opt" data-min="50">50 min</button>
+              <button class="duration-opt" data-min="90">90 min</button>
+            </div>
+          </div>
+          <button class="plant-btn" id="btnPlant">
+            <i data-lucide="sprout" class="icon"></i><span>Plant a seed</span>
+          </button>
+          <button class="plant-btn danger" id="btnGiveUp" style="display:none">
+            <i data-lucide="x" class="icon"></i><span>Give up</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat-tile">
+          <i data-lucide="tree-deciduous" class="icon"></i>
+          <div class="stat-num" id="statTreesGrown">0</div>
+          <div class="stat-label">Trees grown</div>
+        </div>
+        <div class="stat-tile">
+          <i data-lucide="skull" class="icon"></i>
+          <div class="stat-num" id="statTreesWithered">0</div>
+          <div class="stat-label">Withered</div>
+        </div>
+        <div class="stat-tile">
+          <i data-lucide="clock" class="icon"></i>
+          <div class="stat-num" id="statFocusHours">0h</div>
+          <div class="stat-label">Focus time</div>
+        </div>
+        <div class="stat-tile">
+          <i data-lucide="flame" class="icon"></i>
+          <div class="stat-num" id="statStreakPlant">0</div>
+          <div class="stat-label">Day streak</div>
+        </div>
+      </div>
+    </div>
+    <!-- ============ MY GROVE ============ -->
+    <div class="view" id="view-mygrove" data-view="mygrove">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">My Grove</h1>
+          <p class="view-sub">Every tree you've grown — and every one you've lost — stays here.</p>
+        </div>
+        <div class="view-meta">
+          <span class="meta-chip" id="myGroveCountChip">0 trees</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="grove-grid" id="myGroveGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ COMMUNITY GROVE ============ -->
+    <div class="view" id="view-community" data-view="community">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Community Grove</h1>
+          <p class="view-sub">Every tree, planted by everyone at Books Coffee and Dreams, growing in one shared place. Yours glows.</p>
+        </div>
+      </div>
+
+      <div class="community-canvas-wrap">
+        <div class="community-canvas" id="communityCanvas"></div>
+        <div class="community-stats-bar">
+          <div class="stat-inline"><i data-lucide="tree-deciduous" class="icon" style="width:14px;height:14px"></i><strong id="communityTotalTrees">0</strong> trees planted</div>
+          <div class="stat-inline"><i data-lucide="clock" class="icon" style="width:14px;height:14px"></i><strong id="communityTotalHours">0h</strong> total focus</div>
+          <div class="stat-inline"><i data-lucide="sprout" class="icon" style="width:14px;height:14px"></i>Yours <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--vine-bright);box-shadow:0 0 6px var(--vine-bright);margin-left:4px"></span></div>
+        </div>
+      </div>
+    </div>
+    <!-- ============ SETTINGS ============ -->
+    <div class="view" id="view-settings" data-view="settings">
+      <div class="view-head">
+        <div>
+          <h1 class="view-title">Settings</h1>
+          <p class="view-sub">Grove syncs to your Books Coffee and Dreams account.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <i data-lucide="shield-check" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
+          <h3 style="font-size:14.5px">Focus mode</h3>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:16px">
+          Strict mode: leaving this tab while a tree is growing kills it, permanently. Relaxed mode: your tree
+          visibly struggles if you leave, but recovers if you come back — no permanent loss.
+        </p>
+        <div class="sound-row-head">
+          <span class="si-name">Strict mode</span>
+          <button class="switch" id="strictModeToggle" title="Toggle strict mode"></button>
+        </div>
+        <div class="si-desc">When off, trees can't be permanently killed by leaving the tab</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <i data-lucide="globe" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
+          <h3 style="font-size:14.5px">Community Grove</h3>
+        </div>
+        <div class="sound-row-head">
+          <span class="si-name">Share my trees publicly</span>
+          <button class="switch" id="communityShareToggle" title="Toggle community sharing"></button>
+        </div>
+        <div class="si-desc">When on, your grown trees appear in the shared Community Grove for everyone at BCD to see (no name shown, just the tree)</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <i data-lucide="sun" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
+          <h3 style="font-size:14.5px">Appearance</h3>
+        </div>
+        <div class="sound-row-head">
+          <span class="si-name">Theme</span>
+          <div class="tab-group" id="themeTabs" style="display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden">
+            <button class="tab" data-theme="light" style="padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--ink-soft)">Light</button>
+            <button class="tab" data-theme="dark" style="padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--ink-soft)">Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <i data-lucide="download" class="icon" style="width:15px;height:15px;color:var(--vine)"></i>
+          <h3 style="font-size:14.5px">Your data</h3>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">All data syncs to your Books Coffee and Dreams account.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary" id="btnExportData"><i data-lucide="download" class="icon"></i>Export data (.json)</button>
+          <button class="btn btn-secondary" id="btnImportData"><i data-lucide="upload" class="icon"></i>Import data</button>
+          <input type="file" id="importFileInput" accept="application/json" style="display:none">
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--tomato-soft-2);background:var(--tomato-soft)">
+        <h3 style="font-size:14.5px;color:var(--tomato-deep);margin-bottom:6px">Reset all data</h3>
+        <p style="font-size:12.5px;color:var(--ink)">Permanently deletes your whole grove — every tree, grown or withered. This cannot be undone.</p>
+        <button class="btn btn-danger" style="margin-top:14px;background:var(--surface);border:1px solid var(--tomato-soft-2)" id="btnResetAll">
+          <i data-lucide="trash-2" class="icon"></i>Reset everything
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+<!-- ============ WITHER WARNING MODAL (strict mode, tab left) ============ -->
+<div class="modal-backdrop" id="modalWither">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">You left the tree</span>
+      <button class="modal-close" data-close="modalWither"><i data-lucide="x" class="icon"></i></button>
+    </div>
+    <div class="modal-body">
+      <svg class="wither-modal-tree" id="witherModalSvg" viewBox="0 0 200 200"></svg>
+      <div class="modal-danger-box">
+        <p id="witherDesc">In strict mode, leaving the tab while a tree is growing kills it. This one didn't make it — but the next one will.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-close="modalWither" style="background:var(--vine)">Plant again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CELEBRATION MODAL (tree fully grown) ============ -->
+<div class="modal-backdrop" id="modalCelebrate">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Fully grown</span>
+      <button class="modal-close" data-close="modalCelebrate"><i data-lucide="x" class="icon"></i></button>
+    </div>
+    <div class="modal-body">
+      <svg class="wither-modal-tree" id="celebrateModalSvg" viewBox="0 0 200 200" style="filter:none"></svg>
+      <div class="modal-success-box">
+        <p style="font-size:14px;font-weight:700;color:var(--vine-deep);margin-bottom:4px" id="celebrateSpecies">—</p>
+        <p style="font-size:12px;color:var(--ink-soft)" id="celebrateDesc">Planted in My Grove and the Community Grove.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-close="modalCelebrate" style="background:var(--vine)">Nice</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM MODAL ============ -->
+<div class="modal-backdrop" id="modalConfirm">
+  <div class="modal" style="width:380px">
+    <div class="modal-head">
+      <span class="modal-title" id="confirmTitle">Are you sure?</span>
+      <button class="modal-close" data-close="modalConfirm"><i data-lucide="x" class="icon"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-danger-box">
+        <p id="confirmDesc">This action cannot be undone.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modalConfirm">Cancel</button>
+      <button class="btn btn-danger" id="btnConfirmAction" style="background:var(--tomato);color:#fff">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+
 <script>
-/* ═══════════════════════════════════════════════
-   FIREBASE — same project as the rest of the site
-═══════════════════════════════════════════════ */
-const firebaseConfig={apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",authDomain:"bcd-discord.firebaseapp.com",projectId:"bcd-discord",storageBucket:"bcd-discord.firebasestorage.app",messagingSenderId:"278895155371",appId:"1:278895155371:web:177a468f5fa3f0abfe3fee"};
-if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.firestore();
-let currentUser=null;
-auth.onAuthStateChanged(u=>{
-  currentUser=u;
-  if(u){
-    const el=document.getElementById('navAv');
-    const inits=(u.displayName||'D').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    if(u.photoURL) el.innerHTML=`<img src="${u.photoURL}" alt=""/>`;
-    else el.textContent=inits;
-  }
-});
+/* ============================================================
+   GROVE — state, defaults, species system
+   Architecture mirrors Ripen/Sprout: a single STATE object,
+   saveState() with a postHooks array for Firebase sync to
+   register into.
+   ============================================================ */
+(function(){
 
-/* ═══════════════════════════════════════════════
-   MODE TOGGLE
-═══════════════════════════════════════════════ */
-const html=document.documentElement;
-html.setAttribute('data-mode',localStorage.getItem('bcd-mode')||'dark');
-document.getElementById('modeBtn').onclick=()=>{const n=html.getAttribute('data-mode')==='dark'?'light':'dark';html.setAttribute('data-mode',n);localStorage.setItem('bcd-mode',n)};
+const STORAGE_KEY = 'grove_state_v1';
+const DAY_MS = 86400000;
 
-/* ═══════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════ */
-function toast(msg,type='ok'){
-  const t=document.getElementById('toast'),d=document.getElementById('toastDot'),m=document.getElementById('toastMsg');
-  d.className='toast-dot '+type; m.textContent=msg;
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+function todayKey(){ return dateKey(new Date()); }
+function dateKey(d){
+  const dt = new Date(d);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 }
 
-/* ═══════════════════════════════════════════════
-   KEYS — single Gemini key + optional Grok fallback.
-   NOTE: this mirrors ai-study.html's pattern for consistency,
-   but for production this call should move server-side
-   (Cloud Function) so the business — not each visitor —
-   controls and pays for the key. See README note at bottom
-   of this file for the swap.
-═══════════════════════════════════════════════ */
-let geminiKey = '';
-let grokKey = '';
-function loadKeys(){
-  geminiKey = localStorage.getItem('bcd_planner_gemini_key') || '';
-  grokKey = localStorage.getItem('bcd_planner_grok_key') || '';
-  document.getElementById('geminiKeyInp').value = geminiKey;
-  document.getElementById('grokKeyInp').value = grokKey;
-  updateEngineBar();
+/* ---------- species: unlocked by duration, original names/forms ---------- */
+const SPECIES = [
+  { id:'sprig',    name:'Sprig Pine',      minDuration:10, hue:'green'  },
+  { id:'paper',    name:'Paper Birch',     minDuration:25, hue:'green'  },
+  { id:'lantern',  name:'Lantern Maple',   minDuration:50, hue:'amber'  },
+  { id:'deeproot', name:'Deeproot Oak',    minDuration:90, hue:'green'  }
+];
+
+function speciesForDuration(minutes){
+  let chosen = SPECIES[0];
+  for(const s of SPECIES){ if(minutes >= s.minDuration) chosen = s; }
+  return chosen;
 }
-function saveKeys(){
-  geminiKey = document.getElementById('geminiKeyInp').value.trim();
-  grokKey = document.getElementById('grokKeyInp').value.trim();
-  localStorage.setItem('bcd_planner_gemini_key', geminiKey);
-  localStorage.setItem('bcd_planner_grok_key', grokKey);
-  updateEngineBar();
-  toast(geminiKey ? 'Key saved — engine is live' : 'No key set — running in demo mode','ok');
-  toggleKeysPanel();
-}
-function updateEngineBar(){
-  const dot=document.getElementById('keyDot'), label=document.getElementById('engineModeLabel'), cur=document.getElementById('currentKeyLabel'), grokDot=document.getElementById('grokDot');
-  if(geminiKey){
-    dot.className='engine-dot active'; label.textContent='Gemini live';
-    cur.textContent = `Key · ${geminiKey.slice(0,8)}…`;
-  }else{
-    dot.className='engine-dot off'; label.textContent='Demo mode';
-    cur.textContent='No key active';
-  }
-  grokDot.className='engine-dot '+(grokKey?'active':'standby');
-}
-function toggleKeysPanel(){ document.getElementById('keysPanel').classList.toggle('open'); }
-loadKeys();
+function speciesById(id){ return SPECIES.find(s=>s.id===id) || SPECIES[0]; }
 
-/* ═══════════════════════════════════════════════
-   WEAK TOPIC CHIPS (per exam)
-═══════════════════════════════════════════════ */
-const TOPIC_BANK = {
-  JEE:['Rotational Motion','Organic Chemistry','Coordinate Geometry','Thermodynamics','Permutations & Combinations','Electrostatics','Chemical Bonding','Calculus'],
-  NEET:['Genetics','Human Physiology','Organic Chemistry','Plant Kingdom','Thermodynamics','Cell Biology','Reproduction','Ecology'],
-  UPSC:['Modern History','Polity','Economy','Ethics','Geography','Current Affairs','Environment','Governance'],
-  CAT:['Quant — Geometry','Verbal — RC','DILR','Quant — Algebra','Para Jumbles','Quant — Number System'],
-  CBSE12:['Organic Chemistry','Calculus','Electrostatics','Biology — Genetics','Accountancy','Economics'],
-  CUET:['General Test','Domain Subject','English Comprehension','Quantitative Reasoning']
-};
-function renderWeakChips(){
-  const exam=document.getElementById('examSel').value;
-  const wrap=document.getElementById('weakChips');
-  wrap.innerHTML='';
-  (TOPIC_BANK[exam]||[]).forEach(t=>{
-    const c=document.createElement('div');
-    c.className='chip'; c.textContent=t; c.dataset.topic=t;
-    c.onclick=()=>c.classList.toggle('on');
-    wrap.appendChild(c);
-  });
-}
-document.getElementById('examSel').addEventListener('change', renderWeakChips);
-renderWeakChips();
-
-/* ═══════════════════════════════════════════════
-   GEMINI CALL — same engine pattern as ai-study.html's
-   key rotation, simplified to a single primary key plus
-   a Grok fallback (no multi-key evasion — one real key,
-   used honestly, is the point).
-═══════════════════════════════════════════════ */
-const GEMINI_MODEL='gemini-2.5-flash-preview-04-17';
-
-async function callGemini(promptText){
-  if(!geminiKey) throw new Error('NO_KEY');
-  const res=await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(geminiKey)}`,
-    {method:'POST',headers:{'Content-Type':'application/json'},
-     body:JSON.stringify({contents:[{parts:[{text:promptText}]}],generationConfig:{temperature:0.4,maxOutputTokens:2048,responseMimeType:'application/json'}})}
-  );
-  if(!res.ok){
-    const err=await res.json().catch(()=>({}));
-    const msg=err?.error?.message||`HTTP ${res.status}`;
-    if(/quota|rate.?limit|429/i.test(msg) && grokKey) return callGrok(promptText);
-    throw new Error(msg);
-  }
-  const data=await res.json();
-  const text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
-  return text;
-}
-
-async function callGrok(promptText){
-  if(!grokKey) throw new Error('NO_GROK_KEY');
-  const res=await fetch('https://api.x.ai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Bearer ${grokKey}`},
-    body:JSON.stringify({
-      model:'grok-3-mini',
-      messages:[{role:'system',content:'You output ONLY valid JSON, no markdown fences, matching the exact schema requested by the user message.'},{role:'user',content:promptText}],
-      temperature:0.4,max_tokens:2048
-    })
-  });
-  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e?.error?.message||`Grok HTTP ${res.status}`); }
-  const data=await res.json();
-  return data.choices?.[0]?.message?.content||'';
-}
-
-function buildPlannerPrompt({exam,hours,weakTopics,history}){
-  return `You are the study-planning engine for an exam-prep platform. Build ONE day's study plan.
-
-Exam: ${exam}
-Hours available today: ${hours}
-Topics the student says are hardest right now: ${weakTopics.length?weakTopics.join(', '):'none specified'}
-Recent history (most recent last, "hit"=finished full plan, "partial"=finished some, "miss"=finished none): ${JSON.stringify(history)}
-
-Rules:
-- If recent history shows misses, reduce total task count and total time below ${hours} hours — do not overload a student who is falling behind.
-- If weak topics are given, at least half the tasks must target them directly, tagged "weak".
-- Mix in exactly one lighter review task (tagged "review") and, if hours allow, one practice/test task (tagged "practice").
-- Each task needs a short, concrete title (not generic — name the actual sub-topic), a one-line "sub" description of exactly what to do, a "why" sentence explaining the reasoning tied to their weak topics or history, an estimated "minutes", and a "tag" from [weak, review, new, practice].
-- Tasks must sum to within 15 minutes of ${hours*60} total minutes.
-- Return STRICT JSON only, no markdown, matching exactly:
-{"reason":"one sentence explaining today's overall plan logic","tasks":[{"title":"","sub":"","why":"","minutes":0,"tag":"weak"}]}`;
-}
-
-function demoPlan({exam,hours,weakTopics}){
-  const topics = weakTopics.length?weakTopics:(TOPIC_BANK[exam]||['Core Topic']).slice(0,2);
-  const perTask = Math.round((hours*60)/4);
+function defaultState(){
   return {
-    reason:`Demo plan — you flagged ${topics.length} weak area${topics.length>1?'s':''}, so today leans into those first while keeping one review and one practice block.`,
-    tasks:[
-      {title:`Deep work: ${topics[0]}`, sub:'Work through 2 worked examples, then attempt 5 problems unaided.', why:`You marked ${topics[0]} as hardest right now — tackling it while you're fresh.`, minutes:perTask, tag:'weak'},
-      {title:topics[1]?`Deep work: ${topics[1]}`:'Concept review: yesterday\'s topic', sub:'Re-derive the core formula from scratch, no notes.', why:'Second weak area, placed before fatigue sets in.', minutes:perTask, tag:'weak'},
-      {title:'Quick review: last week\'s notes', sub:'Skim and self-quiz on 3 random flashcards.', why:'Spaced repetition — this is due for review based on timing.', minutes:Math.round(perTask*0.6), tag:'review'},
-      {title:'Timed practice set (10 Qs)', sub:'Mixed questions, strict timer, no pausing.', why:'Builds exam-pace stamina — added since you have enough hours today.', minutes:Math.round(perTask*1.4), tag:'practice'}
-    ]
+    version: 1,
+    settings: {
+      theme: 'light',
+      strictMode: true,
+      shareToCommunity: true,
+      defaultDuration: 25
+    },
+    trees: [],        // { id, speciesId, durationMin, plantedAt, completedAt, status: 'grown'|'withered', shared }
+    streak: { current:0, best:0, lastActiveDate:null },
+    meta: { createdAt: Date.now(), updatedAt: Date.now() }
   };
 }
 
-/* ═══════════════════════════════════════════════
-   PLAN GENERATION + PERSISTENCE
-   Every generated plan is written to Firestore under
-   studyPlans/{uid}/days/{date} — this is the durable,
-   timestamped log of the AI making a real daily decision
-   for a real student. Use this collection as evidence.
-═══════════════════════════════════════════════ */
-let activePlan=null;
-
-async function getHistory(){
-  if(!currentUser) return [];
+function loadState(){
   try{
-    const snap=await db.collection('studyPlans').doc(currentUser.uid).collection('days')
-      .orderBy('date','desc').limit(14).get();
-    return snap.docs.map(d=>({date:d.id,status:d.data().status||'miss'})).reverse();
-  }catch(e){ return []; }
-}
-
-async function generatePlan(){
-  const btn=document.getElementById('genBtn'), lbl=document.getElementById('genBtnLabel');
-  const exam=document.getElementById('examSel').value;
-  const hours=parseFloat(document.getElementById('hoursInp').value)||4;
-  const weakTopics=[...document.querySelectorAll('#weakChips .chip.on')].map(c=>c.dataset.topic);
-
-  btn.disabled=true; lbl.innerHTML='Thinking…';
-  try{
-    const history=await getHistory();
-    let plan;
-    if(geminiKey){
-      const raw=await callGemini(buildPlannerPrompt({exam,hours,weakTopics,history}));
-      plan=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    }else{
-      await new Promise(r=>setTimeout(r,900)); // feels like a real call, isn't billed as one
-      plan=demoPlan({exam,hours,weakTopics});
-    }
-    activePlan={exam,hours,weakTopics,plan,date:todayKey(),source:geminiKey?'gemini':'demo'};
-    renderPlan();
-    if(currentUser && geminiKey){
-      await db.collection('studyPlans').doc(currentUser.uid).collection('days').doc(todayKey()).set({
-        date:todayKey(), exam, hours, weakTopics, plan, status:'pending',
-        source:'gemini', createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-    await renderLogStrip();
-    toast(geminiKey?'Plan generated':'Demo plan ready — add a key for real generation','ok');
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    const def = defaultState();
+    return {
+      ...def, ...parsed,
+      settings: { ...def.settings, ...(parsed.settings||{}) },
+      streak: { ...def.streak, ...(parsed.streak||{}) },
+      meta: { ...def.meta, ...(parsed.meta||{}) },
+      trees: parsed.trees || []
+    };
   }catch(e){
-    console.error(e);
-    toast('Could not generate plan: '+e.message,'err');
-  }finally{
-    btn.disabled=false; lbl.textContent='Build today\'s plan';
+    console.warn('Grove: failed to load state, starting fresh.', e);
+    return defaultState();
   }
 }
 
-function regenerate(){ generatePlan(); }
+function saveState(){
+  try{
+    STATE.meta.updatedAt = Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  }catch(e){
+    console.warn('Grove: failed to save state.', e);
+    showToast('icon-alert','Storage error','Your browser blocked saving data.');
+  }
+  for(let i=0;i<saveState.postHooks.length;i++){
+    try{ saveState.postHooks[i](); }catch(e){ console.warn('Grove: saveState hook failed', e); }
+  }
+}
+saveState.postHooks = [];
 
-function todayKey(){ return new Date().toISOString().slice(0,10); }
+let STATE = loadState();
 
-function renderPlan(){
-  document.getElementById('onboardCard').style.display='none';
-  document.getElementById('planWrap').classList.add('show');
-  document.getElementById('planDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',month:'short',day:'numeric'}).toUpperCase();
-  document.getElementById('engineReason').innerHTML = `<strong>Why this plan:</strong> ${escapeHtml(activePlan.plan.reason)}`;
-  document.getElementById('statHours').textContent = activePlan.hours;
-  document.getElementById('statTasks').textContent = activePlan.plan.tasks.length;
-  document.getElementById('statStreak').textContent = '—';
+/* ---------- queries ---------- */
+function grownTrees(){ return STATE.trees.filter(t=>t.status==='grown'); }
+function witheredTrees(){ return STATE.trees.filter(t=>t.status==='withered'); }
+function totalFocusMinutes(){ return grownTrees().reduce((sum,t)=>sum+t.durationMin,0); }
 
-  const weakStrip=document.getElementById('weakStrip');
-  weakStrip.innerHTML = activePlan.weakTopics.map(t=>`<div class="weak-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${escapeHtml(t)}</div>`).join('') || '<div class="weak-chip" style="opacity:.6">No weak topics flagged — plan is balanced across new material</div>';
+function registerActivity(){
+  const today = todayKey();
+  if(STATE.streak.lastActiveDate === today) return;
+  const yesterday = dateKey(new Date(Date.now() - DAY_MS));
+  if(STATE.streak.lastActiveDate === yesterday) STATE.streak.current += 1;
+  else STATE.streak.current = 1;
+  STATE.streak.lastActiveDate = today;
+  if(STATE.streak.current > STATE.streak.best) STATE.streak.best = STATE.streak.current;
+}
 
-  const list=document.getElementById('taskList');
-  list.innerHTML='';
-  activePlan.plan.tasks.forEach((t,i)=>{
-    const el=document.createElement('div');
-    el.className='task'; el.id='task-'+i;
-    el.innerHTML=`
-      <div class="task-check" onclick="toggleTask(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="task-body">
-        <div class="task-top"><span class="task-tag ${t.tag}">${t.tag}</span></div>
-        <div class="task-title">${escapeHtml(t.title)}</div>
-        <div class="task-sub">${escapeHtml(t.sub)}</div>
-        <div class="task-why">${escapeHtml(t.why)}</div>
-      </div>
-      <div class="task-time">${t.minutes}m</div>`;
-    list.appendChild(el);
+function showToast(icon, title, desc, opts){
+  opts = opts || {};
+  const wrap = document.getElementById('toastWrap');
+  if(!wrap) return;
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<i data-lucide="${icon.replace('icon-','')}" class="icon"></i><span>${title}</span>`;
+  wrap.appendChild(el);
+  refreshIcons(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(), 200); }, opts.duration || 3200);
+}
+
+window.Grove = {
+  STATE, STORAGE_KEY, DAY_MS, SPECIES,
+  defaultState, loadState, saveState,
+  uid, todayKey, dateKey,
+  speciesForDuration, speciesById,
+  grownTrees, witheredTrees, totalFocusMinutes,
+  registerActivity, showToast
+};
+})();
+
+/* lucideIcon: generates a lucide icon element and re-runs createIcons on its parent.
+   Use instead of <svg class="icon"><use href="#icon-X"/> in dynamic innerHTML. */
+function lucideIcon(name, extraStyle){
+  return extraStyle
+    ? "<i data-lucide=\""+name+"\" class=\"icon\" style=\""+extraStyle+"\"></i>"
+    : "<i data-lucide=\""+name+"\" class=\"icon\"></i>";
+}
+function refreshIcons(el){
+  if(typeof lucide!=="undefined") lucide.createIcons({nodes:[el||document]});
+}
+window.lucideIcon = lucideIcon;
+window.refreshIcons = refreshIcons;
+
+/* ============================================================
+   TREE RENDERER
+   Generates an original SVG tree at one of 6 growth stages
+   (seed -> sprout -> sapling -> young -> mature -> flowering),
+   built entirely from layered paths/shapes — no images, no
+   external assets. Each species gets a slightly different
+   canopy shape and palette so the grove reads as varied.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+
+const STAGE_NAMES = ['seed','sprout','sapling','young','mature','flowering'];
+
+function colorsFor(hue, withered, theme){
+  if(withered){
+    return { trunk:'#8a7a5f', canopy:'#b6a888', canopyDeep:'#9c8e70', accent:'#c2b596' };
+  }
+  if(hue==='amber'){
+    return { trunk:'#8a6a48', canopy:'#d97706', canopyDeep:'#92400e', accent:'#fbbf24' };
+  }
+  return { trunk:'#8a6a48', canopy:'#6b8e6f', canopyDeep:'#4a6b4f', accent:'#7fa383' };
+}
+
+function stageSeed(c){
+  return `
+    <ellipse cx="100" cy="178" rx="14" ry="6" fill="${c.trunk}" opacity=".25"/>
+    <path d="M100 178 C 96 168, 96 160, 100 154 C 104 160, 104 168, 100 178 Z" fill="${c.canopyDeep}"/>
+  `;
+}
+function stageSprout(c){
+  return `
+    <ellipse cx="100" cy="180" rx="18" ry="6" fill="${c.trunk}" opacity=".2"/>
+    <path d="M100 180 L100 150" stroke="${c.trunk}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M100 156 C 88 150, 82 138, 86 128 C 96 132, 102 144, 100 156 Z" fill="${c.canopy}"/>
+    <path d="M100 156 C 112 150, 118 140, 115 130 C 105 134, 99 144, 100 156 Z" fill="${c.canopyDeep}"/>
+  `;
+}
+function stageSapling(c){
+  return `
+    <ellipse cx="100" cy="182" rx="22" ry="7" fill="${c.trunk}" opacity=".2"/>
+    <path d="M100 182 L99 130" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M99 138 C 78 132, 66 112, 72 92 C 92 96, 104 116, 99 138 Z" fill="${c.canopy}"/>
+    <path d="M99 138 C 120 130, 130 110, 124 90 C 106 96, 96 116, 99 138 Z" fill="${c.canopyDeep}"/>
+    <circle cx="86" cy="108" r="4" fill="${c.accent}" opacity=".8"/>
+  `;
+}
+function stageYoung(c){
+  return `
+    <ellipse cx="100" cy="184" rx="28" ry="8" fill="${c.trunk}" opacity=".2"/>
+    <path d="M100 184 L98 108" stroke="${c.trunk}" stroke-width="7" stroke-linecap="round"/>
+    <path d="M88 130 C 70 124, 64 134, 60 124" stroke="${c.trunk}" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M98 116 C 68 110, 50 80, 58 52 C 92 58, 110 92, 98 116 Z" fill="${c.canopy}"/>
+    <path d="M98 116 C 128 106, 144 78, 136 50 C 104 58, 88 90, 98 116 Z" fill="${c.canopyDeep}"/>
+    <path d="M98 116 C 96 96, 100 76, 110 60" stroke="${c.canopy}" stroke-width="2" opacity=".4" fill="none"/>
+    <circle cx="74" cy="78" r="5" fill="${c.accent}" opacity=".85"/>
+    <circle cx="118" cy="70" r="4" fill="${c.accent}" opacity=".7"/>
+  `;
+}
+function stageMature(c){
+  return `
+    <ellipse cx="100" cy="186" rx="34" ry="9" fill="${c.trunk}" opacity=".22"/>
+    <path d="M100 186 L97 92" stroke="${c.trunk}" stroke-width="9" stroke-linecap="round"/>
+    <path d="M97 140 C 76 130, 64 142, 56 130" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M97 116 C 110 106, 126 112, 134 100" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M97 100 C 60 92, 36 56, 48 22 C 92 30, 116 70, 97 100 Z" fill="${c.canopy}"/>
+    <path d="M97 100 C 138 88, 158 52, 148 18 C 106 28, 84 66, 97 100 Z" fill="${c.canopyDeep}"/>
+    <path d="M70 60 C 60 50, 62 36, 74 28" stroke="${c.canopy}" stroke-width="2" opacity=".35" fill="none"/>
+    <circle cx="60" cy="56" r="6" fill="${c.accent}" opacity=".85"/>
+    <circle cx="128" cy="46" r="5" fill="${c.accent}" opacity=".7"/>
+    <circle cx="92" cy="36" r="4" fill="${c.accent}" opacity=".6"/>
+  `;
+}
+function stageFlowering(c){
+  return `
+    <ellipse cx="100" cy="188" rx="38" ry="10" fill="${c.trunk}" opacity=".22"/>
+    <path d="M100 188 L96 86" stroke="${c.trunk}" stroke-width="10" stroke-linecap="round"/>
+    <path d="M96 142 C 72 130, 58 144, 48 130" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M96 112 C 112 100, 130 108, 140 94" stroke="${c.trunk}" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M96 94 C 56 84, 28 44, 42 8 C 90 18, 118 62, 96 94 Z" fill="${c.canopy}"/>
+    <path d="M96 94 C 142 80, 164 40, 152 4 C 106 16, 80 58, 96 94 Z" fill="${c.canopyDeep}"/>
+    <g opacity=".9">
+      <circle cx="50" cy="46" r="5" fill="${c.accent}"/>
+      <circle cx="62" cy="30" r="4" fill="#fff" opacity=".8"/>
+      <circle cx="84" cy="18" r="4.5" fill="#fff" opacity=".85"/>
+      <circle cx="112" cy="24" r="4" fill="#fff" opacity=".75"/>
+      <circle cx="134" cy="40" r="5" fill="${c.accent}"/>
+      <circle cx="100" cy="50" r="3.5" fill="#fff" opacity=".7"/>
+    </g>
+  `;
+}
+
+const STAGE_BUILDERS = [stageSeed, stageSprout, stageSapling, stageYoung, stageMature, stageFlowering];
+
+function renderTree(svgEl, opts){
+  opts = opts || {};
+  const stageIdx = Math.max(0, Math.min(5, opts.stage!==undefined?opts.stage:5));
+  const speciesHue = opts.hue || 'green';
+  const withered = !!opts.withered;
+  const c = colorsFor(speciesHue, withered);
+  const builder = STAGE_BUILDERS[stageIdx];
+  svgEl.innerHTML = builder(c);
+  svgEl.classList.toggle('withering', withered && opts.partial);
+  svgEl.classList.toggle('dead', withered && !opts.partial);
+}
+
+function stageForProgress(progress01){
+  if(progress01 >= 0.999) return 5;
+  return Math.min(4, Math.floor(progress01 * 5));
+}
+
+window.GroveTree = { renderTree, stageForProgress, STAGE_NAMES };
+})();
+/* ============================================================
+   NAVIGATION, MODALS, THEME
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+
+function switchView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const target = document.getElementById('view-'+view);
+  if(target) target.classList.add('active');
+  const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+  if(navItem) navItem.classList.add('active');
+
+  if(window.GroveViews && window.GroveViews[view]) window.GroveViews[view]();
+
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+  window.scrollTo(0,0);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', STATE.settings.theme);
+  document.querySelectorAll('#themeTabs .tab').forEach(t=>{
+    t.style.background = t.dataset.theme===STATE.settings.theme ? 'var(--surface-2)' : 'transparent';
+    t.style.color = t.dataset.theme===STATE.settings.theme ? 'var(--ink)' : 'var(--ink-soft)';
+  });
+}
+function setTheme(theme){
+  STATE.settings.theme = theme;
+  saveState();
+  applyTheme();
+}
+
+function initSidebarNav(){
+  document.querySelectorAll('.nav-item[data-view]').forEach(btn=>{
+    btn.addEventListener('click', ()=> switchView(btn.dataset.view));
+  });
+  document.getElementById('menuBtn').addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarBackdrop').classList.add('show');
+  });
+  document.getElementById('sidebarBackdrop').addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('show');
+  });
+  document.querySelectorAll('.modal-backdrop').forEach(bd=>{
+    bd.addEventListener('click', (e)=>{ if(e.target===bd) closeModal(bd.id); });
+  });
+  document.querySelectorAll('[data-close]').forEach(btn=>{
+    btn.addEventListener('click', ()=> closeModal(btn.dataset.close));
+  });
+  document.querySelectorAll('#themeTabs .tab').forEach(tab=>{
+    tab.addEventListener('click', ()=> setTheme(tab.dataset.theme));
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape') document.querySelectorAll('.modal-backdrop.show').forEach(m=>closeModal(m.id));
   });
 }
 
-function toggleTask(i){
-  const el=document.getElementById('task-'+i);
-  const chk=el.querySelector('.task-check');
-  const isDone=chk.classList.toggle('checked');
-  el.classList.toggle('done',isDone);
+window.GroveNav = { switchView, openModal, closeModal, applyTheme, setTheme, initSidebarNav };
+})();
+/* ============================================================
+   PLANTING ENGINE
+   The core loop: pick a duration, plant, grow in real time.
+   Visibility changes are watched; in strict mode, leaving the
+   tab permanently withers the tree. In relaxed mode, the tree
+   visibly struggles while away but recovers on return.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+const T = window.GroveTree;
+
+let session = null;
+let selectedDuration = 25;
+
+function getDaytime(){
+  const h = new Date().getHours();
+  if(h>=6 && h<18) return 'day';
+  if(h>=18 && h<21) return 'dusk';
+  return 'night';
 }
 
-async function markAllAndAdapt(){
-  const total=activePlan.plan.tasks.length;
-  const done=document.querySelectorAll('.task-check.checked').length;
-  const status = done===total?'hit':(done===0?'miss':'partial');
-  if(currentUser && geminiKey){
-    try{
-      await db.collection('studyPlans').doc(currentUser.uid).collection('days').doc(activePlan.date).set({status},{merge:true});
-    }catch(e){}
+function renderSky(){
+  const card = document.getElementById('plantCard');
+  const daytime = getDaytime();
+  card.setAttribute('data-daytime', daytime);
+  const starsWrap = document.getElementById('plantStars');
+  if(daytime==='night' && !starsWrap.children.length){
+    for(let i=0;i<40;i++){
+      const star = document.createElement('div');
+      star.className = 'plant-star';
+      star.style.left = Math.random()*100+'%';
+      star.style.top = Math.random()*55+'%';
+      star.style.opacity = (0.4+Math.random()*0.6).toFixed(2);
+      starsWrap.appendChild(star);
+    }
+  }else if(daytime!=='night'){
+    starsWrap.innerHTML = '';
   }
-  toast(`Logged: ${done}/${total} tasks done — tomorrow's plan will adjust`,'info');
-  await renderLogStrip();
 }
 
-async function renderLogStrip(){
-  const strip=document.getElementById('logStrip');
-  const history=await getHistory();
-  const days=[...history];
-  while(days.length<14) days.unshift({date:'',status:'none'});
-  strip.innerHTML = days.slice(-14).map(d=>{
-    const cls = d.status==='hit'?'hit':d.status==='partial'?'partial':d.status==='miss'?'miss':'';
-    const label = d.date ? d.date.slice(8,10) : '·';
-    return `<div class="log-day ${cls}">${label}</div>`;
-  }).join('');
+function formatTime(sec){
+  const m = Math.floor(sec/60), s = Math.floor(sec%60);
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
+function selectDuration(min){
+  selectedDuration = min;
+  document.querySelectorAll('.duration-opt').forEach(b=>b.classList.toggle('active', parseInt(b.dataset.min,10)===min));
+  document.getElementById('plantTimer').textContent = formatTime(min*60);
+}
 
-/* init log strip on load (will be empty until signed in / first plan) */
-renderLogStrip();
+function setStateLabel(text, warning){
+  const label = document.getElementById('plantStateLabel');
+  label.classList.toggle('warning', !!warning);
+  document.getElementById('plantStateText').textContent = text;
+}
+
+function plant(){
+  const species = G.speciesForDuration(selectedDuration);
+  session = {
+    durationMin: selectedDuration,
+    startedAt: Date.now(),
+    species,
+    awayStartedAt: null,
+    struggling: false,
+    withered: false
+  };
+
+  document.getElementById('plantControlsIdle').style.display = 'none';
+  document.getElementById('btnPlant').style.display = 'none';
+  document.getElementById('btnGiveUp').style.display = 'flex';
+  document.getElementById('plantSpeciesName').style.display = 'block';
+  document.getElementById('plantSpeciesName').textContent = species.name;
+  setStateLabel('Growing…');
+
+  tick();
+  session.tickId = setInterval(tick, 1000);
+}
+
+function tick(){
+  if(!session) return;
+  const elapsed = (Date.now() - session.startedAt)/1000;
+  const total = session.durationMin*60;
+  const remaining = Math.max(0, total - elapsed);
+  document.getElementById('plantTimer').textContent = formatTime(remaining);
+
+  const progress = Math.min(1, elapsed/total);
+  const stage = T.stageForProgress(progress);
+  const svg = document.getElementById('plantSvg');
+  T.renderTree(svg, { stage, hue: session.species.hue, withered: session.struggling, partial: session.struggling });
+
+  if(remaining <= 0){
+    completeSession();
+  }
+}
+
+function completeSession(){
+  clearInterval(session.tickId);
+  const tree = {
+    id: G.uid(),
+    speciesId: session.species.id,
+    durationMin: session.durationMin,
+    plantedAt: session.startedAt,
+    completedAt: Date.now(),
+    status: 'grown',
+    shared: STATE.settings.shareToCommunity
+  };
+  STATE.trees.push(tree);
+  G.registerActivity();
+  saveState();
+
+  const svg = document.getElementById('plantSvg');
+  T.renderTree(svg, { stage:5, hue: session.species.hue, withered:false });
+
+  document.getElementById('celebrateModalSvg').innerHTML = svg.innerHTML;
+  document.getElementById('celebrateSpecies').textContent = session.species.name + ' — fully grown';
+  document.getElementById('celebrateDesc').textContent =
+    (tree.shared ? 'Planted in My Grove and the Community Grove.' : 'Planted in My Grove.');
+  window.GroveNav.openModal('modalCelebrate');
+
+  resetToIdle();
+  if(window.GroveViews) window.GroveViews.refreshStats();
+}
+
+function witherTree(reason){
+  if(!session || session.withered) return;
+  session.withered = true;
+  clearInterval(session.tickId);
+
+  const tree = {
+    id: G.uid(),
+    speciesId: session.species.id,
+    durationMin: session.durationMin,
+    plantedAt: session.startedAt,
+    completedAt: Date.now(),
+    status: 'withered',
+    shared: false
+  };
+  STATE.trees.push(tree);
+  saveState();
+
+  const svg = document.getElementById('plantSvg');
+  const stage = T.stageForProgress((Date.now()-session.startedAt)/1000/(session.durationMin*60));
+  T.renderTree(svg, { stage, hue: session.species.hue, withered:true, partial:false });
+  document.getElementById('witherModalSvg').innerHTML = svg.innerHTML;
+  window.GroveNav.openModal('modalWither');
+
+  resetToIdle();
+  if(window.GroveViews) window.GroveViews.refreshStats();
+}
+
+function giveUp(){
+  if(!session) return;
+  if(STATE.settings.strictMode){
+    witherTree('gave-up');
+  }else{
+    clearInterval(session.tickId);
+    resetToIdle();
+    G.showToast('icon-sprout','Session ended — nothing lost in relaxed mode', null);
+  }
+}
+
+function resetToIdle(){
+  session = null;
+  document.getElementById('plantControlsIdle').style.display = 'flex';
+  document.getElementById('btnPlant').style.display = 'flex';
+  document.getElementById('btnGiveUp').style.display = 'none';
+  document.getElementById('plantSpeciesName').style.display = 'none';
+  setStateLabel('Choose a duration to begin');
+  selectDuration(selectedDuration);
+  const svg = document.getElementById('plantSvg');
+  svg.innerHTML = '';
+  svg.classList.remove('withering','dead');
+}
+
+function handleVisibilityChange(){
+  if(!session) return;
+  if(document.hidden){
+    session.awayStartedAt = Date.now();
+    if(STATE.settings.strictMode){
+      witherTree('left-tab-strict');
+    }else{
+      session.struggling = true;
+      setStateLabel('Your tree is struggling without you…', true);
+    }
+  }else{
+    if(session && session.struggling){
+      session.struggling = false;
+      setStateLabel('Growing…');
+    }
+  }
+}
+
+function initPlanting(){
+  document.querySelectorAll('.duration-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=> selectDuration(parseInt(btn.dataset.min,10)));
+  });
+  document.getElementById('btnPlant').addEventListener('click', plant);
+  document.getElementById('btnGiveUp').addEventListener('click', giveUp);
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  selectDuration(STATE.settings.defaultDuration || 25);
+  renderSky();
+  setInterval(renderSky, 60000);
+}
+
+window.GrovePlant = { initPlanting, isSessionActive: ()=>!!session, renderSky };
+})();
+/* ============================================================
+   VIEWS
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+const T = window.GroveTree;
+
+function refreshStats(){
+  document.getElementById('statTreesGrown').textContent = G.grownTrees().length;
+  document.getElementById('statTreesWithered').textContent = G.witheredTrees().length;
+  const hours = G.totalFocusMinutes()/60;
+  document.getElementById('statFocusHours').textContent = (hours>=10?Math.round(hours):hours.toFixed(1))+'h';
+  document.getElementById('statStreakPlant').textContent = STATE.streak.current;
+  document.getElementById('sidebarStreak').textContent = STATE.streak.current;
+  document.getElementById('countMyTrees').textContent = STATE.trees.length;
+}
+
+function plant(){
+  refreshStats();
+  if(window.GrovePlant) window.GrovePlant.renderSky();
+}
+
+function mygrove(){
+  refreshStats();
+  const grid = document.getElementById('myGroveGrid');
+  document.getElementById('myGroveCountChip').textContent = STATE.trees.length+' trees';
+  grid.innerHTML = '';
+  if(!STATE.trees.length){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <i data-lucide="tree-deciduous" class="icon"></i>
+      <div class="empty-state-title">Your grove is empty</div>
+      <div class="empty-state-desc">Plant your first seed to begin.</div>
+    </div>`;
+    return;
+  }
+  const sorted = STATE.trees.slice().sort((a,b)=>b.completedAt-a.completedAt);
+  sorted.forEach(tree=>{
+    const species = G.speciesById(tree.speciesId);
+    const tile = document.createElement('div');
+    tile.className = 'grove-tree-tile' + (tree.status==='withered' ? ' withered' : '');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 200 200');
+    svg.classList.add('grove-tree-tile-svg');
+    tile.appendChild(svg);
+    T.renderTree(svg, {
+      stage: tree.status==='withered' ? T.stageForProgress(0.6) : 5,
+      hue: species.hue,
+      withered: tree.status==='withered'
+    });
+    const date = document.createElement('div');
+    date.className = 'grove-tree-tile-date';
+    date.textContent = new Date(tree.completedAt).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    tile.appendChild(date);
+    const dur = document.createElement('div');
+    dur.className = 'grove-tree-tile-dur';
+    dur.textContent = tree.status==='withered' ? 'Withered' : tree.durationMin+' min · '+species.name;
+    tile.appendChild(dur);
+    grid.appendChild(tile);
+  });
+  refreshIcons(grid);
+}
+
+function community(){
+  refreshStats();
+  if(window.GroveCommunity) window.GroveCommunity.render();
+}
+
+function settings(){
+  const strictToggle = document.getElementById('strictModeToggle');
+  strictToggle.classList.toggle('on', STATE.settings.strictMode);
+  const shareToggle = document.getElementById('communityShareToggle');
+  shareToggle.classList.toggle('on', STATE.settings.shareToCommunity);
+  window.GroveNav.applyTheme();
+  updateModeChip();
+}
+
+function updateModeChip(){
+  const label = document.getElementById('modeChipLabel');
+  const chip = document.getElementById('modeChip');
+  const iconEl = chip ? chip.querySelector('i[data-lucide]') : null;
+  if(STATE.settings.strictMode){
+    label.textContent = 'Strict mode';
+    if(iconEl){ iconEl.setAttribute('data-lucide','shield-check'); refreshIcons(chip); }
+  }else{
+    label.textContent = 'Relaxed mode';
+    if(iconEl){ iconEl.setAttribute('data-lucide','leaf'); refreshIcons(chip); }
+  }
+}
+
+function refreshActive(){
+  const active = document.querySelector('.view.active');
+  if(!active) return;
+  const view = active.dataset.view;
+  if(window.GroveViews[view]) window.GroveViews[view]();
+}
+
+window.GroveViews = { plant, mygrove, community, settings, refreshStats, refreshActive, updateModeChip };
+})();
+/* ============================================================
+   SETTINGS HANDLERS
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState } = G;
+
+function initSettings(){
+  document.getElementById('strictModeToggle').addEventListener('click', ()=>{
+    if(window.GrovePlant.isSessionActive()){
+      G.showToast('icon-alert','Finish or give up on your current tree first', null);
+      return;
+    }
+    STATE.settings.strictMode = !STATE.settings.strictMode;
+    document.getElementById('strictModeToggle').classList.toggle('on', STATE.settings.strictMode);
+    saveState();
+    window.GroveViews.updateModeChip();
+  });
+
+  document.getElementById('communityShareToggle').addEventListener('click', ()=>{
+    STATE.settings.shareToCommunity = !STATE.settings.shareToCommunity;
+    document.getElementById('communityShareToggle').classList.toggle('on', STATE.settings.shareToCommunity);
+    saveState();
+  });
+
+  document.getElementById('btnExportData').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(STATE, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'grove-backup-'+G.todayKey()+'.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btnImportData').addEventListener('click', ()=>{
+    document.getElementById('importFileInput').click();
+  });
+  document.getElementById('importFileInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const imported = JSON.parse(reader.result);
+        if(!imported.trees){ throw new Error('Not a valid Grove backup'); }
+        Object.assign(STATE, imported);
+        saveState();
+        window.GroveViews.refreshActive();
+        G.showToast('icon-check','Data imported', null);
+      }catch(err){
+        G.showToast('icon-alert','Could not read that file', null);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('btnResetAll').addEventListener('click', ()=>{
+    document.getElementById('confirmTitle').textContent = 'Reset everything?';
+    document.getElementById('confirmDesc').textContent = 'Your whole grove — every grown and withered tree — will be permanently deleted.';
+    const btn = document.getElementById('btnConfirmAction');
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', ()=>{
+      Object.assign(STATE, G.defaultState());
+      saveState();
+      window.GroveNav.switchView('plant');
+      window.GroveNav.closeModal('modalConfirm');
+      G.showToast('icon-check','Grove reset', null);
+    });
+    window.GroveNav.openModal('modalConfirm');
+  });
+}
+
+window.GroveSettings = { initSettings };
+})();
+/* ============================================================
+   COMMUNITY GROVE CANVAS
+   Renders every shared tree (from this user + others, once
+   Firebase populates the community collection) as small trees
+   scattered across a shared horizon. Position is deterministic
+   per tree id so the layout doesn't reshuffle on every render.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const T = window.GroveTree;
+
+let communityTrees = [];
+
+function hashToUnit(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) >>> 0; }
+  return (h % 10000) / 10000;
+}
+
+function render(){
+  const canvas = document.getElementById('communityCanvas');
+  canvas.innerHTML = '';
+
+  const myTreeIds = new Set(G.STATE.trees.filter(t=>t.status==='grown' && t.shared).map(t=>t.id));
+
+  const localShared = G.STATE.trees.filter(t=>t.status==='grown' && t.shared).map(t=>({
+    ...t, ownerIsMe:true
+  }));
+  const remoteOnly = communityTrees.filter(t=>!myTreeIds.has(t.id));
+  const display = [...localShared, ...remoteOnly];
+
+  document.getElementById('communityTotalTrees').textContent = display.length;
+  const totalMin = display.reduce((s,t)=>s+(t.durationMin||0),0);
+  document.getElementById('communityTotalHours').textContent = Math.round(totalMin/60)+'h';
+
+  if(!display.length){
+    canvas.innerHTML = `<div class="empty-state" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <i data-lucide="globe" class="icon"></i>
+      <div class="empty-state-title">The grove is waiting</div>
+      <div class="empty-state-desc">Be the first to plant a tree here today.</div>
+    </div>`;
+    return;
+  }
+
+  display.forEach(tree=>{
+    const species = G.speciesById(tree.speciesId);
+    const u = hashToUnit(tree.id);
+    const x = 4 + u*92;
+    const sizeJitter = 0.7 + hashToUnit(tree.id+'size')*0.6;
+    const size = 50 * sizeJitter;
+    const bottomJitter = hashToUnit(tree.id+'y')*30;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'community-tree' + (tree.ownerIsMe ? ' mine' : '');
+    wrap.style.left = x+'%';
+    wrap.style.bottom = bottomJitter+'px';
+    wrap.style.width = size+'px';
+    wrap.style.height = size+'px';
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 200 200');
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    T.renderTree(svg, { stage:5, hue: species.hue, withered:false });
+    wrap.appendChild(svg);
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'community-tree-tooltip';
+    tooltip.style.left = '50%';
+    tooltip.style.top = '0';
+    tooltip.textContent = species.name + ' · ' + tree.durationMin + 'min' + (tree.ownerIsMe?' · yours':'');
+    wrap.appendChild(tooltip);
+
+    canvas.appendChild(wrap);
+  });
+}
+
+function setRemoteTrees(trees){
+  communityTrees = trees || [];
+  if(document.getElementById('view-community').classList.contains('active')) render();
+}
+
+window.GroveCommunity = { render, setRemoteTrees };
+})();
+/* ============================================================
+   BOOT
+   ============================================================ */
+(function(){
+function boot(){
+  window.GroveNav.initSidebarNav();
+  window.GrovePlant.initPlanting();
+  window.GroveSettings.initSettings();
+  window.GroveNav.applyTheme();
+  window.GroveViews.updateModeChip();
+  window.GroveViews.refreshStats();
+  window.GroveViews.plant();
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', boot);
+}else{
+  boot();
+}
+})();
+/* ============================================================
+   BCD FIREBASE SYNC
+   Mirrors Ripen/Sprout's pattern for personal data. Adds a new
+   piece: a top-level shared collection, community-grove/{treeId},
+   where every signed-in user can read all entries but can only
+   write/delete their own — this is what makes the Community
+   Grove genuinely shared rather than per-user.
+   ============================================================ */
+(function(){
+const G = window.Grove;
+const { STATE, saveState, defaultState } = G;
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
+  authDomain: "bcd-discord.firebaseapp.com",
+  databaseURL: "https://bcd-discord-default-rtdb.firebaseio.com",
+  projectId: "bcd-discord",
+  storageBucket: "bcd-discord.firebasestorage.app",
+  messagingSenderId: "278895155371",
+  appId: "1:278895155371:web:177a468f5fa3f0abfe3fee",
+  measurementId: "G-6Q46Z9ZF0D"
+};
+
+const DEF_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+
+let app, auth, db;
+let currentUser = null;
+let docRef = null;
+let saveTimer = null;
+let suppressNextWrite = false;
+let syncedTreeIds = new Set();
+const SAVE_DEBOUNCE_MS = 1200;
+
+function init(){
+  try{
+    if(!window.firebase || !window.firebase.initializeApp){
+      console.warn('Grove: Firebase SDK not found, running in local-only mode.');
+      setFallbackAccountPill();
+      return;
+    }
+    app = (!firebase.apps || !firebase.apps.length) ? firebase.initializeApp(FIREBASE_CONFIG) : firebase.app();
+    auth = firebase.auth();
+    db = firebase.firestore();
+  }catch(e){
+    console.warn('Grove: Firebase init failed, running in local-only mode.', e);
+    setFallbackAccountPill();
+    return;
+  }
+
+  showSyncStatus('connecting');
+  installSaveHook();
+
+  auth.onAuthStateChanged(user=>{
+    if(!user){
+      location.href = '../login.html';
+      return;
+    }
+    currentUser = user;
+    populateAccountPill(user);
+    docRef = db.collection('users').doc(user.uid).collection('tools').doc('grove');
+    attachListener();
+    attachCommunityListener();
+  });
+}
+
+function populateAccountPill(user){
+  const img = document.getElementById('accountAvatarImg');
+  if(!img) return;
+  const tryDefault = ()=>{ img.onerror=()=>{ img.removeAttribute('src'); img.onerror=null; }; img.src=DEF_AV; };
+  if(user.photoURL){ img.onerror=tryDefault; img.src=user.photoURL; }
+  else tryDefault();
+}
+function setFallbackAccountPill(){
+  const img = document.getElementById('accountAvatarImg');
+  if(!img) return;
+  img.onerror = ()=>{ img.removeAttribute('src'); img.onerror=null; };
+  img.src = DEF_AV;
+}
+
+function mergeStateInPlace(target, incoming){
+  const def = defaultState();
+  const merged = Object.assign({}, def, incoming || {});
+  merged.settings = Object.assign({}, def.settings, (incoming&&incoming.settings)||{});
+  merged.streak = Object.assign({}, def.streak, (incoming&&incoming.streak)||{});
+  merged.meta = Object.assign({}, def.meta, (incoming&&incoming.meta)||{});
+  merged.trees = (incoming&&incoming.trees) || [];
+
+  Object.keys(target).forEach(k=>delete target[k]);
+  Object.keys(merged).forEach(k=>{ target[k] = merged[k]; });
+}
+
+function pickInitial(localState, remoteState){
+  if(!remoteState) return localState;
+  const localTs = (localState && localState.meta && localState.meta.updatedAt) || 0;
+  const remoteTs = (remoteState && remoteState.meta && remoteState.meta.updatedAt) || 0;
+  const localHasData = localState && Array.isArray(localState.trees) && localState.trees.length>0;
+  const remoteHasData = remoteState && Array.isArray(remoteState.trees) && remoteState.trees.length>0;
+  if(remoteHasData && !localHasData) return remoteState;
+  if(localHasData && !remoteHasData) return localState;
+  return remoteTs >= localTs ? remoteState : localState;
+}
+
+function attachListener(){
+  let firstSnapshot = true;
+  docRef.onSnapshot({ includeMetadataChanges:true }, snap=>{
+    if(!firstSnapshot && snap.metadata.hasPendingWrites){ showSyncStatus('synced'); return; }
+    const remoteData = snap.exists ? snap.data().state : null;
+    if(firstSnapshot){
+      firstSnapshot = false;
+      const chosen = pickInitial(STATE, remoteData);
+      applyRemoteState(chosen);
+      pushToFirestore();
+      pushAnyUnsharedTrees();
+      showSyncStatus('synced');
+      return;
+    }
+    if(remoteData){ applyRemoteState(remoteData); showSyncStatus('synced'); }
+  }, err=>{
+    console.warn('Grove: Firestore listener error, continuing in local-only mode.', err);
+    showSyncStatus('offline');
+  });
+}
+
+function attachCommunityListener(){
+  db.collection('community-grove').limit(300).onSnapshot(snap=>{
+    const trees = [];
+    snap.forEach(doc=>{
+      const data = doc.data();
+      trees.push({
+        id: doc.id,
+        speciesId: data.speciesId,
+        durationMin: data.durationMin,
+        completedAt: data.completedAt,
+        ownerId: data.ownerId
+      });
+    });
+    if(window.GroveCommunity) window.GroveCommunity.setRemoteTrees(trees);
+  }, err=>{
+    console.warn('Grove: community-grove listener error (shared grove unavailable).', err);
+  });
+}
+
+function pushAnyUnsharedTrees(){
+  if(!currentUser) return;
+  const toShare = STATE.trees.filter(t=>t.status==='grown' && t.shared && !syncedTreeIds.has(t.id));
+  toShare.forEach(tree=>{
+    db.collection('community-grove').doc(tree.id).set({
+      speciesId: tree.speciesId,
+      durationMin: tree.durationMin,
+      completedAt: tree.completedAt,
+      ownerId: currentUser.uid
+    }).then(()=>{
+      syncedTreeIds.add(tree.id);
+    }).catch(e=>console.warn('Grove: failed to share tree to community grove', e));
+  });
+}
+
+function applyRemoteState(remoteData){
+  suppressNextWrite = true;
+  mergeStateInPlace(STATE, remoteData);
+  try{ localStorage.setItem(G.STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+  refreshEverything();
+  suppressNextWrite = false;
+}
+
+function refreshEverything(){
+  if(!window.GroveViews) return;
+  window.GroveNav.applyTheme();
+  window.GroveViews.updateModeChip();
+  window.GroveViews.refreshActive();
+  document.getElementById('sidebarStreak').textContent = STATE.streak.current;
+}
+
+function scheduleSave(){
+  if(!docRef || suppressNextWrite) return;
+  if(saveTimer) clearTimeout(saveTimer);
+  showSyncStatus('saving');
+  saveTimer = setTimeout(()=>{ pushToFirestore(); pushAnyUnsharedTrees(); }, SAVE_DEBOUNCE_MS);
+}
+
+function pushToFirestore(){
+  if(!docRef) return;
+  STATE.meta = STATE.meta || {};
+  STATE.meta.updatedAt = Date.now();
+  try{ localStorage.setItem(G.STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+  const payload = {
+    state: JSON.parse(JSON.stringify(STATE)),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: currentUser ? currentUser.uid : null
+  };
+  docRef.set(payload, { merge:false }).then(()=>showSyncStatus('synced')).catch(err=>{
+    console.warn('Grove: Firestore write failed, will retry on next change.', err);
+    showSyncStatus('offline');
+  });
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
+}
+
+function installSaveHook(){
+  saveState.postHooks.push(scheduleSave);
+}
+
+function showSyncStatus(state){
+  let dot = document.getElementById('syncStatusDot');
+  if(!dot){
+    const streakBox = document.querySelector('.streak-box');
+    if(!streakBox) return;
+    dot = document.createElement('span');
+    dot.id = 'syncStatusDot';
+    dot.style.cssText = 'width:7px;height:7px;border-radius:50%;display:inline-block;margin-left:auto;flex-shrink:0;transition:background-color .3s;';
+    streakBox.style.display = 'flex';
+    streakBox.appendChild(dot);
+  }
+  const colors = { connecting:'var(--ink-faint)', saving:'var(--amber)', synced:'var(--vine)', offline:'var(--tomato)' };
+  dot.style.backgroundColor = colors[state] || 'var(--ink-faint)';
+  dot.title = {
+    connecting:'Connecting to your Books Coffee and Dreams account…',
+    saving:'Saving…', synced:'Synced to your account',
+    offline:'Offline — changes saved on this device only'
+  }[state] || '';
+}
+
+window.GroveFirebase = { init, getCurrentUser: ()=>currentUser };
+init();
+})();
+
+// Initialize Lucide icons after all DOM and app modules have loaded
+if(typeof lucide !== 'undefined') lucide.createIcons();
+</script>
+
+<!-- ============================================================
+     DISCORD BRIDGE — mirrors grown-tree count into the linked
+     Discord user's profile (users/{discordId}.treesPlanted).
+     NOTE: unlike the todo/focus bridges, your bot doesn't
+     currently read or display this field anywhere (no /profile
+     line, no badge) — there was no existing Grove/forest concept
+     on the Discord side to connect to, so this just writes the
+     data and holds it ready. Say the word if you want a matching
+     badge, !profile line, or leaderboard for it — same pattern
+     as everything else, just needs the bot-side piece added.
+     ============================================================ -->
+<script>
+(function(){
+  var G = window.Grove;
+  if(!G) return;
+  var STATE = G.STATE;
+  var saveState = G.saveState;
+
+  var lastGrownCount = STATE.trees.filter(function(t){ return t.status==='grown'; }).length;
+
+  var fbUser = null, fbDb = null, linkedDiscordId = null;
+
+  function waitForFirebase(){
+    if(!window.firebase || !firebase.apps || !firebase.apps.length){
+      setTimeout(waitForFirebase, 400);
+      return;
+    }
+    fbDb = firebase.firestore();
+    firebase.auth().onAuthStateChanged(function(user){
+      fbUser = user;
+      linkedDiscordId = null;
+      if(user){
+        fbDb.collection('users').doc(user.uid).get().then(function(doc){
+          linkedDiscordId = (doc.exists && doc.data().linkedDiscordId) || null;
+        }).catch(function(){});
+      }
+    });
+  }
+  waitForFirebase();
+
+  function mirrorTree(amount){
+    if(!fbUser || !fbDb || !linkedDiscordId || amount <= 0) return;
+    fbDb.collection('users').doc(linkedDiscordId).set({
+      treesPlanted: firebase.firestore.FieldValue.increment(amount),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge:true }).catch(function(){});
+  }
+
+  saveState.postHooks.push(function(){
+    var grownNow = STATE.trees.filter(function(t){ return t.status==='grown'; }).length;
+    if(grownNow > lastGrownCount) mirrorTree(grownNow - lastGrownCount);
+    lastGrownCount = grownNow;
+  });
+})();
 </script>
 </body>
 </html>
-<!--
-PRODUCTION NOTE FOR THE TEAM (not user-facing):
-
-1. Right now callGemini() runs from the browser with a key typed into
-   localStorage. That's fine for a demo, but for the hackathon's
-   "AI-Native Operations" criterion you want the AI decision-making
-   to be something YOUR business runs continuously, not something
-   that only works if a visitor pastes in their own key.
-
-   Swap path: move buildPlannerPrompt() + the fetch() call into a
-   Firebase Cloud Function (or Cloud Run service, which also satisfies
-   the "must use one Google Cloud product" requirement on its own).
-   The client calls your function with {exam, hours, weakTopics, history};
-   the function holds the real Gemini key as a server-side secret and
-   writes the result to Firestore itself. Nothing in this file's UI
-   needs to change — only where callGemini() actually executes.
-
-2. Firestore security rules: studyPlans/{uid}/days/{date} should only
-   be readable/writable by that uid (and your admin role for judging).
-   Check your current rules before going live with real users —
-   this matters a lot once real customer data is in here.
-
-3. This collection (studyPlans) IS your evidence trail for "AI live in
-   production, executing key decisions." Every doc has a timestamp,
-   the reasoning the model gave, and the student's actual completion
-   status feeding the next day's plan. Keep it running for the full
-   90 days — don't let it go quiet after the demo video is recorded.
--->
