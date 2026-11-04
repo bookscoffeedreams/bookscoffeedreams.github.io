@@ -33,10 +33,6 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:55vw;height:55vh
 .nav-site-name em{color:var(--amber);font-style:italic}
 .nav-divider{width:1px;height:18px;background:var(--bdr);flex-shrink:0}
 .nav-page-title{font-family:var(--mono);font-size:11px;color:var(--tx4);letter-spacing:.14em;text-transform:uppercase}
-.nav-links{display:flex;align-items:center;gap:2px;margin-left:12px}
-.nav-link{padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--tx3);transition:all .18s;white-space:nowrap}
-.nav-link:hover{color:var(--tx);background:var(--sur2)}
-@media(max-width:900px){.nav-links{display:none}}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .nav-user{display:none;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:99px;background:var(--sur2);border:1px solid var(--bdr);cursor:pointer;transition:all .2s}
 .nav-user:hover{border-color:var(--bdr2)}
@@ -197,8 +193,6 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:55vw;height:55vh
 .rule-item{display:flex;gap:8px;font-size:12px;color:var(--tx4)}
 .rule-num{font-family:var(--mono);color:var(--amber);flex-shrink:0}
 
-/* header fit: keeps all links + account controls on one line between 900px and 1240px */
-@media(max-width:1240px){.nav-inner{gap:14px}.nav-links{margin-left:6px;gap:0}.nav-link{padding:6px 9px;font-size:13px}.nav-user-name{display:none}.nav-user{padding:5px}#modeLabel{display:none}.mode-toggle{padding:7px 10px}}
 @media(max-width:1100px){.layout{grid-template-columns:200px 1fr;gap:14px}.right-sidebar{display:none}}
 @media(max-width:760px){.layout{grid-template-columns:1fr;padding:74px 16px 40px}.left-sidebar{display:none}.tab-btn .tab-label{display:none}}
 </style>
@@ -212,15 +206,6 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:55vw;height:55vh
     </a>
     <div class="nav-divider"></div>
     <span class="nav-page-title">Community</span>
-    <div class="nav-links">
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="content.html">Content</a>
-      <a class="nav-link" href="courses.html">Courses</a>
-      <a class="nav-link" href="blogs.html">Blogs</a>
-      <a class="nav-link" href="dashboard.html">Dashboard</a>
-      <a class="nav-link" href="partners.html">Partners</a>
-      <a class="nav-link" href="staff-application.html">Apply</a>
-    </div>
     <div class="nav-right">
       <button class="mode-toggle" id="modeToggle">
         <span class="icon-sun"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
@@ -356,7 +341,7 @@ const auth=firebase.auth();
 const db=firebase.firestore();
 const CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/dkxuilgai/auto/upload";
 const CLOUDINARY_UPLOAD_PRESET="bcd_courses";
-const DEFAULT_AVATAR="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png";
+const DEFAULT_AVATAR="https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png";
 let currentUser=null,currentUserRole=null,typingTimeout=null;
 const userCache={};
 const EMOJIS=['\u{1F44D}','\u2764\uFE0F','\u{1F602}','\u{1F62E}'];
