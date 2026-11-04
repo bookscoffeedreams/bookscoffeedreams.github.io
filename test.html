@@ -337,7 +337,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 <nav class="nav">
   <div class="nav-inner">
-    <a class="nav-brand" href="index.html">
+    <a class="nav-brand" href="../index.html">
       <span class="nav-site-name">Books Coffee <em>&amp;</em> Dreams</span>
     </a>
     <div class="nav-search-trigger" id="searchTrigger">
@@ -355,7 +355,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <span class="icon-sun"><svg width="16" height="16" data-lucide="sun"></svg></span>
         <span class="icon-moon"><svg width="16" height="16" data-lucide="moon"></svg></span>
       </button>
-      <div class="nav-user" onclick="location.href='profile.html'">
+      <div class="nav-user" onclick="location.href='../profile.html'">
         <div class="nav-user-av-wrap"><img class="nav-user-av" id="navAvatar" src="" alt=""/><div class="nav-user-level" id="navLevel">1</div></div>
         <div class="nav-user-meta"><span class="nav-user-name" id="navName">Loading…</span><span class="nav-user-xp" id="navXpMeta">0 XP</span></div>
       </div>
@@ -426,12 +426,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
   <div class="section-head reveal r2"><div class="section-title">Quick Actions</div></div>
   <div class="qa-grid reveal r3" id="qaGrid">
-    <div class="qa-card" data-action="tools/ai-planner.html"><div class="qa-badge">New</div><div class="qa-icon-wrap tone-violet"><svg data-lucide="sparkles"></svg></div><div class="qa-label">AI Study<br/>Planner</div></div>
-    <div class="qa-card" data-action="tools/ai-study.html"><div class="qa-icon-wrap tone-teal"><svg data-lucide="file-text"></svg></div><div class="qa-label">Revision<br/>Notes</div></div>
+    <div class="qa-card" data-action="ai-planner.html"><div class="qa-badge">New</div><div class="qa-icon-wrap tone-violet"><svg data-lucide="sparkles"></svg></div><div class="qa-label">AI Study<br/>Planner</div></div>
+    <div class="qa-card" data-action="ai-study.html"><div class="qa-icon-wrap tone-teal"><svg data-lucide="file-text"></svg></div><div class="qa-label">Revision<br/>Notes</div></div>
     <div class="qa-card" data-action="#custom-practice"><div class="qa-icon-wrap tone-amber"><svg data-lucide="target"></svg></div><div class="qa-label">Custom<br/>Practice</div></div>
     <div class="qa-card" data-action="#improvement-book"><div class="qa-icon-wrap tone-rose"><svg data-lucide="trending-up"></svg></div><div class="qa-label">Improvement<br/>Book</div></div>
-    <div class="qa-card" data-action="tools/recaller.html"><div class="qa-icon-wrap tone-blue"><svg data-lucide="zap"></svg></div><div class="qa-label">Flashcards</div></div>
-    <div class="qa-card" data-action="tools/pomodoro.html"><div class="qa-icon-wrap tone-green"><svg data-lucide="timer"></svg></div><div class="qa-label">Pomodoro<br/>Timer</div></div>
+    <div class="qa-card" data-action="flashcards.html"><div class="qa-icon-wrap tone-blue"><svg data-lucide="zap"></svg></div><div class="qa-label">Flashcards</div></div>
+    <div class="qa-card" data-action="pomodoro.html"><div class="qa-icon-wrap tone-green"><svg data-lucide="timer"></svg></div><div class="qa-label">Pomodoro<br/>Timer</div></div>
   </div>
 
   <div class="section-head reveal r3">
@@ -664,16 +664,16 @@ document.getElementById('notifMarkAll').addEventListener('click', async e=>{
 });
 
 const SEARCH_INDEX=[
-  {group:'Tools', icon:'sparkles', label:'AI Study Planner', sub:'Adaptive daily plans', href:'tools/ai-planner.html'},
-  {group:'Tools', icon:'file-text', label:'Revision Notes / AI Study Engine', sub:'Upload anything, get notes', href:'tools/ai-study.html'},
-  {group:'Tools', icon:'zap', label:'Flashcards', sub:'Spaced repetition review', href:'tools/recaller.html'},
-  {group:'Tools', icon:'timer', label:'Pomodoro Timer', sub:'Focus sprints', href:'tools/pomodoro.html'},
-  {group:'Tools', icon:'trees', label:'Forest — Focus Mode', sub:'Grow a tree while you study', href:'tools/forest.html'},
-  {group:'Tools', icon:'list-checks', label:'Todo List', sub:'Daily tasks', href:'tools/todolist.html'},
-  {group:'Pages', icon:'book-open', label:'Courses', sub:'Browse all courses', href:'courses.html'},
-  {group:'Pages', icon:'users', label:'Community', sub:'Discussions and posts', href:'community.html'},
-  {group:'Pages', icon:'user', label:'Profile', sub:'Your account', href:'profile.html'},
-  {group:'Pages', icon:'settings', label:'Settings', sub:'Preferences', href:'settings.html'},
+  {group:'Tools', icon:'sparkles', label:'AI Study Planner', sub:'Adaptive daily plans', href:'ai-planner.html'},
+  {group:'Tools', icon:'file-text', label:'Revision Notes / AI Study Engine', sub:'Upload anything, get notes', href:'ai-study.html'},
+  {group:'Tools', icon:'zap', label:'Flashcards', sub:'Spaced repetition review', href:'flashcards.html'},
+  {group:'Tools', icon:'timer', label:'Pomodoro Timer', sub:'Focus sprints', href:'pomodoro.html'},
+  {group:'Tools', icon:'trees', label:'Forest — Focus Mode', sub:'Grow a tree while you study', href:'forest.html'},
+  {group:'Tools', icon:'list-checks', label:'Todo List', sub:'Daily tasks', href:'todolist.html'},
+  {group:'Pages', icon:'book-open', label:'Courses', sub:'Browse all courses', href:'../courses.html'},
+  {group:'Pages', icon:'users', label:'Community', sub:'Discussions and posts', href:'../community.html'},
+  {group:'Pages', icon:'user', label:'Profile', sub:'Your account', href:'../profile.html'},
+  {group:'Pages', icon:'settings', label:'Settings', sub:'Preferences', href:'../settings.html'},
 ];
 const cmdkOverlay=document.getElementById('cmdkOverlay'), cmdkInput=document.getElementById('cmdkInput'), cmdkResults=document.getElementById('cmdkResults');
 let cmdkActiveIdx=0, cmdkCurrentResults=[];
