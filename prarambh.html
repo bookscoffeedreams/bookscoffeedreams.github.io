@@ -445,11 +445,11 @@ function showToast(msg){
 
 // Prarambh badge URLs
 const BADGES=[
-  {day:1, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_1.png', label:'Day 1'},
-  {day:5, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_2.png', label:'Day 5'},
-  {day:10,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_3.png', label:'Day 10'},
-  {day:15,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_4.png', label:'Day 15'},
-  {day:21,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/prarambh_study_badge_5.png', label:'Day 21'},
+  {day:1, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_1.png', label:'Day 1'},
+  {day:5, url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_2.png', label:'Day 5'},
+  {day:10,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_3.png', label:'Day 10'},
+  {day:15,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_4.png', label:'Day 15'},
+  {day:21,url:'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/badges/prarambh/prarambh_study_badge_5.png', label:'Day 21'},
 ];
 function getBadges(day=0){ return BADGES.filter(b=>day>=b.day); }
 function badgeImgsSmall(day){
@@ -494,7 +494,7 @@ firebase.initializeApp({
 });
 const auth=firebase.auth();
 const db=firebase.firestore();
-const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 let allUsers=[], currentUid=null;
 let searchQ='', roleQ='', versionQ='';
