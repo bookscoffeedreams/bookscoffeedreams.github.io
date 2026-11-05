@@ -380,7 +380,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
         <!-- Terms -->
         <div class="terms-wrap">
           <div class="terms-check" id="termsCheck"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data will be stored securely.</div>
+          <div class="terms-text">I agree to the <a href="terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>. I understand my data will be stored securely.</div>
         </div>
 
         <button class="btn-primary" id="submitBtn">
@@ -588,7 +588,7 @@ firebase.initializeApp({
 });
 const auth=firebase.auth();
 const db=firebase.firestore();
-const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 // Already logged in
 auth.onAuthStateChanged(user=>{if(user) location.href='index.html'});
