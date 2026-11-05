@@ -430,7 +430,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="qa-card" data-action="tools/ai-study.html"><div class="qa-icon-wrap tone-teal"><svg data-lucide="file-text"></svg></div><div class="qa-label">Revision<br/>Notes</div></div>
     <div class="qa-card" data-action="#custom-practice"><div class="qa-icon-wrap tone-amber"><svg data-lucide="target"></svg></div><div class="qa-label">Custom<br/>Practice</div></div>
     <div class="qa-card" data-action="#improvement-book"><div class="qa-icon-wrap tone-rose"><svg data-lucide="trending-up"></svg></div><div class="qa-label">Improvement<br/>Book</div></div>
-    <div class="qa-card" data-action="tools/recaller.html"><div class="qa-icon-wrap tone-blue"><svg data-lucide="zap"></svg></div><div class="qa-label">Flashcards</div></div>
+    <div class="qa-card" data-action="#flashcards"><div class="qa-icon-wrap tone-blue"><svg data-lucide="zap"></svg></div><div class="qa-label">Flashcards</div></div>
     <div class="qa-card" data-action="tools/pomodoro.html"><div class="qa-icon-wrap tone-green"><svg data-lucide="timer"></svg></div><div class="qa-label">Pomodoro<br/>Timer</div></div>
   </div>
 
@@ -627,10 +627,17 @@ document.querySelectorAll('.qa-card').forEach(card=>{
   card.addEventListener('click', ()=>{
     const dest=card.dataset.action;
     if(dest && dest[0]!=='#') location.href=dest;
-    else if(dest) document.querySelector(dest)?.scrollIntoView({behavior:'smooth',block:'start'});
+    else if(dest){ const el=document.querySelector(dest); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); else comingSoon(); }
   });
 });
 
+
+function comingSoon(){
+  let t=document.getElementById('csToast');
+  if(!t){ t=document.createElement('div'); t.id='csToast'; t.textContent='Coming soon'; t.style.cssText='position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:var(--sur2,#222);color:var(--tx,#fff);border:1px solid var(--bdr,#444);padding:10px 18px;border-radius:12px;font-size:13px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none'; document.body.appendChild(t); }
+  t.style.opacity='1'; clearTimeout(comingSoon._t); comingSoon._t=setTimeout(()=>{t.style.opacity='0'},1600);
+}
+document.querySelectorAll('a.section-link[href="#"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();comingSoon();}));
 function fitIndicator(indicator, activeTab){ indicator.style.width = activeTab.offsetWidth+'px'; indicator.style.transform = `translateX(${activeTab.offsetLeft-4}px)`; }
 ['#schedIndicator1','#schedIndicator2'].forEach(sel=>{
   const indicator=document.querySelector(sel); if(!indicator) return;
@@ -666,7 +673,6 @@ document.getElementById('notifMarkAll').addEventListener('click', async e=>{
 const SEARCH_INDEX=[
   {group:'Tools', icon:'sparkles', label:'AI Study Planner', sub:'Adaptive daily plans', href:'tools/ai-planner.html'},
   {group:'Tools', icon:'file-text', label:'Revision Notes / AI Study Engine', sub:'Upload anything, get notes', href:'tools/ai-study.html'},
-  {group:'Tools', icon:'zap', label:'Flashcards', sub:'Spaced repetition review', href:'tools/recaller.html'},
   {group:'Tools', icon:'timer', label:'Pomodoro Timer', sub:'Focus sprints', href:'tools/pomodoro.html'},
   {group:'Tools', icon:'trees', label:'Forest — Focus Mode', sub:'Grow a tree while you study', href:'tools/forest.html'},
   {group:'Tools', icon:'list-checks', label:'Todo List', sub:'Daily tasks', href:'tools/todolist.html'},
