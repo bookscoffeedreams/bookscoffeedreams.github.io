@@ -580,7 +580,7 @@ firebase.initializeApp(FC);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const DEFAULT_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/images/account_logo_default.png';
+const DEFAULT_AV = 'https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 
 function timeAgo(ms) {
   const s = Math.floor((Date.now() - ms) / 1000);
@@ -730,7 +730,7 @@ auth.onAuthStateChanged(async user => {
     if (d.location)
       bc.innerHTML += `<span class="bio-chip"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${d.location}</span>`;
     if (d.website)
-      bc.innerHTML += `<span class="bio-chip"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><a href="${d.website}" target="_blank">${d.website.replace(/^https?:\/\//, '')}</a></span>`;
+      bc.innerHTML += `<span class="bio-chip"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><a href="${d.website}" target="_blank" rel="noopener noreferrer">${d.website.replace(/^https?:\/\//, '')}</a></span>`;
   }
 
   // Reading
