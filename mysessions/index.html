@@ -1574,7 +1574,7 @@ async function initTicker(){
 function openJoin(room){
   if(!S.user){
     S.pendingRoomAfterAuth = room;
-    toast('Sign in first — we'll take you straight to the room','info');
+    toast('Sign in first — we\'ll take you straight to the room','info');
     navTo('auth');
     return;
   }
