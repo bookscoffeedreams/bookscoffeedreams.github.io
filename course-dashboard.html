@@ -1058,7 +1058,7 @@ function renderLectures(){
           </div>
           <div class="lec-l">
             <div class="lec-title">${esc(l.title||'Lecture')}</div>
-            <div class="lec-sub">${d?'Completed':'Not started'}${l.videoUrl?` · <a href="${l.videoUrl}" target="_blank" style="color:var(--p6)">Watch ↗</a>`:''}</div>
+            <div class="lec-sub">${d?'Completed':'Not started'}${l.videoUrl?` · <a href="${l.videoUrl}" target="_blank" style="color:var(--p6)" rel="noopener noreferrer">Watch ↗</a>`:''}</div>
           </div>
           <span class="lec-dur">${l.duration||'—'}</span>
           ${!d?`<button class="mark-done-btn" onclick="markLectureDone('${lecId}')">✓ Done</button>`:''}
@@ -1112,7 +1112,7 @@ function renderConceptsPanel(){
       </div>`;
       concepts.forEach(c=>{
         const url=c.videoUrl||c.url||'';
-        html+=`<a class="concept-card" href="${esc(url)}" target="_blank" style="text-decoration:none">
+        html+=`<a class="concept-card" href="${esc(url)}" target="_blank" style="text-decoration:none" rel="noopener noreferrer">
           ${c.thumbnailURL?`<img class="concept-thumb" src="${esc(c.thumbnailURL)}" alt=""/>`:`<div class="concept-thumb">🎬</div>`}
           <div class="concept-info">
             <div class="concept-title">${esc(c.title||'Concept')}</div>
@@ -1153,7 +1153,7 @@ function renderStudyPanel(){
             <div class="study-title">${esc(st.title||'Study material')}</div>
             <div class="study-sub">${esc(s.title||sk)} · ${esc(ch.title||'')}</div>
           </div>
-          <a class="study-open-btn" href="${esc(st.url||'#')}" target="_blank">Open</a>
+          <a class="study-open-btn" href="${esc(st.url||'#')}" target="_blank" rel="noopener noreferrer">Open</a>
         </div>`;
       });
     });
