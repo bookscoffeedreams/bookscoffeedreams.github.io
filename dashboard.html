@@ -302,6 +302,137 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
   .xp-card{grid-template-columns:1fr}
   .discord-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ═══════════ DASHBOARD UPGRADE ═══════════ */
+.greeting-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.d-pill-info{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--tx3);background:var(--sur2);border:1px solid var(--bdr)}
+.d-pill-info.hot{color:var(--amber2);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.d-refresh{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font-family:var(--mono);font-size:10.5px;color:var(--tx4);background:transparent;border:1px solid var(--bdr);cursor:pointer;transition:all .2s}
+.d-refresh:hover{color:var(--amber);border-color:var(--bdr2)}
+.d-refresh svg{width:12px;height:12px}
+.d-refresh.spin svg{animation:d-spin .8s linear infinite}
+@keyframes d-spin{to{transform:rotate(360deg)}}
+
+/* announcement strip */
+.d-ann{position:relative;display:flex;gap:14px;align-items:flex-start;background:var(--sur);border:1px solid var(--bdr);border-left:3px solid var(--amber);border-radius:14px;padding:14px 44px 14px 16px;margin-bottom:20px;box-shadow:var(--sh);animation:fade-up .5s var(--spring) .05s both}
+.d-ann.t-success{border-left-color:#10b981}.d-ann.t-warning{border-left-color:#f59e0b}.d-ann.t-urgent{border-left-color:#ef4444}
+.d-ann-ico{font-size:20px;line-height:1.2;flex-shrink:0}
+.d-ann-body{min-width:0;flex:1}
+.d-ann-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.d-ann-title{font-family:var(--serif);font-size:17px;color:var(--tx)}
+.d-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:6px}
+.d-tag.info{color:var(--amber);background:rgba(217,119,6,.12)}.d-tag.success{color:#10b981;background:rgba(16,185,129,.12)}
+.d-tag.warning{color:#d97706;background:rgba(245,158,11,.14)}.d-tag.urgent{color:#ef4444;background:rgba(239,68,68,.13)}
+.d-tag.pinned{color:var(--tx3);background:var(--sur3)}
+.d-ann-msg{font-size:13.5px;color:var(--tx3);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.d-ann-foot{display:flex;gap:14px;align-items:center;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--tx4)}
+.d-ann-foot a{color:var(--amber)}.d-ann-foot a:hover{text-decoration:underline}
+.d-ann-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:8px;border:none;background:transparent;color:var(--tx4);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.d-ann-x:hover{background:var(--sur3);color:var(--tx)}
+.d-ann-x svg{width:14px;height:14px}
+
+/* continue learning hero */
+.d-cont{position:relative;display:grid;grid-template-columns:250px minmax(0,1fr);background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;box-shadow:var(--sh);margin-bottom:20px;animation:fade-up .5s var(--spring) .08s both}
+.d-cont::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;z-index:2;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24,#d97706,#92400e)}
+.d-cont-thumb{position:relative;min-height:168px;background:linear-gradient(135deg,var(--sur3),var(--sur2));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:44px;color:var(--amber);overflow:hidden}
+.d-cont-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-cont-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 55%,var(--sur))}
+.d-cont-body{padding:24px 28px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.d-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber)}
+.d-cont-title{font-family:var(--serif);font-size:clamp(21px,2.5vw,29px);letter-spacing:-.02em;color:var(--tx);line-height:1.2;overflow-wrap:anywhere}
+.d-cont-sub{font-size:13.5px;color:var(--tx3);line-height:1.5;overflow-wrap:anywhere}
+.d-bar{height:6px;background:var(--sur3);border-radius:99px;overflow:hidden}
+.d-bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#92400e,#d97706,#fbbf24);transition:width 1s var(--spring)}
+.d-bar-meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--tx4);margin-top:6px}
+.d-bar-meta b{color:var(--amber);font-weight:500}
+.d-cont-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.d-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:11px;font-size:13px;font-weight:600;font-family:var(--sans);background:linear-gradient(135deg,#92400e,#d97706);color:#fff;border:1px solid transparent;box-shadow:0 4px 16px rgba(217,119,6,.3);transition:all .2s;cursor:pointer}
+.d-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(217,119,6,.45)}
+.d-btn.ghost{background:transparent;color:var(--tx3);border-color:var(--bdr2);box-shadow:none}
+.d-btn.ghost:hover{color:var(--amber);border-color:var(--bdr3);transform:none}
+.d-btn svg{width:14px;height:14px}
+.d-cont.empty{grid-template-columns:1fr}
+.d-cont.empty .d-cont-body{padding:26px 30px}
+
+/* block header controls + filters */
+.d-pills{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.d-pill{padding:5px 11px;border-radius:99px;border:1px solid var(--bdr);background:var(--sur);color:var(--tx4);font-family:var(--mono);font-size:10px;letter-spacing:.04em;cursor:pointer;transition:all .15s}
+.d-pill:hover{color:var(--tx2);border-color:var(--bdr2)}
+.d-pill.on{color:var(--amber);border-color:rgba(217,119,6,.45);background:rgba(217,119,6,.1)}
+.d-pill i{font-style:normal;opacity:.65;margin-left:4px}
+
+/* course rows (now real links) */
+a.course-row{text-decoration:none;color:inherit}
+a.course-row:focus-visible,a.lb-row:focus-visible,.d-tool:focus-visible,.d-rec:focus-visible,.d-btn:focus-visible,.d-pill:focus-visible,.d-refresh:focus-visible,.d-retry:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.course-thumb.ph{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--amber);background:linear-gradient(135deg,var(--sur3),var(--sur2));border:1px solid var(--bdr)}
+.course-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.d-chip{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid transparent;white-space:nowrap}
+.d-chip.done{color:#16a34a;background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.25)}
+.d-chip.prog{color:var(--amber);background:rgba(217,119,6,.1);border-color:rgba(217,119,6,.25)}
+.d-chip.new{color:var(--tx3);background:var(--sur3);border-color:var(--bdr)}
+.d-chip.free{color:#16a34a;background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.22)}
+.d-chip.paid{color:var(--amber);background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.22)}
+.course-sub{font-family:var(--mono);font-size:10px;color:var(--tx4);margin:-1px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d-more{display:block;width:100%;margin-top:10px;padding:9px;border-radius:10px;border:1px dashed var(--bdr2);background:transparent;color:var(--tx3);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s}
+.d-more:hover{color:var(--amber);border-color:var(--bdr3)}
+
+/* recommended */
+.d-recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.d-rec{display:flex;flex-direction:column;border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:var(--sur2);transition:all .2s;text-decoration:none;color:inherit}
+.d-rec:hover{border-color:var(--bdr2);transform:translateY(-2px)}
+.d-rec-t{aspect-ratio:16/9;background:linear-gradient(135deg,var(--sur3),var(--sur2));position:relative;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:26px;color:var(--amber)}
+.d-rec-t img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-rec-b{padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px;flex:1}
+.d-rec-n{font-size:13px;font-weight:600;color:var(--tx2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.d-rec-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.d-rec-f span:last-child{font-family:var(--mono);font-size:10px;color:var(--tx4)}
+
+/* study tools */
+.d-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.d-tool{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:10px;border:1px solid var(--bdr);background:var(--sur2);transition:all .18s;text-decoration:none;color:inherit;min-width:0}
+.d-tool:hover{border-color:var(--bdr2);background:var(--sur3);transform:translateY(-1px)}
+.d-tool-e{font-size:19px;width:26px;text-align:center;flex-shrink:0}
+.d-tool-n{font-size:12.5px;font-weight:600;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d-tool-s{font-family:var(--mono);font-size:9.5px;color:var(--tx4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.d-tool>div{min-width:0}
+
+/* badges grid */
+.d-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.d-badge{text-align:center;padding:11px 4px 9px;border-radius:11px;background:var(--sur2);border:1px solid var(--bdr);transition:all .18s;min-width:0}
+.d-badge:hover{border-color:var(--bdr2);transform:translateY(-1px)}
+.d-badge-e{font-size:23px;line-height:1.1}
+.d-badge-n{font-family:var(--mono);font-size:9.5px;color:var(--tx3);margin-top:5px;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d-badge.off{opacity:.4;filter:grayscale(1)}
+.d-badge.off:hover{opacity:.55}
+
+/* leaderboard extras */
+a.lb-row{text-decoration:none;color:inherit}
+a.lb-row:hover .lb-name{color:var(--amber)}
+.lb-you{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(217,119,6,.07);border:1px dashed rgba(217,119,6,.3);font-family:var(--mono);font-size:10.5px;color:var(--tx3);line-height:1.6}
+.lb-you b{color:var(--amber);font-weight:500}
+
+/* generic states */
+.d-err{padding:16px 10px;text-align:center;font-size:12.5px;color:var(--tx3);line-height:1.6}
+.d-err .e{font-size:22px;display:block;margin-bottom:4px;opacity:.7}
+.d-retry{margin-top:8px;padding:6px 14px;border-radius:8px;border:1px solid var(--bdr2);background:var(--sur2);color:var(--amber);font-family:var(--mono);font-size:11px;cursor:pointer}
+.d-retry:hover{background:var(--sur3)}
+.d-empty{padding:10px 0;text-align:center}
+.d-empty p{font-family:var(--mono);font-size:12px;color:var(--tx4);margin-bottom:4px}
+
+@media(max-width:900px){.d-cont{grid-template-columns:200px minmax(0,1fr)}}
+@media(max-width:640px){
+  .d-cont{grid-template-columns:1fr}
+  .d-cont-thumb{min-height:130px}
+  .d-cont-thumb::after{background:linear-gradient(180deg,transparent 55%,var(--sur))}
+  .d-cont-body{padding:18px 20px}
+  .d-btn{padding:10px 16px}
+  .d-ann{padding-right:40px}
+  .course-row{flex-wrap:wrap}
+  .course-side{flex-direction:row;align-items:center;margin-left:auto}
+  .d-pills{margin-left:0;width:100%}
+  .block-head{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){.d-cont,.d-ann{animation:none}.d-bar>i{transition:none}.d-refresh.spin svg{animation:none}}
 </style>
 </head>
 <body>
@@ -346,14 +477,21 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
       <div class="greeting-eyebrow" id="greetingTime">Good morning</div>
       <div class="greeting-title" id="greetingTitle">Welcome back, <em>Reader.</em></div>
       <div class="greeting-sub" id="greetingSub">Here's what's happening in your learning world today.</div>
+      <div class="greeting-chips"><span class="d-pill-info" id="chipLevel"></span><span class="d-pill-info" id="chipStreak"></span><button class="d-refresh" id="refreshBtn" type="button" data-act="refresh" aria-label="Refresh dashboard"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Refresh</button></div>
     </div>
     <div class="greeting-right">
-      <img class="greeting-av" id="greetingAv" src="" alt="avatar"/>
+      <img class="greeting-av" id="greetingAv" alt="avatar"/>
       <div class="greeting-name" id="greetingName">—</div>
       <div class="greeting-role" id="greetingRole">Member</div>
       <div class="greeting-xp" id="greetingXp">0 XP</div>
     </div>
   </div>
+
+  <!-- ANNOUNCEMENT -->
+  <div id="annSlot"></div>
+
+  <!-- CONTINUE LEARNING -->
+  <div id="continueSlot"><div class="skel" style="height:168px;border-radius:16px;margin-bottom:20px"></div></div>
 
   <!-- STATS ROW -->
   <div class="stats-row">
@@ -390,14 +528,26 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
         <div class="block-head">
           <div class="block-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
           <div><div class="block-title">My Courses</div><div class="block-desc">Enrolled &amp; in progress</div></div>
-          <div class="block-head-right"><a href="courses.html" class="block-link">Browse<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a></div>
+          <div class="d-pills" id="coursePills"></div>
+          <div class="block-head-right" style="margin-left:12px"><a href="courses.html" class="block-link">Browse<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a></div>
         </div>
         <div class="block-body">
           <div class="courses-grid" id="coursesGrid">
             <div class="skel" style="height:58px;border-radius:11px"></div>
             <div class="skel" style="height:58px;border-radius:11px"></div>
           </div>
+          <button class="d-more" id="coursesMore" type="button" data-act="more" hidden></button>
         </div>
+      </div>
+
+      <!-- Recommended -->
+      <div class="block" id="discoverBlock" style="display:none">
+        <div class="block-head">
+          <div class="block-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div><div class="block-title">Recommended for you</div><div class="block-desc">Fresh from the catalogue</div></div>
+          <div class="block-head-right"><a href="courses.html" class="block-link">All courses<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
+        </div>
+        <div class="block-body"><div class="d-recs" id="recs"></div></div>
       </div>
 
       <!-- Recent Posts -->
@@ -418,7 +568,8 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
           <div class="block-icon">
             <svg fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
           </div>
-          <div><div class="block-title">Discord Stats</div><div class="block-desc">Your activity on the server</div></div>
+          <div><div class="block-title">Discord Stats</div><div class="block-desc" id="discordWho">Your activity on the server</div></div>
+          <div class="block-head-right"><button class="d-refresh" type="button" data-act="unlink" title="Stop showing Discord stats on this device">Unlink</button></div>
         </div>
         <div class="block-body">
           <div class="discord-grid" id="discordGrid"></div>
@@ -481,6 +632,15 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
         </div>
       </div>
 
+      <!-- Study Tools -->
+      <div class="block">
+        <div class="block-head">
+          <div class="block-icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <div><div class="block-title">Study Tools</div><div class="block-desc">Focus, plan &amp; remember</div></div>
+        </div>
+        <div class="block-body"><div class="d-tools" id="toolsGrid"></div></div>
+      </div>
+
       <!-- Badges -->
       <div class="block">
         <div class="block-head">
@@ -488,7 +648,7 @@ body::after{content:'';position:fixed;top:-20%;right:-10%;width:60vw;height:60vh
           <div><div class="block-title">Badges</div><div class="block-desc" id="badgeCount">Earned achievements</div></div>
         </div>
         <div class="block-body">
-          <div class="badge-list" id="badgesList"><div class="badge-none">Loading…</div></div>
+          <div class="d-badges" id="badgesList"><div class="badge-none">Loading…</div></div>
         </div>
       </div>
 
@@ -536,6 +696,8 @@ document.getElementById('greetingTime').textContent=greet();
 </script>
 
 <script>
+(function(){
+'use strict';
 firebase.initializeApp({
   apiKey:"AIzaSyACEG_4v-3ROgMNOlFZsAllC9VcYb8Nm2A",
   authDomain:"bcd-discord.firebaseapp.com",
@@ -548,287 +710,392 @@ const auth=firebase.auth();
 const db=firebase.firestore();
 const DEF_AV='https://raw.githubusercontent.com/bookscoffeedreams/bookscoffeedreams.github.io/refs/heads/main/assets/icons/account_default.png';
 const DISCORD_API='https://discord-login-backend.vercel.app/api/profile';
+const DISCORD_KEY='bcd_dash_discord';
+const ANN_KEY='bcd_dash_ann_dismissed';
+const XP_PER_LEVEL=500;
 
+/* ── helpers ── */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const safeUrl=u=>{u=String(u||'').trim();return /^https?:\/\//i.test(u)?u:''};
+const enc=encodeURIComponent;
+const toMs=v=>!v?0:(typeof v.toMillis==='function'?v.toMillis():(typeof v.seconds==='number'?v.seconds*1000:(typeof v==='number'?v:(Date.parse(v)||0))));
+const num=v=>{const n=Number(v);return isFinite(n)?n:0};
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
+const initials=t=>(String(t||'?').trim().match(/[A-Za-z0-9]/g)||['?']).slice(0,2).join('').toUpperCase();
 function timeAgo(ms){
   const s=Math.floor((Date.now()-ms)/1000);
-  if(s<60) return 'just now';
-  if(s<3600) return Math.floor(s/60)+'m ago';
-  if(s<86400) return Math.floor(s/3600)+'h ago';
+  if(s<60)return 'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  if(s<86400*7)return Math.floor(s/86400)+'d ago';
   return new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
+const greetNow=()=>{const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'};
+function errorBlock(host,msg){
+  host.innerHTML=`<div class="d-err"><span class="e">⚠️</span>${esc(msg)}<br><button class="d-retry" type="button" data-act="retry">Try again</button></div>`;
+}
+function safe(fn){try{fn()}catch(e){console.error('dashboard:',e)}}
 
-const BADGE_EM={
-  'Reader':'📚','Reviewer':'⭐','Helper':'🤝','Early Bird':'🐦',
-  'Bookworm':'🐛','Explorer':'🗺️','Contributor':'✍️','Staff':'🛡️','Verified':'✅'
-};
+const BADGE_EM={'Reader':'📚','Reviewer':'⭐','Helper':'🤝','Early Bird':'🐦','Bookworm':'🐛','Explorer':'🗺️','Contributor':'✍️','Staff':'🛡️','Verified':'✅'};
+const TOOLS=[
+  {n:'Ripen',s:'Focus timer',e:'🍅',h:'tools/pomodoro.html'},
+  {n:'Grove',s:'Grow a focus forest',e:'🌲',h:'tools/forest.html'},
+  {n:'Sprout',s:'Tasks & lists',e:'🌱',h:'tools/todolist.html'},
+  {n:'The Nook',s:'Lofi focus room',e:'🎧',h:'tools/lofi.html'},
+  {n:'AI Planner',s:'Study planner',e:'🗓️',h:'tools/ai-planner.html'},
+  {n:'AI Study',s:'Study engine',e:'🧠',h:'tools/ai-study.html'},
+  {n:'Memory Map',s:'Connect ideas',e:'🗺️',h:'tools/memory-map.html'},
+  {n:'Workspace',s:'Notes & pages',e:'📓',h:'tools/impulse.html'},
+  {n:'MySession',s:'Focus together',e:'👥',h:'mysessions/index.html'}
+];
 
-auth.onAuthStateChanged(async user=>{
-  if(!user){ location.href='login.html'; return; }
+/* ── state ── */
+let ME=null,busy=false,lastLoad=0,FILTER='all',SHOW_ALL=false,COURSES=[];
 
-  const av=user.photoURL||DEF_AV;
-  // Nav
-  document.getElementById('navAvatar').src=av;
-  document.getElementById('navAvatar').onerror=()=>document.getElementById('navAvatar').src=DEF_AV;
-  document.getElementById('navName').textContent=user.displayName||user.email?.split('@')[0]||'You';
-  // Greeting avatar
-  document.getElementById('greetingAv').src=av;
-  document.getElementById('greetingAv').onerror=()=>document.getElementById('greetingAv').src=DEF_AV;
+/* ── auth ── */
+auth.onAuthStateChanged(user=>{
+  if(!user){location.href='login.html?redirect='+enc('dashboard.html'+location.search);return}
+  ME=user;
+  const av=safeUrl(user.photoURL)||DEF_AV;
+  ['navAvatar','greetingAv'].forEach(id=>{const el=document.getElementById(id);if(el){el.dataset.av='1';el.src=av}});
+  document.getElementById('navName').textContent=user.displayName||(user.email||'').split('@')[0]||'You';
+  captureDiscordParam();
+  safe(paintTools);
+  load();
+});
 
-  // Load all data in parallel
-  const [userSnap, postsSnap, purchasesSnap, topUsersSnap] = await Promise.all([
-    db.collection('users').doc(user.uid).get(),
-    db.collection('communityPosts').where('uid','==',user.uid).orderBy('createdAt','desc').limit(5).get(),
-    db.collection('purchases').where('uid','==',user.uid).get(),
-    db.collection('users').orderBy('xp','desc').limit(7).get()
-  ]);
+/* ── main loader: every section is independent, so one failure never blanks the page ── */
+async function load(){
+  if(busy||!ME)return;
+  busy=true;
+  const btn=$('#refreshBtn');if(btn)btn.classList.add('spin');
+  const uid=ME.uid;
+  const jobs={
+    profile:()=>db.collection('users').doc(uid).get(),
+    posts:()=>db.collection('communityPosts').where('uid','==',uid).limit(200).get(),
+    purchases:()=>db.collection('purchases').where('uid','==',uid).get(),
+    progress:()=>db.collection('userCourseProgress').where('uid','==',uid).get(),
+    top:()=>db.collection('users').orderBy('xp','desc').limit(10).get(),
+    ann:()=>db.collection('announcements').get(),
+    catalog:()=>db.collection('courses').orderBy('createdAt','desc').limit(30).get(),
+    main:()=>db.collection('courses_main').where('students','array-contains',uid).get()
+  };
+  const R={};
+  await Promise.all(Object.keys(jobs).map(async k=>{
+    try{R[k]={ok:true,v:await jobs[k]()}}catch(e){console.warn('dashboard load:',k,e);R[k]={ok:false,e}}
+  }));
+  safe(()=>paintProfile(R));
+  safe(()=>paintPosts(R));
+  safe(()=>paintLeaderboard(R));
+  safe(()=>paintAnnouncement(R));
+  try{await paintCourses(R)}catch(e){console.error(e);errorBlock($('#coursesGrid'),'Couldn’t load your courses.');$('#continueSlot').innerHTML='';$('#sCourses').textContent='—'}
+  safe(()=>paintDiscord(R));
+  lastLoad=Date.now();busy=false;
+  if(btn)btn.classList.remove('spin');
+}
 
-  const ud = userSnap.exists ? userSnap.data() : {};
-
-  // ── GREETING ──
-  const name = ud.name||user.displayName||'Reader';
-  const words = name.trim().split(/\s+/);
-  document.getElementById('greetingTitle').innerHTML =
-    `${greet()}, <em>${words[0]}.</em>`;
-  document.getElementById('greetingName').textContent = name;
-  const role = ud.role||'user';
-  document.getElementById('greetingRole').textContent = role.charAt(0).toUpperCase()+role.slice(1);
-  document.getElementById('greetingXp').textContent = (ud.xp||0)+' XP total';
-
-  // ── STATS ──
-  const xp = ud.xp||0;
-  const level = Math.floor(xp/500)+1;
-  document.getElementById('sXP').textContent = xp;
-  document.getElementById('sLevel').textContent = level;
-  document.getElementById('sPosts').textContent = postsSnap.size;
-  document.getElementById('sCourses').textContent = purchasesSnap.size; // updated after courses_main loads
-  const badges = ud.badges||[];
-  document.getElementById('sBadges').textContent = badges.length;
-  document.getElementById('sStreak').textContent = (ud.streak||0)+'d';
-
-  // ── XP BAR ──
-  const prog = xp%500;
-  document.getElementById('xpEyebrow').textContent = `Level ${level}`;
-  document.getElementById('xpCard').setAttribute('data-level',`Lv ${level}`);
-  document.getElementById('xpBig').textContent = xp;
-  document.getElementById('xpSub').textContent = `${prog} / 500 XP · ${500-prog} XP to go`;
-  setTimeout(()=>{
-    document.getElementById('xpFill').style.width = Math.round(prog/500*100)+'%';
-  },400);
-
-  // ── BADGES ──
-  const bl = document.getElementById('badgesList');
-  bl.innerHTML='';
-  if(badges.length){
-    document.getElementById('badgeCount').textContent = `${badges.length} earned`;
-    badges.forEach(b=>{
-      const row=document.createElement('div'); row.className='badge-row';
-      row.innerHTML=`<span class="badge-em">${BADGE_EM[b]||'🏅'}</span><span class="badge-name">${b}</span>`;
-      bl.appendChild(row);
-    });
-  } else {
-    bl.innerHTML='<div class="badge-none">No badges yet. Keep engaging!</div>';
+/* ── profile, stats, xp, badges ── */
+function paintProfile(R){
+  const ok=R.profile.ok;
+  const ud=ok&&R.profile.v.exists?R.profile.v.data():{};
+  const name=ud.name||ME.displayName||(ME.email||'').split('@')[0]||'Reader';
+  const first=String(name).trim().split(/\s+/)[0];
+  $('#greetingTitle').innerHTML=`${esc(greetNow())}, <em>${esc(first)}.</em>`;
+  $('#greetingTime').textContent=greetNow();
+  $('#greetingName').textContent=name;
+  const role=String(ud.role||'user');
+  $('#greetingRole').textContent=role.charAt(0).toUpperCase()+role.slice(1);
+  const photo=safeUrl(ud.photoURL);
+  if(photo){['navAvatar','greetingAv'].forEach(id=>{const el=document.getElementById(id);if(el&&el.src!==photo)el.src=photo})}
+  if(!ok){
+    ['sXP','sLevel','sBadges','sStreak'].forEach(id=>$('#'+id).textContent='—');
+    $('#greetingXp').textContent='XP unavailable';
+    $('#chipLevel').textContent='';$('#chipStreak').textContent='Couldn’t load your profile';$('#chipStreak').className='d-pill-info';
+    paintBadges([]);
+    return;
   }
+  const xp=Math.max(0,num(ud.xp)),level=Math.floor(xp/XP_PER_LEVEL)+1,prog=xp%XP_PER_LEVEL,streak=Math.max(0,Math.floor(num(ud.streak)));
+  const badges=(Array.isArray(ud.badges)?ud.badges:[]).map(String);
+  $('#greetingXp').textContent=xp+' XP total';
+  $('#sXP').textContent=xp;$('#sLevel').textContent=level;$('#sBadges').textContent=badges.length;$('#sStreak').textContent=streak+'d';
+  $('#chipLevel').textContent='Level '+level;
+  const cs=$('#chipStreak');cs.textContent=streak>0?`🔥 ${streak}-day streak`:'Start a streak today';cs.className='d-pill-info'+(streak>0?' hot':'');
+  $('#xpEyebrow').textContent='Level '+level;
+  $('#xpCard').setAttribute('data-level','Lv '+level);
+  $('#xpBig').textContent=xp;
+  $('#xpSub').textContent=`${prog} / ${XP_PER_LEVEL} XP · ${XP_PER_LEVEL-prog} XP to Level ${level+1}`;
+  setTimeout(()=>{$('#xpFill').style.width=Math.round(prog/XP_PER_LEVEL*100)+'%'},350);
+  window.__myXp=xp;
+  paintBadges(badges);
+}
+function paintBadges(earned){
+  const host=$('#badgesList');if(!host)return;
+  const set=new Set(earned);
+  const all=[...earned,...Object.keys(BADGE_EM).filter(b=>!set.has(b))];
+  $('#badgeCount').textContent=earned.length?`${earned.length} of ${all.length} earned`:'None earned yet — keep going!';
+  host.innerHTML=all.map(b=>{
+    const on=set.has(b);
+    return`<div class="d-badge${on?'':' off'}" title="${esc(b)}${on?'':' — not earned yet'}"><div class="d-badge-e">${BADGE_EM[b]||'🏅'}</div><div class="d-badge-n">${esc(b)}</div></div>`;
+  }).join('');
+}
 
-  // ── COURSES (merged from both purchases + courses_main) ──
-  const grid = document.getElementById('coursesGrid');
-  grid.innerHTML='';
+/* ── posts ── */
+function paintPosts(R){
+  const pl=$('#postsList');
+  if(!R.posts.ok){errorBlock(pl,'Couldn’t load your posts.');$('#sPosts').textContent='—';return}
+  const arr=R.posts.v.docs.map(d=>d.data()).sort((a,b)=>toMs(b.createdAt)-toMs(a.createdAt));
+  $('#sPosts').textContent=arr.length>=200?'200+':arr.length;
+  if(!arr.length){pl.innerHTML='<div class="post-empty">No posts yet. Share something with the community!</div>';return}
+  pl.innerHTML=arr.slice(0,5).map((p,i)=>{
+    const cat=String(p.category||'general').toLowerCase().replace(/[^a-z0-9_-]/g,'')||'general';
+    const text=String(p.content||'');
+    const t=toMs(p.createdAt);
+    return`<div class="post-item"><span class="post-idx">0${i+1}</span><div><div class="post-cat ${cat}"><span class="post-cat-dot"></span>${esc(cat)}</div><div class="post-text">${esc(text.slice(0,120))}${text.length>120?'…':''}</div><div class="post-time">${t?esc(timeAgo(t)):''}</div></div></div>`;
+  }).join('');
+}
 
-  // Source 1: purchases collection → courses collection
-  const purchasedIds = purchasesSnap.docs.map(d=>d.data().courseId).filter(Boolean);
+/* ── leaderboard ── */
+function paintLeaderboard(R){
+  const lb=$('#leaderboard');
+  if(!R.top.ok){errorBlock(lb,'Couldn’t load the leaderboard.');return}
+  const docs=R.top.v.docs;
+  if(!docs.length){lb.innerHTML='<div class="post-empty">No rankings yet.</div>';return}
+  const medals=['','🥇','🥈','🥉'],cls=['','gold','silver','bronze'];
+  let myRank=0,lastXp=0;
+  lb.innerHTML=docs.map((d,i)=>{
+    const u=d.data(),rank=i+1,me=ME&&d.id===ME.uid;
+    if(me)myRank=rank;lastXp=num(u.xp);
+    const av=safeUrl(u.photoURL)||DEF_AV;
+    const tag=me?'div':'a',href=me?'':` href="profile.html?uid=${enc(d.id)}"`;
+    return`<${tag} class="lb-row${me?' lb-me':''}"${href}><span class="lb-rank ${cls[rank]||''}">${rank<=3?medals[rank]:rank}</span><img class="lb-av" src="${esc(av)}" alt="" data-av="1" loading="lazy"><span class="lb-name">${esc(u.name||'Member')}${me?' (you)':''}</span><span class="lb-xp">${num(u.xp)} XP</span></${tag}>`;
+  }).join('');
+  const myXp=num(window.__myXp);
+  const note=document.createElement('div');note.className='lb-you';
+  if(myRank)note.innerHTML=`You’re <b>#${myRank}</b> in the community right now. 🎉`;
+  else if(docs.length>=10&&ME)note.innerHTML=`You have <b>${myXp} XP</b>. You’re <b>${Math.max(1,lastXp-myXp+1)} XP</b> away from the top ${docs.length}.`;
+  else return;
+  lb.appendChild(note);
+}
 
-  // Source 2: courses_main collection where students[] contains uid
-  let mainEnrolled = [];
-  try{
-    const mainSnap = await db.collection('courses_main').get();
-    mainEnrolled = mainSnap.docs
-      .filter(d => (d.data().students||[]).includes(user.uid))
-      .map(d => ({ id: d.id, source: 'main', ...d.data() }));
-  }catch(e){ console.warn('courses_main fetch failed:', e); }
+/* ── announcements (honours hide / schedule / pin from the admin Content page) ── */
+function annLive(d){if(d.active===false)return false;const n=Date.now(),s=toMs(d.startsAt),e=toMs(d.endsAt);if(s&&s>n)return false;if(e&&e<n)return false;return true}
+function paintAnnouncement(R){
+  const slot=$('#annSlot');slot.innerHTML='';
+  if(!R.ann.ok)return;
+  const list=R.ann.v.docs.map(d=>({id:d.id,...d.data()})).filter(annLive)
+    .sort((a,b)=>((b.pinned===true)-(a.pinned===true))||((toMs(b.createdAt)||toMs(b.updatedAt))-(toMs(a.createdAt)||toMs(a.updatedAt))));
+  const a=list[0];if(!a)return;
+  const sig=a.id+':'+(toMs(a.updatedAt)||toMs(a.createdAt)||0);
+  if(lsGet(ANN_KEY)===sig)return;
+  const type=['success','warning','urgent'].includes(a.type)?a.type:'info';
+  const ico={info:'📣',success:'🎉',warning:'⚠️',urgent:'🚨'}[type];
+  const label={info:'',success:'Good news',warning:'Heads up',urgent:'Urgent'}[type];
+  const when=toMs(a.createdAt)||toMs(a.updatedAt);
+  slot.innerHTML=`<div class="d-ann t-${type}" role="status"><div class="d-ann-ico">${ico}</div><div class="d-ann-body"><div class="d-ann-top">${a.pinned?'<span class="d-tag pinned">Pinned</span>':''}<span class="d-ann-title">${esc(a.title||'Announcement')}</span>${label?`<span class="d-tag ${type}">${label}</span>`:''}</div><div class="d-ann-msg">${esc(a.message||'')}</div><div class="d-ann-foot">${when?`<span>${esc(timeAgo(when))}</span>`:''}<a href="community.html">Open community →</a></div></div><button class="d-ann-x" type="button" data-act="annx" data-sig="${esc(sig)}" aria-label="Dismiss announcement"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`;
+}
 
-  // Update stat count to reflect both sources
-  const totalEnrolled = new Set([...purchasedIds, ...mainEnrolled.map(c=>c.id)]).size;
-  document.getElementById('sCourses').textContent = totalEnrolled;
-
-  // Build display list — deduplicated, max 8
-  const allEnrolled = [];
-  // Add purchased courses first (with progress)
-  for(const cid of [...new Set(purchasedIds)].slice(0,6)){
-    allEnrolled.push({ id: cid, source: 'purchases' });
-  }
-  // Add courses_main enrolled (not already in list)
-  const existingIds = new Set(allEnrolled.map(c=>c.id));
-  for(const c of mainEnrolled){
-    if(!existingIds.has(c.id)) allEnrolled.push({ id: c.id, source: 'main', data: c });
-    if(allEnrolled.length >= 8) break;
-  }
-
-  if(!allEnrolled.length){
-    grid.innerHTML=`<div class="course-empty">No enrolled courses yet.</div>
-      <a href="courses.html" class="course-cta">
-        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" width="13" height="13"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Browse Courses
-      </a>`;
-  } else {
-    for(const enrolled of allEnrolled){
-      try{
-        let c, thumb, title, totalLessons=0, doneLessons=0, pct=0, detailHref;
-
-        if(enrolled.source === 'purchases'){
-          // From courses collection (Razorpay purchases)
-          const [cSnap, progSnap] = await Promise.all([
-            db.collection('courses').doc(enrolled.id).get(),
-            db.collection('userCourseProgress').where('uid','==',user.uid).where('courseId','==',enrolled.id).get()
-          ]);
-          if(!cSnap.exists) continue;
-          c = cSnap.data();
-          thumb = c.thumbnailURL || '';
-          title = c.title || 'Untitled';
-          totalLessons = (c.modules||[]).reduce((n,m)=>n+((m.lessons||[]).length),0);
-          doneLessons = progSnap.docs.filter(d=>d.data().completed).length;
-          pct = totalLessons ? Math.round(doneLessons/totalLessons*100) : 0;
-          detailHref = `course-dashboard.html?id=${enrolled.id}`;
-        } else {
-          // From courses_main collection (students[] enrollment)
-          c = enrolled.data;
-          thumb = c.thumbnails?.[0]?.url || c.thumbnailURL || '';
-          title = c.title || 'Untitled';
-          // courses_main has no granular progress — show category & duration as subtitle
-          totalLessons = 0; doneLessons = 0; pct = 0;
-          detailHref = `course-dashboard.html?id=${enrolled.id}`;
-        }
-
-        const fallbackThumb = `https://placehold.co/60x42/2c2a25/d97706?text=${encodeURIComponent(title.slice(0,2))}`;
-        const row = document.createElement('div'); row.className='course-row';
-
-        if(enrolled.source === 'purchases'){
-          row.innerHTML=`
-            <img class="course-thumb" src="${thumb||fallbackThumb}" alt="" loading="lazy" onerror="this.src='${fallbackThumb}'"/>
-            <div class="course-info">
-              <div class="course-title">${title}</div>
-              <div class="course-prog-track"><div class="course-prog-fill" style="width:${pct}%"></div></div>
-              <div class="course-meta">
-                <span class="course-pct">${pct}% complete</span>
-                <span class="course-lessons">${doneLessons}/${totalLessons} lessons</span>
-              </div>
-            </div>`;
-        } else {
-          // courses_main — show category/duration, free/paid badge instead of progress
-          const isFree = c.price == 0 || !c.price;
-          row.innerHTML=`
-            <img class="course-thumb" src="${thumb||fallbackThumb}" alt="" loading="lazy" onerror="this.src='${fallbackThumb}'"/>
-            <div class="course-info">
-              <div class="course-title">${title}</div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
-                ${c.category ? `<span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--tx4)">${c.category}</span>` : ''}
-                ${c.duration ? `<span style="font-family:var(--mono);font-size:9px;color:var(--tx4)">· ${c.duration}</span>` : ''}
-                <span style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:99px;background:${isFree?'rgba(22,163,74,.1)':'rgba(217,119,6,.1)'};border:1px solid ${isFree?'rgba(22,163,74,.25)':'rgba(217,119,6,.25)'};color:${isFree?'var(--green)':'var(--amber)'}">
-                  ${isFree?'Free':'Paid'}
-                </span>
-              </div>
-            </div>`;
-        }
-        row.addEventListener('click',()=>location.href=detailHref);
-        grid.appendChild(row);
-      }catch(e){ console.warn('Course row error:', e); }
+/* ── courses ── */
+function analyse(snap){
+  const m={};
+  snap.forEach(d=>{
+    const p=d.data(),cid=p.courseId;if(!cid)return;
+    const e=m[cid]||(m[cid]={lessons:[],doneLessons:new Set(),lectures:new Set(),lastMs:0});
+    const t=Math.max(toMs(p.updatedAt),toMs(p.lastUpdated));if(t>e.lastMs)e.lastMs=t;
+    if(Number.isInteger(p.moduleIndex)&&Number.isInteger(p.lessonIndex)){
+      e.lessons.push({mi:p.moduleIndex,li:p.lessonIndex,done:!!p.completed,ms:toMs(p.updatedAt)});
+      if(p.completed)e.doneLessons.add(p.moduleIndex+':'+p.lessonIndex);
     }
-    if(!grid.children.length)
-      grid.innerHTML='<div class="course-empty">Course details unavailable.</div>';
-  }
-
-  // ── RECENT POSTS ──
-  const pl = document.getElementById('postsList');
-  pl.innerHTML='';
-  if(postsSnap.empty){
-    pl.innerHTML='<div class="post-empty">No posts yet. Share something!</div>';
-  } else {
-    let i=1;
-    postsSnap.forEach(pd=>{
-      const p=pd.data();
-      const cat=p.category||'general';
-      const t=p.createdAt?timeAgo(new Date(p.createdAt.seconds*1000).getTime()):'';
-      const el=document.createElement('div'); el.className='post-item';
-      el.innerHTML=`
-        <span class="post-idx">0${i++}</span>
-        <div>
-          <div class="post-cat ${cat}"><span class="post-cat-dot"></span>${cat}</div>
-          <div class="post-text">${(p.content||'').slice(0,120)}${(p.content||'').length>120?'…':''}</div>
-          <div class="post-time">${t}</div>
-        </div>`;
-      pl.appendChild(el);
-    });
-  }
-
-  // ── LEADERBOARD ──
-  const lb = document.getElementById('leaderboard');
-  lb.innerHTML='';
-  const rankLabels=['','🥇','🥈','🥉'];
-  const rankCls=['','gold','silver','bronze'];
-  let rank=0;
-  topUsersSnap.forEach(d=>{
-    rank++;
-    const u=d.data();
-    const isMe=d.id===user.uid;
-    const row=document.createElement('div');
-    row.className='lb-row'+(isMe?' lb-me':'');
-    if(!isMe){ row.style.cursor='pointer'; row.onclick=()=>location.href='profile.html?uid='+d.id; }
-    row.innerHTML=`
-      <span class="lb-rank ${rankCls[rank]||''}">${rank<=3?rankLabels[rank]:rank}</span>
-      <img class="lb-av" src="${u.photoURL||DEF_AV}" alt="" onerror="this.src='${DEF_AV}'"/>
-      <span class="lb-name">${u.name||'Member'}${isMe?' (you)':''}</span>
-      <span class="lb-xp">${u.xp||0} XP</span>`;
-    lb.appendChild(row);
+    if(Array.isArray(p.completedLectures))p.completedLectures.forEach(x=>e.lectures.add(String(x)));
   });
+  return m;
+}
+function totalsOf(c){
+  let lessons=0,lectures=0;
+  (Array.isArray(c.modules)?c.modules:[]).forEach(m=>{lessons+=Array.isArray(m&&m.lessons)?m.lessons.length:0});
+  Object.values(c.subjects&&typeof c.subjects==='object'?c.subjects:{}).forEach(s=>(Array.isArray(s&&s.chapters)?s.chapters:[]).forEach(ch=>{lectures+=Array.isArray(ch&&ch.lectures)?ch.lectures.length:0}));
+  return{lessons,lectures};
+}
+function nextLesson(mods,mi,li){
+  const m=mods[mi];
+  if(m&&Array.isArray(m.lessons)&&m.lessons[li+1])return{mi,li:li+1};
+  for(let i=mi+1;i<mods.length;i++)if(mods[i]&&Array.isArray(mods[i].lessons)&&mods[i].lessons.length)return{mi:i,li:0};
+  return null;
+}
+function resumeFor(id,c,e){
+  const detail='course-dashboard.html?id='+enc(id);
+  const out={href:detail,detail,where:'',label:'Start learning'};
+  if(!e||(!e.lessons.length&&!e.lectures.size))return out;
+  out.label='Resume';
+  const mods=Array.isArray(c.modules)?c.modules:[];
+  if(e.lessons.length&&mods.length){
+    const last=e.lessons.slice().sort((a,b)=>b.ms-a.ms)[0];
+    let t=last.done?(nextLesson(mods,last.mi,last.li)||last):last;
+    const lesson=mods[t.mi]&&Array.isArray(mods[t.mi].lessons)?mods[t.mi].lessons[t.li]:null;
+    if(lesson){
+      out.href=`lesson-player.html?courseId=${enc(id)}&module=${t.mi}&lesson=${t.li}`;
+      out.where=`Module ${t.mi+1} · ${lesson.title||('Lesson '+(t.li+1))}`;
+    }
+  }
+  return out;
+}
+async function paintCourses(R){
+  const grid=$('#coursesGrid');
+  const prog=R.progress.ok?analyse(R.progress.v):{};
+  const ids=new Map();
+  if(R.purchases.ok)R.purchases.v.forEach(d=>{const p=d.data();if(p.courseId)ids.set(String(p.courseId),{paid:true,bought:toMs(p.createdAt)})});
+  Object.keys(prog).forEach(id=>{if(!ids.has(id))ids.set(id,{})});   // free courses: enrolled = has progress
+  const catalog=new Map();
+  if(R.catalog.ok)R.catalog.v.forEach(d=>catalog.set(d.id,d.data()));
+  const fetched=await Promise.all([...ids.keys()].map(async id=>{
+    if(catalog.has(id))return[id,catalog.get(id)];
+    try{const s=await db.collection('courses').doc(id).get();return[id,s.exists?s.data():null]}catch(e){return[id,null]}
+  }));
+  const list=[];
+  fetched.forEach(([id,c])=>{
+    if(!c)return;                                   // deleted / unreadable course
+    const e=prog[id],meta=ids.get(id),tot=totalsOf(c),total=tot.lessons+tot.lectures;
+    const done=e?Math.min(e.doneLessons.size,tot.lessons)+Math.min(e.lectures.size,tot.lectures):0;
+    const pct=total?Math.min(100,Math.round(done/total*100)):0;
+    const r=resumeFor(id,c,e);
+    const unit=tot.lessons&&!tot.lectures?'lessons':tot.lectures&&!tot.lessons?'lectures':'items';
+    list.push({id,kind:'course',title:c.title||'Untitled course',thumb:safeUrl(c.thumbnailURL),paid:!!meta.paid||!!c.isPaid||num(c.price)>0,
+      total,done,pct,unit,state:total&&pct>=100?'done':(done>0||(e&&e.lastMs)?'prog':'new'),
+      lastMs:e?e.lastMs:0,bought:meta.bought||0,href:r.href,detail:r.detail,where:r.where,label:r.label,
+      subtitle:total?`${done}/${total} ${unit}`:''});
+  });
+  if(R.main.ok)R.main.v.forEach(d=>{          // legacy enrolment list
+    if(ids.has(d.id))return;
+    const c=d.data();
+    list.push({id:d.id,kind:'main',title:c.title||'Untitled course',thumb:safeUrl((c.thumbnails&&c.thumbnails[0]&&c.thumbnails[0].url)||c.thumbnailURL),
+      paid:num(c.price)>0,total:0,done:0,pct:0,unit:'',state:'new',lastMs:0,bought:0,href:'course-dashboard.html?id='+enc(d.id),detail:'course-dashboard.html?id='+enc(d.id),
+      where:'',label:'Open course',subtitle:[c.category,c.duration].filter(Boolean).join(' · ')});
+  });
+  list.sort((a,b)=>(b.lastMs-a.lastMs)||(b.bought-a.bought)||a.title.localeCompare(b.title));
+  COURSES=list;
+  $('#sCourses').textContent=list.length;
+  if(!R.progress.ok&&!R.purchases.ok&&!R.main.ok){errorBlock(grid,'Couldn’t load your courses.');paintContinue();paintRecs(R);return}
+  paintContinue();paintCoursesList();paintRecs(R);
+}
+function thumbHtml(c,cls){
+  const ph=`<div class="${cls} ph">${esc(initials(c.title))}</div>`;
+  return c.thumb?`<img class="${cls}" src="${esc(c.thumb)}" alt="" loading="lazy" data-ph="${esc(initials(c.title))}" data-phcls="${cls} ph">`:ph;
+}
+function paintContinue(){
+  const slot=$('#continueSlot');
+  const open=COURSES.find(c=>c.state!=='done');
+  if(!COURSES.length){
+    slot.innerHTML=`<div class="d-cont empty"><div class="d-cont-body"><div class="d-eyebrow">Start learning</div><div class="d-cont-title">Your first course is one click away</div><div class="d-cont-sub">Pick a course and your progress, streaks and XP will show up right here.</div><div class="d-cont-actions"><a class="d-btn" href="courses.html">Browse courses</a><a class="d-btn ghost" href="community.html">Join the community</a></div></div></div>`;
+    return;
+  }
+  if(!open){
+    slot.innerHTML=`<div class="d-cont empty"><div class="d-cont-body"><div class="d-eyebrow">All caught up</div><div class="d-cont-title">You’ve finished every course 🎉</div><div class="d-cont-sub">Great work. Find your next challenge or revisit a favourite.</div><div class="d-cont-actions"><a class="d-btn" href="courses.html">Find a new course</a></div></div></div>`;
+    return;
+  }
+  const c=open,sub=c.where||(c.lastMs?`Last studied ${timeAgo(c.lastMs)}`:'Ready when you are');
+  const meta=c.kind==='course'&&c.total?`<div><div class="d-bar" role="progressbar" aria-valuenow="${c.pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:0" data-w="${c.pct}%"></i></div><div class="d-bar-meta"><span><b>${c.pct}%</b> complete</span><span>${c.done}/${c.total} ${esc(c.unit)}${c.lastMs&&c.where?' · '+esc(timeAgo(c.lastMs)):''}</span></div></div>`:'';
+  slot.innerHTML=`<div class="d-cont"><div class="d-cont-thumb">${c.thumb?`<img src="${esc(c.thumb)}" alt="" data-ph="${esc(initials(c.title))}" data-phcls="" data-hero="1">`:esc(initials(c.title))}</div><div class="d-cont-body"><div class="d-eyebrow">Continue learning</div><div class="d-cont-title">${esc(c.title)}</div><div class="d-cont-sub">${esc(sub)}</div>${meta}<div class="d-cont-actions"><a class="d-btn" href="${esc(c.href)}">${esc(c.label)} <svg fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>${c.href!==c.detail?`<a class="d-btn ghost" href="${esc(c.detail)}">Course page</a>`:''}</div></div></div>`;
+  setTimeout(()=>$$('.d-bar>i[data-w]').forEach(i=>{i.style.width=i.dataset.w}),300);
+}
+function paintCoursesList(){
+  const grid=$('#coursesGrid'),pills=$('#coursePills'),more=$('#coursesMore');
+  const n={all:COURSES.length,prog:0,done:0};COURSES.forEach(c=>{if(c.state==='done')n.done++;else if(c.state==='prog')n.prog++});
+  pills.innerHTML=COURSES.length>1?[['all','All'],['prog','In progress'],['done','Completed']].map(([k,l])=>`<button type="button" class="d-pill${FILTER===k?' on':''}" data-act="filter" data-f="${k}">${l}<i>${n[k]}</i></button>`).join(''):'';
+  if(!COURSES.length){
+    grid.innerHTML='<div class="d-empty"><p>No enrolled courses yet.</p><a href="courses.html" class="course-cta">Browse Courses</a></div>';more.hidden=true;return;
+  }
+  const list=COURSES.filter(c=>FILTER==='all'||c.state===FILTER);
+  if(!list.length){grid.innerHTML=`<div class="d-empty"><p>Nothing here yet.</p></div>`;more.hidden=true;return}
+  const shown=SHOW_ALL?list:list.slice(0,5);
+  grid.innerHTML=shown.map(c=>{
+    const chip=c.state==='done'?'<span class="d-chip done">Completed</span>':c.state==='prog'?'<span class="d-chip prog">In progress</span>':c.kind==='main'?`<span class="d-chip ${c.paid?'paid':'free'}">${c.paid?'Paid':'Free'}</span>`:'<span class="d-chip new">Not started</span>';
+    const bar=c.kind==='course'&&c.total?`<div class="course-prog-track"><div class="course-prog-fill" style="width:${c.pct}%"></div></div><div class="course-meta"><span class="course-pct">${c.pct}% complete</span><span class="course-lessons">${c.done}/${c.total} ${esc(c.unit)}</span></div>`:'';
+    const sub=c.kind==='main'&&c.subtitle?`<div class="course-sub">${esc(c.subtitle)}</div>`:'';
+    return`<a class="course-row" href="${esc(c.href)}">${thumbHtml(c,'course-thumb')}<div class="course-info"><div class="course-title">${esc(c.title)}</div>${sub}${bar}</div><div class="course-side">${chip}</div></a>`;
+  }).join('');
+  if(list.length>5){more.hidden=false;more.textContent=SHOW_ALL?'Show fewer':`Show all ${list.length} courses`}else more.hidden=true;
+}
+function paintRecs(R){
+  const blk=$('#discoverBlock'),host=$('#recs');
+  if(!R.catalog.ok){blk.style.display='none';return}
+  const mine=new Set(COURSES.map(c=>c.id));
+  const recs=R.catalog.v.docs.filter(d=>!mine.has(d.id)).map(d=>({id:d.id,...d.data()})).filter(c=>c.title&&(c.visibility===undefined||c.visibility==='public')).slice(0,3);   // never recommend hidden / enrolled-only courses
+  if(!recs.length){blk.style.display='none';return}
+  blk.style.display='';
+  host.innerHTML=recs.map(c=>{
+    const paid=!!c.isPaid||num(c.price)>0,t=safeUrl(c.thumbnailURL);
+    return`<a class="d-rec" href="course-detail.html?id=${enc(c.id)}"><div class="d-rec-t">${t?`<img src="${esc(t)}" alt="" loading="lazy" data-ph="${esc(initials(c.title))}" data-phcls="" data-hero="1">`:esc(initials(c.title))}</div><div class="d-rec-b"><div class="d-rec-n">${esc(c.title)}</div><div class="d-rec-f"><span class="d-chip ${paid?'paid':'free'}">${paid?(c.price?'₹'+esc(c.price):'Paid'):'Free'}</span><span>${esc(c.duration||'')}</span></div></div></a>`;
+  }).join('');
+}
 
-  // ── DISCORD STATS (from external API via user param if present) ──
-  const params = new URLSearchParams(location.search);
-  const discordUser = params.get('user');
-  if(discordUser){
-    try{
-      const du = JSON.parse(decodeURIComponent(discordUser));
-      const res = await fetch(`${DISCORD_API}?userId=${du.id}`);
-      const profile = await res.json();
-      if(profile && !profile.error){
-        document.getElementById('discordBlock').style.display='block';
-        const dg = document.getElementById('discordGrid');
-        const dc = [
-          {n:profile.level??0,l:'Level'},
-          {n:profile.messagesSent??0,l:'Messages'},
-          {n:profile.vcStreak??0,l:'VC Streak'},
-          {n:profile.todoTasksCompleted??0,l:'Tasks Done'},
-          {n:profile.prarambhDay??0,l:'Prarambh Day',extra:true},
-          {n:profile.prarambhVersion??'—',l:'Prarambh Ver',extra:true},
-        ];
-        dg.innerHTML='';
-        dc.forEach(({n,l,extra})=>{
-          const div=document.createElement('div');
-          div.className='dc-stat'+(extra?' dc-prarambh':'');
-          div.innerHTML=`<div class="dc-n">${n}</div><div class="dc-l">${l}</div>`;
-          dg.appendChild(div);
-        });
-        // VC time bars
-        const xp = profile.xp||{};
-        const vb = document.getElementById('vcBars');
-        const vcItems=[
-          {l:'Daily',v:xp.daily??0,max:100},
-          {l:'Weekly',v:xp.weekly??0,max:1000},
-          {l:'Monthly',v:xp.monthly??0,max:1500},
-          {l:'Yearly',v:xp.yearly??0,max:5000},
-          {l:'Total',v:xp.total??0,max:9000},
-        ];
-        vb.innerHTML='';
-        vcItems.forEach(({l,v,max})=>{
-          const pct=Math.min(Math.round(v/max*100),100);
-          const row=document.createElement('div'); row.className='vc-row';
-          row.innerHTML=`<span class="vc-label">${l}</span><div class="vc-track"><div class="vc-fill" style="width:0%" data-pct="${pct}%"></div></div><span class="vc-val">${v}</span>`;
-          vb.appendChild(row);
-        });
-        setTimeout(()=>{
-          document.querySelectorAll('.vc-fill').forEach(el=>{el.style.width=el.dataset.pct});
-        },400);
-      }
-    }catch(e){console.warn('Discord stats failed:',e)}
+/* ── study tools ── */
+function paintTools(){
+  $('#toolsGrid').innerHTML=TOOLS.map(t=>`<a class="d-tool" href="${esc(t.h)}"><span class="d-tool-e">${t.e}</span><div><div class="d-tool-n">${esc(t.n)}</div><div class="d-tool-s">${esc(t.s)}</div></div></a>`).join('');
+}
+
+/* ── discord (remembered after the first visit with ?user=) ── */
+function captureDiscordParam(){
+  const raw=new URLSearchParams(location.search).get('user');
+  if(!raw)return;
+  try{
+    const du=JSON.parse(decodeURIComponent(raw));
+    if(du&&du.id)lsSet(DISCORD_KEY,{id:String(du.id),username:String(du.username||'')});
+  }catch(e){console.warn('Bad Discord param',e)}
+  try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
+}
+async function paintDiscord(){
+  const blk=$('#discordBlock');
+  const saved=lsGet(DISCORD_KEY);
+  const id=saved&&saved.id;
+  if(!id){blk.style.display='none';return}
+  try{
+    const ctl=typeof AbortController!=='undefined'?new AbortController():null;
+    const timer=ctl?setTimeout(()=>ctl.abort(),8000):null;
+    const res=await fetch(`${DISCORD_API}?userId=${enc(id)}`,ctl?{signal:ctl.signal}:{});
+    if(timer)clearTimeout(timer);
+    const profile=await res.json();
+    if(!profile||profile.error){blk.style.display='none';return}
+    blk.style.display='block';
+    const cards=[
+      {n:profile.level??0,l:'Level'},{n:profile.messagesSent??0,l:'Messages'},{n:profile.vcStreak??0,l:'VC Streak'},{n:profile.todoTasksCompleted??0,l:'Tasks Done'},
+      {n:profile.prarambhDay??0,l:'Prarambh Day',x:1},{n:profile.prarambhVersion??'—',l:'Prarambh Ver',x:1}
+    ];
+    $('#discordGrid').innerHTML=cards.map(c=>`<div class="dc-stat${c.x?' dc-prarambh':''}"><div class="dc-n">${esc(c.n)}</div><div class="dc-l">${esc(c.l)}</div></div>`).join('');
+    const xp=profile.xp||{};
+    const items=[['Daily',xp.daily,100],['Weekly',xp.weekly,1000],['Monthly',xp.monthly,1500],['Yearly',xp.yearly,5000],['Total',xp.total,9000]];
+    $('#vcBars').innerHTML=items.map(([l,v,max])=>{const val=num(v);return`<div class="vc-row"><span class="vc-label">${l}</span><div class="vc-track"><div class="vc-fill" style="width:0%" data-pct="${Math.min(100,Math.round(val/max*100))}%"></div></div><span class="vc-val">${esc(val)}</span></div>`}).join('');
+    const who=$('#discordWho');if(who)who.textContent=saved.username?'Linked as '+saved.username:'Your activity on the server';
+    setTimeout(()=>$$('.vc-fill').forEach(el=>{el.style.width=el.dataset.pct}),400);
+  }catch(e){console.warn('Discord stats failed:',e);blk.style.display='none'}
+}
+
+/* ── events ── */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  switch(el.dataset.act){
+    case'retry':load();break;
+    case'refresh':load();break;
+    case'filter':FILTER=el.dataset.f;SHOW_ALL=false;paintCoursesList();break;
+    case'more':SHOW_ALL=!SHOW_ALL;paintCoursesList();break;
+    case'annx':lsSet(ANN_KEY,el.dataset.sig);$('#annSlot').innerHTML='';break;
+    case'unlink':lsDel(DISCORD_KEY);$('#discordBlock').style.display='none';break;
   }
 });
+// broken images → initials / default avatar (replaces the old inline onerror handlers)
+document.addEventListener('error',e=>{
+  const im=e.target;if(!im||im.tagName!=='IMG')return;
+  if(im.dataset.av){if(im.src!==DEF_AV){im.src=DEF_AV}return}
+  if(im.dataset.ph!==undefined){
+    const d=document.createElement('div');
+    if(im.dataset.hero){d.textContent=im.dataset.ph;im.replaceWith(d);return}
+    d.className=im.dataset.phcls||'course-thumb ph';d.textContent=im.dataset.ph;im.replaceWith(d);
+  }
+},true);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ME&&Date.now()-lastLoad>180000)load()});
+})();
 </script>
 <script>
 /* mobile menu: builds the dropdown from the nav links so they only exist once */
